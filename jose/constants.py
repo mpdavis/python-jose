@@ -1,0 +1,17 @@
+
+
+class ALGORITHMS(object):
+    NONE = 'none'
+    HS256 = 'HS256'
+    HS384 = 'HS384'
+    HS512 = 'HS512'
+    RS256 = 'RS256'
+    RS384 = 'RS384'
+    RS512 = 'RS512'
+
+    HMAC = (HS256, HS384, HS512)
+    RSA = (RS256, RS384, RS512)
+
+    SUPPORTED = (NONE, HS256, HS384, HS512)
+
+    ALL = (NONE, HS256, HS384, HS512, RS256, RS384, RS512)

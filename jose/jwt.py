@@ -1,8 +1,8 @@
 
 
-def encode(claims, jwk, algorithm=None):
+def encode(claims, key, algorithm=None):
     pass
 
 
-def decode(token, jwk, algorithms=None, options=None):
+def decode(token, key, algorithms=None, options=None):
     pass
