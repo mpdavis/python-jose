@@ -1,10 +1,15 @@
 
+import binascii
 import json
+import six
+
+from collections import Mapping
 
 from .algorithms import get_algorithm_object
 from .constants import ALGORITHMS
 from .utils import base64url_encode
 from .utils import base64url_decode
+from .utils import merge_dict
 
 
 def sign(claims, key, headers=None, algorithm=ALGORITHMS.HS256):
@@ -42,7 +47,7 @@ def sign(claims, key, headers=None, algorithm=ALGORITHMS.HS256):
     return signed_output
 
 
-def verify(payload, key, algorithms):
+def verify(jwt, key, algorithms):
     """Verifies a JWS string's signature.
 
     Examples:
@@ -63,7 +68,11 @@ def verify(payload, key, algorithms):
 
     """
 
-    pass
+    payload, signing_input, header, signature = _load(jwt)
+
+    _verify_signature(payload, signing_input, header, signature, key, algorithms)
+
+    return payload
 
 
 def _encode_header(algorithm, additional_headers=None):
@@ -104,3 +113,60 @@ def _sign_header_and_claims(encoded_header, encoded_claims, algorithm, key):
     encoded_signature = base64url_encode(signature)
 
     return b'.'.join([encoded_header, encoded_claims, encoded_signature])
+
+
+def _load(jwt):
+    if isinstance(jwt, six.text_type):
+        jwt = jwt.encode('utf-8')
+    try:
+        signing_input, crypto_segment = jwt.rsplit(b'.', 1)
+        header_segment, payload_segment = signing_input.split(b'.', 1)
+    except ValueError:
+        raise Exception('Not enough segments')
+
+    try:
+        header_data = base64url_decode(header_segment)
+    except (TypeError, binascii.Error):
+        raise Exception('Invalid header padding')
+    try:
+        header = json.loads(header_data.decode('utf-8'))
+    except ValueError as e:
+        raise Exception('Invalid header string: %s' % e)
+    if not isinstance(header, Mapping):
+        raise Exception('Invalid header string: must be a json object')
+
+    try:
+        payload_data = base64url_decode(payload_segment)
+    except (TypeError, binascii.Error):
+        raise Exception('Invalid payload padding')
+    try:
+        payload = json.loads(payload_data.decode('utf-8'))
+    except ValueError as e:
+        raise Exception('Invalid payload string: %s' % e)
+    if not isinstance(payload, Mapping):
+        raise Exception('Invalid payload string: must be a json object')
+
+    try:
+        signature = base64url_decode(crypto_segment)
+    except (TypeError, binascii.Error):
+        raise Exception('Invalid crypto padding')
+
+    return (payload, signing_input, header, signature)
+
+
+def _verify_signature(payload, signing_input, header, signature, key='', algorithms=None):
+
+        alg = header['alg']
+
+        if algorithms is not None and alg not in algorithms:
+            raise Exception('The specified alg value is not allowed')
+
+        try:
+            alg_obj = get_algorithm_object(alg)
+            key = alg_obj.prepare_key(key)
+
+            if not alg_obj.verify(signing_input, key, signature):
+                raise Exception('Signature verification failed')
+
+        except KeyError:
+            raise Exception('Algorithm not supported')
