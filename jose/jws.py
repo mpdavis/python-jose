@@ -9,7 +9,6 @@ from .algorithms import get_algorithm_object
 from .constants import ALGORITHMS
 from .utils import base64url_encode
 from .utils import base64url_decode
-from .utils import merge_dict
 
 
 def sign(claims, key, headers=None, algorithm=ALGORITHMS.HS256):
@@ -68,11 +67,11 @@ def verify(jwt, key, algorithms):
 
     """
 
-    payload, signing_input, header, signature = _load(jwt)
+    header, claims, signing_input, signature = _load(jwt)
 
-    _verify_signature(payload, signing_input, header, signature, key, algorithms)
+    _verify_signature(claims, signing_input, header, signature, key, algorithms)
 
-    return payload
+    return claims
 
 
 def _encode_header(algorithm, additional_headers=None):
@@ -120,7 +119,7 @@ def _load(jwt):
         jwt = jwt.encode('utf-8')
     try:
         signing_input, crypto_segment = jwt.rsplit(b'.', 1)
-        header_segment, payload_segment = signing_input.split(b'.', 1)
+        header_segment, claims_segment = signing_input.split(b'.', 1)
     except ValueError:
         raise Exception('Not enough segments')
 
@@ -136,14 +135,14 @@ def _load(jwt):
         raise Exception('Invalid header string: must be a json object')
 
     try:
-        payload_data = base64url_decode(payload_segment)
+        claims_data = base64url_decode(claims_segment)
     except (TypeError, binascii.Error):
         raise Exception('Invalid payload padding')
     try:
-        payload = json.loads(payload_data.decode('utf-8'))
+        claims = json.loads(claims_data.decode('utf-8'))
     except ValueError as e:
         raise Exception('Invalid payload string: %s' % e)
-    if not isinstance(payload, Mapping):
+    if not isinstance(claims, Mapping):
         raise Exception('Invalid payload string: must be a json object')
 
     try:
@@ -151,7 +150,7 @@ def _load(jwt):
     except (TypeError, binascii.Error):
         raise Exception('Invalid crypto padding')
 
-    return (payload, signing_input, header, signature)
+    return (header, claims, signing_input, signature)
 
 
 def _verify_signature(payload, signing_input, header, signature, key='', algorithms=None):

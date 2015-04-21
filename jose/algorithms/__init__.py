@@ -2,6 +2,7 @@
 from jose.constants import ALGORITHMS
 
 from .HMAC import HMACAlgorithm
+from .RSA import RSAAlgorithm
 
 
 def get_algorithm_object(algorithm):
@@ -19,5 +20,14 @@ def get_algorithm_object(algorithm):
 
     if algorithm == ALGORITHMS.HS512:
         return HMACAlgorithm(HMACAlgorithm.SHA512)
+
+    if algorithm == ALGORITHMS.RS256:
+        return RSAAlgorithm(RSAAlgorithm.SHA256)
+
+    if algorithm == ALGORITHMS.RS384:
+        return RSAAlgorithm(RSAAlgorithm.SHA384)
+
+    if algorithm == ALGORITHMS.RS512:
+        return RSAAlgorithm(RSAAlgorithm.SHA512)
 
     raise Exception('No algorithm found for %s.' % algorithm)
