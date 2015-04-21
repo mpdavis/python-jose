@@ -46,7 +46,7 @@ def sign(claims, key, headers=None, algorithm=ALGORITHMS.HS256):
     return signed_output
 
 
-def verify(jwt, key, algorithms):
+def verify(token, key, algorithms):
     """Verifies a JWS string's signature.
 
     Examples:
@@ -55,7 +55,7 @@ def verify(jwt, key, algorithms):
         >>> jws.verify(payload, 'secret', algorithms='HS256')
 
     Args:
-        payload (str): A signed JWS to be verified.
+        token (str): A signed JWS to be verified.
         key (str): A key to attempt to verify the payload with.
         algorithms (str or list): Valid algorithms that should be used to verify the JWS.
 
@@ -67,7 +67,7 @@ def verify(jwt, key, algorithms):
 
     """
 
-    header, claims, signing_input, signature = _load(jwt)
+    header, claims, signing_input, signature = _load(token)
 
     _verify_signature(claims, signing_input, header, signature, key, algorithms)
 
