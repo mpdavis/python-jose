@@ -7,3 +7,4 @@
 * Refactor JWT claims verifcation
 * Audit JWT claims tests and rectify against the spec
 * Add HTML documentation
+* Add tox runner for testing against multiple versions of python
