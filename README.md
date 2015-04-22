@@ -8,6 +8,21 @@ A JOSE implementation in Python
 
 This is a JOSE implementation that is meant to be simple to use, both on and off of AppEngine.
 
+## Examples
+
+
+
+```python
+>>> from jose import jws
+>>> signed = jws.sign({'a': 'b'}, 'secret', algorithm='HS256')
+'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+```
+
+```python
+>>> jws.verify(signed, 'secret', algorithms=['HS256'])
+{'a': 'b'}
+```
+
 ## Algorithms
 
 The following algorithms are currently supported.
