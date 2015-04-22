@@ -2,7 +2,7 @@
 
 A JOSE implementation in Python
 
-[![Build Status](https://travis-ci.org/mpdavis/jose.svg?branch=master)](https://travis-ci.org/mpdavis/jose) [![Coverage Status](https://coveralls.io/repos/mpdavis/jose/badge.svg)](https://coveralls.io/r/mpdavis/jose)
+[![Build Status](https://travis-ci.org/mpdavis/python-jose.svg?branch=master)](https://travis-ci.org/mpdavis/python-jose) [![Coverage Status](https://coveralls.io/repos/mpdavis/jose/badge.svg)](https://coveralls.io/r/mpdavis/jose)
 
 ## Principles
 
