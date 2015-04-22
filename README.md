@@ -10,13 +10,15 @@ This is a JOSE implementation that is meant to be simple to use, both on and off
 
 ## Examples
 
-
+#### Signing tokens
 
 ```python
 >>> from jose import jws
 >>> signed = jws.sign({'a': 'b'}, 'secret', algorithm='HS256')
 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
 ```
+
+#### Verifying token signatures
 
 ```python
 >>> jws.verify(signed, 'secret', algorithms=['HS256'])
