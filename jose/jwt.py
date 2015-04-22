@@ -40,12 +40,12 @@ def encode(claims, key, algorithm=None):
 
         # Convert datetime to a intDate value in known time-format claims
         if isinstance(claims.get(time_claim), datetime):
-            claims[time_claim] = claims(claims[time_claim].utctimetuple())
+            claims[time_claim] = timegm(claims[time_claim].utctimetuple())
 
     return jws.sign(claims, key)
 
 
-def decode(token, key, algorithms=None, options=None):
+def decode(token, key, algorithms=None, options=None, audience=None, issuer=None):
     """Verifies a JWT string's signature and validates reserved claims.
 
     Examples:
@@ -57,6 +57,12 @@ def decode(token, key, algorithms=None, options=None):
         token (str): A signed JWS to be verified.
         key (str): A key to attempt to verify the payload with.
         algorithms (str or list): Valid algorithms that should be used to verify the JWS.
+        audience (str): The intended audience of the token.  If the "aud" claim is
+            included in the claim set, then the audience must be included and must equal
+            the provided claim.
+        issuer (str): The issuer of the token.  If the "iss" claim is
+            included in the claim set, then the issuer must be included and must equal
+            the provided claim.
         options (dict): A dictionary of options for skipping validation steps.
 
             default = {
@@ -77,16 +83,30 @@ def decode(token, key, algorithms=None, options=None):
 
     """
 
+    defaults = {
+        'verify_signature': True,
+        'verify_aud': True,
+        'verify_iat': True,
+        'verify_exp': True,
+        'verify_nbf': True,
+        'leeway': 0,
+    }
+
+    if options:
+        defaults.update(options)
+
     # TODO: skip verification for verify_signature == False
     token_info = jws.verify(token, key, algorithms)
 
-    _validate_claims(token_info, options=options)
+    _validate_claims(token_info, audience=audience, issuer=issuer, options=defaults)
 
     return token_info
 
 
-def _validate_claims(payload, audience=None, issuer=None, leeway=0,
-                     options=None, **kwargs):
+def _validate_claims(payload, audience=None, issuer=None, options=None):
+
+    leeway = options.get('leeway', 0)
+
     if isinstance(leeway, timedelta):
         leeway = timedelta_total_seconds(leeway)
 

@@ -6,6 +6,36 @@ from jose.constants import ALGORITHMS
 import unittest
 
 
+class JWSTest(unittest.TestCase):
+
+    def setUp(self):
+        self.key = 'secret'
+
+    def test_unicode_token(self):
+        token = u'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+        jws.verify(token, 'secret', ['HS256'])
+
+    def test_not_enough_segments(self):
+        token = 'eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+        self.assertRaises(Exception, jws.verify, token, self.key, ['HS256'])
+
+    def test_header_invalid_padding(self):
+        token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9A.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+        self.assertRaises(Exception, jws.verify, token, self.key, ['HS256'])
+
+    def test_header_not_json(self):
+        token = 'dGVzdA.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+        self.assertRaises(Exception, jws.verify, token, self.key, ['HS256'])
+
+    def test_claims_invalid_padding(self):
+        token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.AeyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+        self.assertRaises(Exception, jws.verify, token, self.key, ['HS256'])
+
+    def test_claims_not_json(self):
+        token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dGVzdA.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+        self.assertRaises(Exception, jws.verify, token, self.key, ['HS256'])
+
+
 class HMACTestCase(unittest.TestCase):
 
     def setUp(self):
@@ -33,6 +63,25 @@ class HMACTestCase(unittest.TestCase):
     def test_wrong_key(self):
         signed = jws.sign(self.claims, self.key, algorithm=ALGORITHMS.HS256)
         self.assertRaises(Exception, jws.verify, signed, 'wrong_key', ALGORITHMS.HS256)
+
+    def test_unsupported_alg(self):
+        self.assertRaises(Exception, jws.sign, self.claims, self.key, algorithm='SOMETHING')
+
+    def test_add_headers(self):
+
+        additional_headers = {
+            'test': 'header'
+        }
+
+        expected_headers = {
+            'test': 'header',
+            'alg': 'HS256',
+            'typ': 'JWT',
+        }
+
+        signed = jws.sign(self.claims, self.key, headers=additional_headers)
+        header, claims, signing_input, signature = jws._load(signed)
+        self.assertEqual(expected_headers, header)
 
 
 class RSATestCase(unittest.TestCase):
