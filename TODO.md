@@ -8,3 +8,4 @@
 * Audit JWT claims tests and rectify against the spec
 * Add HTML documentation
 * Add tox runner for testing against multiple versions of python
+* Add actual exceptions instead of using the base exception
