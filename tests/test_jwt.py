@@ -31,14 +31,6 @@ class JWTTestCase(unittest.TestCase):
         token = jwt.encode(self.claims, self.key)
         self.assertRaises(Exception, jwt.decode, token, self.key, ['HS256'])
 
-    def test_iat_in_future(self):
-        self.claims = {
-            'a': 'b',
-            'iat': datetime.utcnow() + timedelta(days=1)
-        }
-        token = jwt.encode(self.claims, self.key)
-        self.assertRaises(Exception, jwt.decode, token, self.key, ['HS256'])
-
     def test_iat_skip_validation(self):
         self.claims = {
             'a': 'b',
@@ -126,6 +118,14 @@ class JWTTestCase(unittest.TestCase):
         }
         token = jwt.encode(self.claims, self.key)
         self.assertRaises(Exception, jwt.decode, token, self.key, audience='audience', algorithms=['HS256'])
+
+    def test_aud_invalid(self):
+        self.claims = {
+            'a': 'b',
+            'aud': 'audience',
+        }
+        token = jwt.encode(self.claims, self.key)
+        self.assertRaises(Exception, jwt.decode, token, self.key, audience='another', algorithms=['HS256'])
 
     def test_issuer_invalid(self):
         self.claims = {
