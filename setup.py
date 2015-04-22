@@ -41,5 +41,9 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
         'Topic :: Utilities',
+    ],
+    install_requires=[
+        'pycrypto==2.6.1',
+        'six==1.9.0',
     ]
 )

@@ -147,7 +147,6 @@ def _load(jwt):
 
     try:
         signature = base64url_decode(crypto_segment)
-        print signature
     except (TypeError, binascii.Error):
         raise Exception('Invalid crypto padding')
 
