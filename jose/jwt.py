@@ -82,6 +82,8 @@ def decode(token, key, algorithms=None, options=None):
 
     _validate_claims(token_info, options=options)
 
+    return token_info
+
 
 def _validate_claims(payload, audience=None, issuer=None, leeway=0,
                      options=None, **kwargs):
