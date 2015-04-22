@@ -30,7 +30,7 @@ setup(
     description='JOSE implementation in Python',
     license='MIT',
     keywords='jose jws jwe jwt json web token security signing',
-    url='http://github.com/mpdavis/jose',
+    url='http://github.com/mpdavis/python-jose',
     packages=get_packages('jose'),
     long_description=long_description,
     classifiers=[
