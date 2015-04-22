@@ -1,4 +1,4 @@
-# jose
+# python-jose
 
 A JOSE implementation in Python
 
