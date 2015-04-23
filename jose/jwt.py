@@ -207,8 +207,8 @@ def _validate_aud(claims, audience=None):
     """
 
     if 'aud' not in claims:
-        if audience:
-            raise JWTError('Audience claim expected, but not in claims')
+        # if audience:
+        #     raise JWTError('Audience claim expected, but not in claims')
         return
 
     audience_claims = claims['aud']
