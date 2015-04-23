@@ -7,6 +7,7 @@ from collections import Mapping
 
 from .algorithms import get_algorithm_object
 from .constants import ALGORITHMS
+from .exceptions import JWSError
 from .utils import base64url_encode
 from .utils import base64url_decode
 
@@ -32,12 +33,12 @@ def sign(claims, key, headers=None, algorithm=ALGORITHMS.HS256):
         str: The string representation of the header, claims, and signature.
 
     Raises:
-        Exception: If there is an error signing the claims.
+        JWSError: If there is an error signing the token.
 
     """
 
     if algorithm not in ALGORITHMS.SUPPORTED:
-        raise Exception('Algorithm %s not supported.' % algorithm)
+        raise JWSError('Algorithm %s not supported.' % algorithm)
 
     encoded_header = _encode_header(algorithm, additional_headers=headers)
     encoded_claims = _encode_claims(claims)
@@ -63,7 +64,7 @@ def verify(token, key, algorithms):
         dict: The dict representation of the claims set, assuming the signature is valid.
 
     Raises:
-        Exception: If the signature is invalid in any way.
+        JWSError: If there is an exception verifying a token.
 
     """
 
@@ -107,7 +108,7 @@ def _sign_header_and_claims(encoded_header, encoded_claims, algorithm, key):
         key = alg_obj.prepare_key(key)
         signature = alg_obj.sign(signing_input, key)
     except:
-        raise Exception('Unable to sign header and claims.')
+        raise JWSError('Unable to sign header and claims.')
 
     encoded_signature = base64url_encode(signature)
 
@@ -121,34 +122,34 @@ def _load(jwt):
         signing_input, crypto_segment = jwt.rsplit(b'.', 1)
         header_segment, claims_segment = signing_input.split(b'.', 1)
     except ValueError:
-        raise Exception('Not enough segments')
+        raise JWSError('Not enough segments')
 
     try:
         header_data = base64url_decode(header_segment)
     except (TypeError, binascii.Error):
-        raise Exception('Invalid header padding')
+        raise JWSError('Invalid header padding')
     try:
         header = json.loads(header_data.decode('utf-8'))
     except ValueError as e:
-        raise Exception('Invalid header string: %s' % e)
+        raise JWSError('Invalid header string: %s' % e)
     if not isinstance(header, Mapping):
-        raise Exception('Invalid header string: must be a json object')
+        raise JWSError('Invalid header string: must be a json object')
 
     try:
         claims_data = base64url_decode(claims_segment)
     except (TypeError, binascii.Error):
-        raise Exception('Invalid payload padding')
+        raise JWSError('Invalid payload padding')
     try:
         claims = json.loads(claims_data.decode('utf-8'))
     except ValueError as e:
-        raise Exception('Invalid payload string: %s' % e)
+        raise JWSError('Invalid payload string: %s' % e)
     if not isinstance(claims, Mapping):
-        raise Exception('Invalid payload string: must be a json object')
+        raise JWSError('Invalid payload string: must be a json object')
 
     try:
         signature = base64url_decode(crypto_segment)
     except (TypeError, binascii.Error):
-        raise Exception('Invalid crypto padding')
+        raise JWSError('Invalid crypto padding')
 
     return (header, claims, signing_input, signature)
 
@@ -158,14 +159,14 @@ def _verify_signature(payload, signing_input, header, signature, key='', algorit
         alg = header['alg']
 
         if algorithms is not None and alg not in algorithms:
-            raise Exception('The specified alg value is not allowed')
+            raise JWSError('The specified alg value is not allowed')
 
         try:
             alg_obj = get_algorithm_object(alg)
             key = alg_obj.prepare_key(key)
 
             if not alg_obj.verify(signing_input, key, signature):
-                raise Exception('Signature verification failed')
+                raise JWSError('Signature verification failed')
 
         except KeyError:
-            raise Exception('Algorithm not supported')
+            raise JWSError('Algorithm not supported')

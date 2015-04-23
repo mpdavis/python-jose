@@ -6,6 +6,7 @@ from six import string_types
 
 from jose import jws
 
+from .exceptions import JWTError
 from .utils import timedelta_total_seconds
 
 
@@ -32,7 +33,7 @@ def encode(claims, key, algorithm=None):
         str: The string representation of the header, claims, and signature.
 
     Raises:
-        Exception: If there is an error encoding the claims.
+        JWTError: If there is an error encoding the claims.
 
     """
 
@@ -79,7 +80,7 @@ def decode(token, key, algorithms=None, options=None, audience=None, issuer=None
             and all requested data validation passes.
 
     Raises:
-        Exception: If the signature is invalid in any way.
+        JWTError: If the signature is invalid in any way.
 
     """
 
@@ -122,7 +123,7 @@ def _validate_iat(claims):
     try:
         int(claims['iat'])
     except ValueError:
-        raise Exception('Issued At claim (iat) must be an integer.')
+        raise JWTError('Issued At claim (iat) must be an integer.')
 
 
 def _validate_nbf(claims, leeway=0):
@@ -147,12 +148,12 @@ def _validate_nbf(claims, leeway=0):
     try:
         nbf = int(claims['nbf'])
     except ValueError:
-        raise Exception('Not Before claim (nbf) must be an integer.')
+        raise JWTError('Not Before claim (nbf) must be an integer.')
 
     now = timegm(datetime.utcnow().utctimetuple())
 
     if nbf > (now + leeway):
-        raise Exception('The token is not yet valid (nbf)')
+        raise JWTError('The token is not yet valid (nbf)')
 
 
 def _validate_exp(claims, leeway=0):
@@ -177,12 +178,12 @@ def _validate_exp(claims, leeway=0):
     try:
         exp = int(claims['exp'])
     except ValueError:
-        raise Exception('Expiration Time claim (exp) must be an integer.')
+        raise JWTError('Expiration Time claim (exp) must be an integer.')
 
     now = timegm(datetime.utcnow().utctimetuple())
 
     if exp < (now - leeway):
-        raise Exception('Signature has expired')
+        raise JWTError('Signature has expired')
 
 
 def _validate_aud(claims, audience=None):
@@ -207,18 +208,18 @@ def _validate_aud(claims, audience=None):
 
     if 'aud' not in claims:
         if audience:
-            raise Exception('Audience claim expected, but not in claims')
+            raise JWTError('Audience claim expected, but not in claims')
         return
 
     audience_claims = claims['aud']
     if isinstance(audience_claims, string_types):
         audience_claims = [audience_claims]
     if not isinstance(audience_claims, list):
-        raise Exception('Invalid claim format in token')
+        raise JWTError('Invalid claim format in token')
     if any(not isinstance(c, string_types) for c in audience_claims):
-        raise Exception('Invalid claim format in token')
+        raise JWTError('Invalid claim format in token')
     if audience not in audience_claims:
-        raise Exception('Invalid audience')
+        raise JWTError('Invalid audience')
 
 
 def _validate_iss(claims, issuer=None):
@@ -236,7 +237,7 @@ def _validate_iss(claims, issuer=None):
 
     if issuer is not None:
         if claims.get('iss') != issuer:
-            raise Exception('Invalid issuer')
+            raise JWTError('Invalid issuer')
 
 
 def _validate_claims(claims, audience=None, issuer=None, options=None):
@@ -247,7 +248,7 @@ def _validate_claims(claims, audience=None, issuer=None, options=None):
         leeway = timedelta_total_seconds(leeway)
 
     if not isinstance(audience, (string_types, type(None))):
-        raise TypeError('audience must be a string or None')
+        raise JWTError('audience must be a string or None')
 
     if options.get('verify_iat'):
         _validate_iat(claims)
