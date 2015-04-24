@@ -43,14 +43,7 @@ setup(
         'Topic :: Utilities',
     ],
     install_requires=[
-        'pycrypto >=2.6.0 <2.7.0',
-        'six >=1.9.0 <1.10.0',
-    ],
-    test_requires=[
-        'pycrypto >=2.6.0 <2.7.0',
-        'six >=1.9.0 <1.10.0',
-        'pytest >=2.7.0'
-        'pytest-cov >=1.8.0'
+        'pycrypto >=2.6.0, <2.7.0',
+        'six >=1.9.0, <1.10.0',
     ]
-
 )
