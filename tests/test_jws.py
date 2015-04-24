@@ -46,6 +46,10 @@ class TestJWS:
         with pytest.raises(JWSError):
             jws.verify(token, 'secret', ['HS256'])
 
+    def test_invalid_key(self, claims):
+        with pytest.raises(JWSError):
+            jws.sign(claims, 'secret', algorithm='RS256')
+
 
 class TestHMAC:
 
