@@ -5,7 +5,6 @@ from jose.constants import ALGORITHMS
 from jose.exceptions import JWSError
 
 import pytest
-import unittest
 
 
 @pytest.fixture
