@@ -1,19 +1,24 @@
 
 from jose.algorithms import base
 
-import unittest
+import pytest
 
 
-class BaseAlgorithmTestCase(unittest.TestCase):
+@pytest.fixture
+def alg():
+    return base.Algorithm()
 
-    def setUp(self):
-        self.alg = base.Algorithm()
 
-    def test_prepare_key_is_interface(self):
-        self.assertRaises(NotImplementedError, self.alg.prepare_key, 'secret')
+class TestBaseAlgorithm:
 
-    def test_sign_is_interface(self):
-        self.assertRaises(NotImplementedError, self.alg.sign, 'msg', 'secret')
+    def test_prepare_key_is_interface(self, alg):
+        with pytest.raises(NotImplementedError):
+            alg.prepare_key('secret')
 
-    def test_verify_is_interface(self):
-        self.assertRaises(NotImplementedError, self.alg.verify, 'msg', 'secret', 'sig')
+    def test_sign_is_interface(self, alg):
+        with pytest.raises(NotImplementedError):
+            alg.sign('msg', 'secret')
+
+    def test_verify_is_interface(self, alg):
+        with pytest.raises(NotImplementedError):
+            alg.verify('msg', 'secret', 'sig')

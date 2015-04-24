@@ -1,13 +1,16 @@
 
 from jose.algorithms import get_algorithm_object
 
-import unittest
+import pytest
 
 
-class GetAlgorithmTestCase(unittest.TestCase):
+@pytest.fixture
+def test():
+    pass
 
-    def setUp(self):
-        pass
 
-    def test_get_unsupported(self):
-        self.assertRaises(Exception, get_algorithm_object, 'SOMETHING')
+class TestGetAlgorithm:
+
+    def test_get_algorithm(self):
+        with pytest.raises(Exception):
+            get_algorithm_object('SOMETHING')

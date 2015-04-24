@@ -1,22 +1,26 @@
 
 from jose.algorithms import HMACAlgorithm
 
-import unittest
+import pytest
 
 
-class HMACAlgorithmTestCase(unittest.TestCase):
+@pytest.fixture
+def alg():
+    return HMACAlgorithm(HMACAlgorithm.SHA256)
 
-    def setUp(self):
-        self.alg = HMACAlgorithm(HMACAlgorithm.SHA256)
 
-    def test_non_string_key(self):
-        self.assertRaises(TypeError, self.alg.prepare_key, object())
+class TestHMACAlgorithm:
 
-    def test_unicode_encode(self):
+    def test_non_string_key(self, alg):
+        with pytest.raises(TypeError):
+            alg.prepare_key(object())
+
+    def test_unicode_encode(self, alg):
         key = u'secret'
-        prepared_key = self.alg.prepare_key(key)
-        self.assertEqual(key, prepared_key)
+        prepared_key = alg.prepare_key(key)
+        assert key == prepared_key
 
-    def test_RSA_key(self):
+    def test_RSA_key(self, alg):
         key = "-----BEGIN PUBLIC KEY-----"
-        self.assertRaises(Exception, self.alg.prepare_key, key)
+        with pytest.raises(Exception):
+            alg.prepare_key(key)
