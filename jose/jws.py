@@ -168,5 +168,5 @@ def _verify_signature(payload, signing_input, header, signature, key='', algorit
             if not alg_obj.verify(signing_input, key, signature):
                 raise JWSError('Signature verification failed')
 
-        except KeyError:
-            raise JWSError('Algorithm not supported')
+        except JWSError:
+            raise JWSError('Invalid or unsupported algorithm: %s' % alg)

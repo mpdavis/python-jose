@@ -1,5 +1,6 @@
 
 from jose.constants import ALGORITHMS
+from jose.exceptions import JWSError
 
 from .HMAC import HMACAlgorithm
 from .RSA import RSAAlgorithm
@@ -10,7 +11,7 @@ def get_algorithm_object(algorithm):
     Returns an algorithm object for the given algorithm.
     """
     if algorithm not in ALGORITHMS.SUPPORTED:
-        raise Exception('Algorithm not supported: %s' % algorithm)
+        raise JWSError('Algorithm not supported: %s' % algorithm)
 
     if algorithm == ALGORITHMS.HS256:
         return HMACAlgorithm(HMACAlgorithm.SHA256)
@@ -30,4 +31,4 @@ def get_algorithm_object(algorithm):
     if algorithm == ALGORITHMS.RS512:
         return RSAAlgorithm(RSAAlgorithm.SHA512)
 
-    raise Exception('No algorithm found for %s.' % algorithm)
+    raise JWSError('No algorithm found for %s.' % algorithm)

@@ -2,14 +2,21 @@
 
 from jose import jws
 from jose.constants import ALGORITHMS
+from jose.exceptions import JWSError
 
+import pytest
 import unittest
 
 
-class JWSTest(unittest.TestCase):
+@pytest.fixture
+def claims():
+    claims = {
+        'a': 'b'
+    }
+    return claims
 
-    def setUp(self):
-        self.key = 'secret'
+
+class TestJWS:
 
     def test_unicode_token(self):
         token = u'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
@@ -17,57 +24,59 @@ class JWSTest(unittest.TestCase):
 
     def test_not_enough_segments(self):
         token = 'eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
-        self.assertRaises(Exception, jws.verify, token, self.key, ['HS256'])
+        with pytest.raises(JWSError):
+            jws.verify(token, 'secret', ['HS256'])
 
     def test_header_invalid_padding(self):
         token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9A.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
-        self.assertRaises(Exception, jws.verify, token, self.key, ['HS256'])
+        with pytest.raises(JWSError):
+            jws.verify(token, 'secret', ['HS256'])
 
     def test_header_not_json(self):
         token = 'dGVzdA.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
-        self.assertRaises(Exception, jws.verify, token, self.key, ['HS256'])
+        with pytest.raises(JWSError):
+            jws.verify(token, 'secret', ['HS256'])
 
     def test_claims_invalid_padding(self):
         token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.AeyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
-        self.assertRaises(Exception, jws.verify, token, self.key, ['HS256'])
+        with pytest.raises(JWSError):
+            jws.verify(token, 'secret', ['HS256'])
 
     def test_claims_not_json(self):
         token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dGVzdA.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
-        self.assertRaises(Exception, jws.verify, token, self.key, ['HS256'])
+        with pytest.raises(JWSError):
+            jws.verify(token, 'secret', ['HS256'])
 
 
-class HMACTestCase(unittest.TestCase):
+class TestHMAC:
 
-    def setUp(self):
-        self.claims = {
-            'test': 'input'
-        }
-        self.key = 'secret'
+    def testHMAC256(self, claims):
+        token = jws.sign(claims, 'secret', algorithm=ALGORITHMS.HS256)
+        assert jws.verify(token, 'secret', ALGORITHMS.HS256) == claims
 
-    def testHMAC256(self):
-        signed = jws.sign(self.claims, self.key, algorithm=ALGORITHMS.HS256)
-        self.assertEqual(jws.verify(signed, self.key, ALGORITHMS.HS256), self.claims)
+    def testHMAC384(self, claims):
+        token = jws.sign(claims, 'secret', algorithm=ALGORITHMS.HS384)
+        assert jws.verify(token, 'secret', ALGORITHMS.HS384) == claims
 
-    def testHMAC384(self):
-        signed = jws.sign(self.claims, self.key, algorithm=ALGORITHMS.HS384)
-        self.assertEqual(jws.verify(signed, self.key, ALGORITHMS.HS384), self.claims)
+    def testHMAC512(self, claims):
+        token = jws.sign(claims, 'secret', algorithm=ALGORITHMS.HS512)
+        assert jws.verify(token, 'secret', ALGORITHMS.HS512) == claims
 
-    def testHMAC512(self):
-        signed = jws.sign(self.claims, self.key, algorithm=ALGORITHMS.HS512)
-        self.assertEqual(jws.verify(signed, self.key, ALGORITHMS.HS512), self.claims)
+    def test_wrong_alg(self, claims):
+        token = jws.sign(claims, 'secret', algorithm=ALGORITHMS.HS256)
+        with pytest.raises(JWSError):
+            jws.verify(token, 'secret', ALGORITHMS.HS384)
 
-    def test_wrong_alg(self):
-        signed = jws.sign(self.claims, self.key, algorithm=ALGORITHMS.HS256)
-        self.assertRaises(Exception, jws.verify, signed, self.key, ALGORITHMS.HS384)
+    def test_wrong_key(self, claims):
+        token = jws.sign(claims, 'secret', algorithm=ALGORITHMS.HS256)
+        with pytest.raises(JWSError):
+            jws.verify(token, 'another', ALGORITHMS.HS256)
 
-    def test_wrong_key(self):
-        signed = jws.sign(self.claims, self.key, algorithm=ALGORITHMS.HS256)
-        self.assertRaises(Exception, jws.verify, signed, 'wrong_key', ALGORITHMS.HS256)
+    def test_unsupported_alg(self, claims):
+        with pytest.raises(JWSError):
+            jws.sign(claims, 'secret', algorithm='SOMETHING')
 
-    def test_unsupported_alg(self):
-        self.assertRaises(Exception, jws.sign, self.claims, self.key, algorithm='SOMETHING')
-
-    def test_add_headers(self):
+    def test_add_headers(self, claims):
 
         additional_headers = {
             'test': 'header'
@@ -79,18 +88,12 @@ class HMACTestCase(unittest.TestCase):
             'typ': 'JWT',
         }
 
-        signed = jws.sign(self.claims, self.key, headers=additional_headers)
-        header, claims, signing_input, signature = jws._load(signed)
-        self.assertEqual(expected_headers, header)
+        token = jws.sign(claims, 'secret', headers=additional_headers)
+        header, claims, signing_input, signature = jws._load(token)
+        assert expected_headers == header
 
 
-class RSATestCase(unittest.TestCase):
-
-    def setUp(self):
-        self.claims = {
-            'test': 'input'
-        }
-        self.private_key = """-----BEGIN RSA PRIVATE KEY-----
+private_key = """-----BEGIN RSA PRIVATE KEY-----
 MIIJKwIBAAKCAgEAtSKfSeI0fukRIX38AHlKB1YPpX8PUYN2JdvfM+XjNmLfU1M7
 4N0VmdzIX95sneQGO9kC2xMIE+AIlt52Yf/KgBZggAlS9Y0Vx8DsSL2HvOjguAdX
 ir3vYLvAyyHin/mUisJOqccFKChHKjnk0uXy/38+1r17/cYTp76brKpU1I4kM20M
@@ -142,7 +145,7 @@ bjJ/JfTO5060SsWftf4iw3jrhSn9RwTTYdq/kErGFWvDGJn2MiuhMe2onNfVzIGR
 mdUxHwi1ulkspAn/fmY7f0hZpskDwcHyZmbKZuk+NU/FJ8IAcmvk9y7m25nSSc8=
 -----END RSA PRIVATE KEY-----"""
 
-        self.public_key = """-----BEGIN PUBLIC KEY-----
+public_key = """-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAtSKfSeI0fukRIX38AHlK
 B1YPpX8PUYN2JdvfM+XjNmLfU1M74N0VmdzIX95sneQGO9kC2xMIE+AIlt52Yf/K
 gBZggAlS9Y0Vx8DsSL2HvOjguAdXir3vYLvAyyHin/mUisJOqccFKChHKjnk0uXy
@@ -157,22 +160,45 @@ Xcppx7kdwsJy72Sust9Hnd9B7V35YnVF6W791lVHnenhCJOziRmkH4xLLbPkaST2
 Ks3IHH7tVltM6NsRk3jNdVMCAwEAAQ==
 -----END PUBLIC KEY-----"""
 
-    def testRSA256(self):
-        signed = jws.sign(self.claims, self.private_key, algorithm=ALGORITHMS.RS256)
-        self.assertEqual(jws.verify(signed, self.public_key, ALGORITHMS.RS256), self.claims)
 
-    def testRSA384(self):
-        signed = jws.sign(self.claims, self.private_key, algorithm=ALGORITHMS.RS384)
-        self.assertEqual(jws.verify(signed, self.public_key, ALGORITHMS.RS384), self.claims)
+class TestRSA:
 
-    def testRSA512(self):
-        signed = jws.sign(self.claims, self.private_key, algorithm=ALGORITHMS.RS512)
-        self.assertEqual(jws.verify(signed, self.public_key, ALGORITHMS.RS512), self.claims)
+    def test_RSA256(self, claims):
+        token = jws.sign(claims, private_key, algorithm=ALGORITHMS.RS256)
+        assert jws.verify(token, public_key, ALGORITHMS.RS256) == claims
 
-    def test_wrong_alg(self):
-        signed = jws.sign(self.claims, self.private_key, algorithm=ALGORITHMS.RS256)
-        self.assertRaises(Exception, jws.verify, signed, self.public_key, ALGORITHMS.RS384)
+    def test_RSA384(self, claims):
+        token = jws.sign(claims, private_key, algorithm=ALGORITHMS.RS384)
+        assert jws.verify(token, public_key, ALGORITHMS.RS384) == claims
 
-    def test_wrong_key(self):
-        signed = jws.sign(self.claims, self.private_key, algorithm=ALGORITHMS.RS256)
-        self.assertRaises(Exception, jws.verify, signed, 'wrong_key', ALGORITHMS.RS256)
+    def test_RSA512(self, claims):
+        token = jws.sign(claims, private_key, algorithm=ALGORITHMS.RS512)
+        assert jws.verify(token, public_key, ALGORITHMS.RS512) == claims
+
+    def test_wrong_alg(self, claims):
+        token = jws.sign(claims, private_key, algorithm=ALGORITHMS.RS256)
+        with pytest.raises(JWSError):
+            jws.verify(token, public_key, ALGORITHMS.RS384)
+
+    def test_wrong_key(self, claims):
+        token = jws.sign(claims, private_key, algorithm=ALGORITHMS.RS256)
+        with pytest.raises(JWSError):
+            jws.verify(token, public_key, ALGORITHMS.HS256)
+
+
+class TestLoad:
+
+    def test_header_not_mapping(self):
+        token = 'WyJ0ZXN0Il0.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+        with pytest.raises(JWSError):
+            jws.verify(token, 'secret', ['HS256'])
+
+    def test_claims_not_mapping(self):
+        token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.WyJ0ZXN0Il0.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+        with pytest.raises(JWSError):
+            jws.verify(token, 'secret', ['HS256'])
+
+    def test_signature_padding(self):
+        token = 'eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.aatvagLDLoaiJKxOKqpBXSEGy7SYSifZhjntgm9ctpyj8'
+        with pytest.raises(JWSError):
+            jws.verify(token, 'secret', ['HS256'])
