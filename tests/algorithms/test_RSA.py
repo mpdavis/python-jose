@@ -1,6 +1,5 @@
 
 from jose.algorithms import RSAAlgorithm
-from jose.exceptions import JWSError
 
 from Crypto.PublicKey import RSA
 

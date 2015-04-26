@@ -7,6 +7,7 @@ from six import string_types
 from jose import jws
 
 from .exceptions import JWTError
+from .exceptions import ExpiredSignatureError
 from .utils import timedelta_total_seconds
 
 
@@ -186,7 +187,7 @@ def _validate_exp(claims, leeway=0):
     now = timegm(datetime.utcnow().utctimetuple())
 
     if exp < (now - leeway):
-        raise JWTError('Signature has expired')
+        raise ExpiredSignatureError('Signature has expired.')
 
 
 def _validate_aud(claims, audience=None):

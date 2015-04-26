@@ -10,3 +10,7 @@ class JWSError(JOSEError):
 
 class JWTError(JOSEError):
     pass
+
+
+class ExpiredSignatureError(JWTError):
+    pass
