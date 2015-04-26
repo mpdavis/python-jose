@@ -43,6 +43,9 @@ def encode(claims, key, algorithm=None):
         if isinstance(claims.get(time_claim), datetime):
             claims[time_claim] = timegm(claims[time_claim].utctimetuple())
 
+    if algorithm:
+        return jws.sign(claims, key, algorithm=algorithm)
+
     return jws.sign(claims, key)
 
 

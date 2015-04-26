@@ -23,6 +23,11 @@ def key():
 
 class TestJWT:
 
+    def test_non_default_alg(self, claims, key):
+        encoded = jwt.encode(claims, key, algorithm='HS384')
+        decoded = jwt.decode(encoded, key, algorithms='HS384')
+        assert claims == decoded
+
     def test_encode(self, claims, key):
 
         expected = (
