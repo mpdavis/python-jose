@@ -47,7 +47,7 @@ def sign(claims, key, headers=None, algorithm=ALGORITHMS.HS256):
     return signed_output
 
 
-def verify(token, key, algorithms):
+def verify(token, key, algorithms, verify=True):
     """Verifies a JWS string's signature.
 
     Examples:
@@ -70,7 +70,8 @@ def verify(token, key, algorithms):
 
     header, claims, signing_input, signature = _load(token)
 
-    _verify_signature(claims, signing_input, header, signature, key, algorithms)
+    if verify:
+        _verify_signature(claims, signing_input, header, signature, key, algorithms)
 
     return claims
 

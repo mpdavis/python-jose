@@ -101,8 +101,8 @@ def decode(token, key, algorithms=None, options=None, audience=None, issuer=None
     if options:
         defaults.update(options)
 
-    # TODO: skip verification for verify_signature == False
-    token_info = jws.verify(token, key, algorithms)
+    verify_signature = defaults.get('verify_signature', True)
+    token_info = jws.verify(token, key, algorithms, verify=verify_signature)
 
     _validate_claims(token_info, audience=audience, issuer=issuer, options=defaults)
 
