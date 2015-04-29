@@ -4,6 +4,7 @@ from jose.exceptions import JWSError
 
 from .HMAC import HMACAlgorithm
 from .RSA import RSAAlgorithm
+from .EC import ECAlgorithm
 
 
 def get_algorithm_object(algorithm):
@@ -28,5 +29,14 @@ def get_algorithm_object(algorithm):
 
     if algorithm == ALGORITHMS.RS512:
         return RSAAlgorithm(RSAAlgorithm.SHA512)
+
+    if algorithm == ALGORITHMS.ES256:
+        return ECAlgorithm(ECAlgorithm.SHA256)
+
+    if algorithm == ALGORITHMS.ES384:
+        return ECAlgorithm(ECAlgorithm.SHA384)
+
+    if algorithm == ALGORITHMS.ES512:
+        return ECAlgorithm(ECAlgorithm.SHA512)
 
     raise JWSError('Algorithm not supported: %s' % algorithm)

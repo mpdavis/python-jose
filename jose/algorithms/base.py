@@ -8,6 +8,9 @@ class Algorithm(object):
         """
         Performs necessary validation and conversions on the key and returns
         the key value in the proper format for sign() and verify().
+
+        Raises:
+            TypeError: If an invalid key is attempted to be used.
         """
         raise NotImplementedError
 

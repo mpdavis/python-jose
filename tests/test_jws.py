@@ -96,7 +96,7 @@ class TestHMAC:
         assert expected_headers == header
 
 
-private_key = """-----BEGIN RSA PRIVATE KEY-----
+rsa_private_key = """-----BEGIN RSA PRIVATE KEY-----
 MIIJKwIBAAKCAgEAtSKfSeI0fukRIX38AHlKB1YPpX8PUYN2JdvfM+XjNmLfU1M7
 4N0VmdzIX95sneQGO9kC2xMIE+AIlt52Yf/KgBZggAlS9Y0Vx8DsSL2HvOjguAdX
 ir3vYLvAyyHin/mUisJOqccFKChHKjnk0uXy/38+1r17/cYTp76brKpU1I4kM20M
@@ -148,7 +148,7 @@ bjJ/JfTO5060SsWftf4iw3jrhSn9RwTTYdq/kErGFWvDGJn2MiuhMe2onNfVzIGR
 mdUxHwi1ulkspAn/fmY7f0hZpskDwcHyZmbKZuk+NU/FJ8IAcmvk9y7m25nSSc8=
 -----END RSA PRIVATE KEY-----"""
 
-public_key = """-----BEGIN PUBLIC KEY-----
+rsa_public_key = """-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAtSKfSeI0fukRIX38AHlK
 B1YPpX8PUYN2JdvfM+XjNmLfU1M74N0VmdzIX95sneQGO9kC2xMIE+AIlt52Yf/K
 gBZggAlS9Y0Vx8DsSL2HvOjguAdXir3vYLvAyyHin/mUisJOqccFKChHKjnk0uXy
@@ -167,26 +167,61 @@ Ks3IHH7tVltM6NsRk3jNdVMCAwEAAQ==
 class TestRSA:
 
     def test_RSA256(self, claims):
-        token = jws.sign(claims, private_key, algorithm=ALGORITHMS.RS256)
-        assert jws.verify(token, public_key, ALGORITHMS.RS256) == claims
+        token = jws.sign(claims, rsa_private_key, algorithm=ALGORITHMS.RS256)
+        assert jws.verify(token, rsa_public_key, ALGORITHMS.RS256) == claims
 
     def test_RSA384(self, claims):
-        token = jws.sign(claims, private_key, algorithm=ALGORITHMS.RS384)
-        assert jws.verify(token, public_key, ALGORITHMS.RS384) == claims
+        token = jws.sign(claims, rsa_private_key, algorithm=ALGORITHMS.RS384)
+        assert jws.verify(token, rsa_public_key, ALGORITHMS.RS384) == claims
 
     def test_RSA512(self, claims):
-        token = jws.sign(claims, private_key, algorithm=ALGORITHMS.RS512)
-        assert jws.verify(token, public_key, ALGORITHMS.RS512) == claims
+        token = jws.sign(claims, rsa_private_key, algorithm=ALGORITHMS.RS512)
+        assert jws.verify(token, rsa_public_key, ALGORITHMS.RS512) == claims
 
     def test_wrong_alg(self, claims):
-        token = jws.sign(claims, private_key, algorithm=ALGORITHMS.RS256)
+        token = jws.sign(claims, rsa_private_key, algorithm=ALGORITHMS.RS256)
         with pytest.raises(JWSError):
-            jws.verify(token, public_key, ALGORITHMS.RS384)
+            jws.verify(token, rsa_public_key, ALGORITHMS.RS384)
 
     def test_wrong_key(self, claims):
-        token = jws.sign(claims, private_key, algorithm=ALGORITHMS.RS256)
+        token = jws.sign(claims, rsa_private_key, algorithm=ALGORITHMS.RS256)
         with pytest.raises(JWSError):
-            jws.verify(token, public_key, ALGORITHMS.HS256)
+            jws.verify(token, rsa_public_key, ALGORITHMS.HS256)
+
+ec_private_key = """-----BEGIN EC PRIVATE KEY-----
+MIHcAgEBBEIBzs13YUnYbLfYXTz4SG4DE4rPmsL3wBTdy34JcO+BDpI+NDZ0pqam
+UM/1sGZT+8hqUjSeQo6oz+Mx0VS6SJh31zygBwYFK4EEACOhgYkDgYYABACYencK
+8pm/iAeDVptaEZTZwNT0yW/muVwvvwkzS/D6GDCLsnLfI6e1FwEnTJF/GPFUlN5l
+9JSLxsbbFdM1muI+NgBE6ZLR1GZWjsNzu7BOB8RMy/mvSTokZwyIaWvWSn3hOF4i
+/4iczJnzJhUKDqHe5dJ//PLd7R3WVHxkvv7jFNTKYg==
+-----END EC PRIVATE KEY-----"""
+
+ec_public_key = """-----BEGIN PUBLIC KEY-----
+MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQAmHp3CvKZv4gHg1abWhGU2cDU9Mlv
+5rlcL78JM0vw+hgwi7Jy3yOntRcBJ0yRfxjxVJTeZfSUi8bG2xXTNZriPjYAROmS
+0dRmVo7Dc7uwTgfETMv5r0k6JGcMiGlr1kp94TheIv+InMyZ8yYVCg6h3uXSf/zy
+3e0d1lR8ZL7+4xTUymI=
+-----END PUBLIC KEY-----"""
+
+
+class TestEC:
+
+    def test_EC256(self, claims):
+        token = jws.sign(claims, ec_private_key, algorithm=ALGORITHMS.ES256)
+        assert jws.verify(token, ec_public_key, ALGORITHMS.ES256) == claims
+
+    def test_EC384(self, claims):
+        token = jws.sign(claims, ec_private_key, algorithm=ALGORITHMS.ES384)
+        assert jws.verify(token, ec_public_key, ALGORITHMS.ES384) == claims
+
+    def test_EC512(self, claims):
+        token = jws.sign(claims, ec_private_key, algorithm=ALGORITHMS.ES512)
+        assert jws.verify(token, ec_public_key, ALGORITHMS.ES512) == claims
+
+    def test_wrong_alg(self, claims):
+        token = jws.sign(claims, ec_private_key, algorithm=ALGORITHMS.ES256)
+        with pytest.raises(JWSError):
+            jws.verify(token, rsa_public_key, ALGORITHMS.ES384)
 
 
 class TestLoad:
