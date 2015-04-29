@@ -39,7 +39,7 @@ JSON Web Signatures (JWS) are used to digitally sign a JSON encoded object and r
 
 ### JSON Web Token
 
-JSON Web Tokens are a JWS with a set of reserved claims to be used in a standardized manner.
+JSON Web Tokens (JWT) are a JWS with a set of reserved claims to be used in a standardized manner.
 
 
 ## Algorithms
