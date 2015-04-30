@@ -31,8 +31,8 @@ Contents
 Principles
 ----------
 
-This is a JOSE implementation that is meant to be simple to use, both on
-and off of AppEngine.
+This is a JOSE implementation that is fully compatible with Google App Engine
+which requires the use of the PyCrypto library.
 
 Thanks
 ------
