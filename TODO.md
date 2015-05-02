@@ -4,12 +4,13 @@
 * Implement RSA PSS signing
 * Implement JWE
 * Implement JWK
-* Add HTML documentation
+* Update HTML docs with extended examples
 * Add tox runner for testing against multiple versions of python
 
 
 ## Done
 
+* Add HTML documentation
 * Implement ECSDA signing
 * Refactor JWT claims verifcation
 * Add actual exceptions instead of using the base exception
