@@ -24,6 +24,12 @@ The following algorithms are currently supported.
 +-------------------+---------------------------------------+
 | RS512             | RSASSA using SHA-512 hash algorithm   |
 +-------------------+---------------------------------------+
+| ES256             | ECDSA using SHA-256 hash algorithm    |
++-------------------+---------------------------------------+
+| ES384             | ECDSA using SHA-384 hash algorithm    |
++-------------------+---------------------------------------+
+| ES512             | ECDSA using SHA-512 hash algorithm    |
++-------------------+---------------------------------------+
 
 Examples
 ^^^^^^^^
