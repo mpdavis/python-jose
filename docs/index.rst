@@ -24,8 +24,8 @@ Contents
 .. toctree::
    :maxdepth: 2
 
-   jws/examples
-   jwt/examples
+   jws/index
+   jwt/index
 
 Principles
 ----------
