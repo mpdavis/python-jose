@@ -43,13 +43,3 @@ This library is based heavily on the work of the guys over at
    :target: https://travis-ci.org/mpdavis/python-jose
 .. |Coverage Status| image:: https://coveralls.io/repos/mpdavis/python-jose/badge.svg
    :target: https://coveralls.io/r/mpdavis/python-jose
-
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
