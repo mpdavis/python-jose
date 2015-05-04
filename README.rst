@@ -32,4 +32,4 @@ This library is based heavily on the work of the guys over at
 .. |Coverage Status| image:: https://coveralls.io/repos/mpdavis/python-jose/badge.svg
    :target: https://coveralls.io/r/mpdavis/python-jose
 .. |Docs| image:: https://readthedocs.org/projects/python-jose/badge/
-   :target: https://readthedocs.org/projects/python-jose/badge/
+   :target: https://python-jose.readthedocs.org/en/latest/
