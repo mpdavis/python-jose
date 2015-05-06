@@ -3,11 +3,6 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Contents:
-
-.. toctree::
-   :maxdepth: 2
-
 python-jose
 ===========
 
@@ -23,81 +18,20 @@ permutations is extremely large, and might be daunting to some, it is
 expected that most applications will only use a small set of algorithms
 to meet their needs.
 
+Contents
+--------
+
+.. toctree::
+   :maxdepth: 2
+
+   jws/examples
+   jwt/examples
+
 Principles
 ----------
 
 This is a JOSE implementation that is meant to be simple to use, both on
 and off of AppEngine.
-
-Examples
---------
-
-JSON Web Signature
-~~~~~~~~~~~~~~~~~~
-
-JSON Web Signatures (JWS) are used to digitally sign a JSON encoded
-object and represent it as a compact URL-safe string.
-
-Signing tokens
-^^^^^^^^^^^^^^
-
-.. code:: python
-
-    >>> from jose import jws
-    >>> signed = jws.sign({'a': 'b'}, 'secret', algorithm='HS256')
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
-
-Verifying token signatures
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. code:: python
-
-    >>> jws.verify(signed, 'secret', algorithms=['HS256'])
-    {'a': 'b'}
-
-JSON Web Token
-~~~~~~~~~~~~~~
-
-JSON Web Tokens (JWT) are a JWS with a set of reserved claims to be used
-in a standardized manner.
-
-JWT Reserved Claims
-^^^^^^^^^^^^^^^^^^^
-
-+---------+--------------+--------------------+-----------------------------------------------+
-| Claim   | Name         | Format             | Usage                                         |
-+=========+==============+====================+===============================================+
-| 'exp'   | Expiration   | int                | The time after which the token is invalid.    |
-+---------+--------------+--------------------+-----------------------------------------------+
-| 'nbf'   | Not Before   | int                | The time before which the token is invalid.   |
-+---------+--------------+--------------------+-----------------------------------------------+
-| 'iss'   | Issuer       | str                | The principal that issued the JWT.            |
-+---------+--------------+--------------------+-----------------------------------------------+
-| 'aud'   | Audience     | str or list(str)   | The recipient that the JWT is intended for.   |
-+---------+--------------+--------------------+-----------------------------------------------+
-| 'iat'   | Issued At    | int                | The time at which the JWT was issued.         |
-+---------+--------------+--------------------+-----------------------------------------------+
-
-Algorithms
-----------
-
-The following algorithms are currently supported.
-
-+-------------------+---------------------------------------+
-| Algorithm Value   | Digital Signature or MAC Algorithm    |
-+===================+=======================================+
-| HS256             | HMAC using SHA-256 hash algorithm     |
-+-------------------+---------------------------------------+
-| HS384             | HMAC using SHA-384 hash algorithm     |
-+-------------------+---------------------------------------+
-| HS512             | HMAC using SHA-512 hash algorithm     |
-+-------------------+---------------------------------------+
-| RS256             | RSASSA using SHA-256 hash algorithm   |
-+-------------------+---------------------------------------+
-| RS384             | RSASSA using SHA-384 hash algorithm   |
-+-------------------+---------------------------------------+
-| RS512             | RSASSA using SHA-512 hash algorithm   |
-+-------------------+---------------------------------------+
 
 Thanks
 ------
