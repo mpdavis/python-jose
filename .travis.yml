@@ -6,5 +6,4 @@ install:
 script: 
   - py.test --cov-report term-missing --cov jose
 after_success:
-  - coveralls
-  - codecov
+- codecov
