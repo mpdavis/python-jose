@@ -1,7 +1,10 @@
 language: python
 python: "2.7"
-install: pip install -r requirements.txt
+install: 
+  - pip install -r requirements.txt
+  - pip install codecov
 script: 
   - py.test --cov-report term-missing --cov jose
 after_success:
   - coveralls
+  - codecov
