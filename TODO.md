@@ -1,5 +1,6 @@
 # TODO
 
+* Refactor JWS json decode and load
 * Implement RSA PSS signing
 * Implement JWE
 * Implement JWK
