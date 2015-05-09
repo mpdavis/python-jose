@@ -14,6 +14,7 @@ permutations is extremely large, and might be daunting to some, it is
 expected that most applications will only use a small set of algorithms
 to meet their needs.
 
+
 Contents
 --------
 
@@ -22,6 +23,16 @@ Contents
 
    jws/index
    jwt/index
+
+
+APIs
+----
+
+.. toctree::
+   :maxdepth: 2
+
+   jws/api
+   jwt/api
 
 
 Principles
@@ -33,10 +44,10 @@ which requires the use of the PyCrypto library.
 Thanks
 ------
 
-This library is based heavily on the work of the guys over at
-`PyJWT <https://github.com/jpadilla/pyjwt>`__.
+This library was originally based heavily on the work of the guys over at PyJWT_.
 
 .. |Build Status| image:: https://travis-ci.org/mpdavis/python-jose.svg?branch=master
    :target: https://travis-ci.org/mpdavis/python-jose
 .. |Coverage Status| image:: https://coveralls.io/repos/mpdavis/python-jose/badge.svg
    :target: https://coveralls.io/r/mpdavis/python-jose
+.. _PyJWT: https://github.com/jpadilla/pyjwt
