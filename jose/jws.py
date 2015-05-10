@@ -15,11 +15,6 @@ from .utils import base64url_decode
 def sign(claims, key, headers=None, algorithm=ALGORITHMS.HS256):
     """Signs a claims set and returns a JWS string.
 
-    Examples:
-
-        >>> jws.sign({'a': 'b'}, 'secret', algorithm='HS256')
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
-
     Args:
         claims (dict): A claims set to sign
         key (str): The key to use for signing the claim set
@@ -34,6 +29,11 @@ def sign(claims, key, headers=None, algorithm=ALGORITHMS.HS256):
 
     Raises:
         JWSError: If there is an error signing the token.
+
+    Examples:
+
+        >>> jws.sign({'a': 'b'}, 'secret', algorithm='HS256')
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
 
     """
 
@@ -50,11 +50,6 @@ def sign(claims, key, headers=None, algorithm=ALGORITHMS.HS256):
 def verify(token, key, algorithms, verify=True):
     """Verifies a JWS string's signature.
 
-    Examples:
-
-        >>> payload = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
-        >>> jws.verify(payload, 'secret', algorithms='HS256')
-
     Args:
         token (str): A signed JWS to be verified.
         key (str): A key to attempt to verify the payload with.
@@ -65,6 +60,11 @@ def verify(token, key, algorithms, verify=True):
 
     Raises:
         JWSError: If there is an exception verifying a token.
+
+    Examples:
+
+        >>> payload = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+        >>> jws.verify(payload, 'secret', algorithms='HS256')
 
     """
 

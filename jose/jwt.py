@@ -17,11 +17,6 @@ def encode(claims, key, algorithm=None):
 
     JWTs are JWS signed objects with a few reserved claims.
 
-    Examples:
-
-        >>> jwt.encode({'a': 'b'}, 'secret', algorithm='HS256')
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
-
     Args:
         claims (dict): A claims set to sign
         key (str): The key to use for signing the claim set
@@ -36,6 +31,11 @@ def encode(claims, key, algorithm=None):
 
     Raises:
         JWTError: If there is an error encoding the claims.
+
+    Examples:
+
+        >>> jwt.encode({'a': 'b'}, 'secret', algorithm='HS256')
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
 
     """
 
@@ -53,11 +53,6 @@ def encode(claims, key, algorithm=None):
 
 def decode(token, key, algorithms=None, options=None, audience=None, issuer=None):
     """Verifies a JWT string's signature and validates reserved claims.
-
-    Examples:
-
-        >>> payload = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
-        >>> jwt.decode(payload, 'secret', algorithms='HS256')
 
     Args:
         token (str): A signed JWS to be verified.
@@ -86,6 +81,11 @@ def decode(token, key, algorithms=None, options=None, audience=None, issuer=None
 
     Raises:
         JWTError: If the signature is invalid in any way.
+
+    Examples:
+
+        >>> payload = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+        >>> jwt.decode(payload, 'secret', algorithms='HS256')
 
     """
 
