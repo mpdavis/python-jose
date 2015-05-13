@@ -1,0 +1,14 @@
+PyYAML==3.11
+cov-core==1.15.0
+coverage==3.7.1
+coveralls==0.5
+docopt==0.6.2
+nose==1.3.6
+py==1.4.26
+pytest==2.7.0
+pytest-cov==1.8.1
+ecdsa==0.13
+wsgiref==0.1.2
+
+-r requirements.txt
+-r requirements-rtd.txt
