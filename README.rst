@@ -5,6 +5,8 @@ A JOSE implementation in Python
 
 |Build Status| |Coverage Status| |Docs|
 
+Docs are available on ReadTheDocs_.
+
 The JavaScript Object Signing and Encryption (JOSE) technologies - JSON
 Web Signature (JWS), JSON Web Encryption (JWE), JSON Web Key (JWK), and
 JSON Web Algorithms (JWA) - collectively can be used to encrypt and/or
@@ -33,3 +35,4 @@ This library is based heavily on the work of the guys over at
    :target: https://coveralls.io/r/mpdavis/python-jose
 .. |Docs| image:: https://readthedocs.org/projects/python-jose/badge/
    :target: https://python-jose.readthedocs.org/en/latest/
+.. _ReadTheDocs: https://python-jose.readthedocs.org/en/latest/
