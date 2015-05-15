@@ -6,6 +6,7 @@ from six import string_types
 
 from jose import jws
 
+from .exceptions import JWTClaimsError
 from .exceptions import JWTError
 from .exceptions import ExpiredSignatureError
 from .utils import timedelta_total_seconds
@@ -127,7 +128,7 @@ def _validate_iat(claims):
     try:
         int(claims['iat'])
     except ValueError:
-        raise JWTError('Issued At claim (iat) must be an integer.')
+        raise JWTClaimsError('Issued At claim (iat) must be an integer.')
 
 
 def _validate_nbf(claims, leeway=0):
@@ -152,12 +153,12 @@ def _validate_nbf(claims, leeway=0):
     try:
         nbf = int(claims['nbf'])
     except ValueError:
-        raise JWTError('Not Before claim (nbf) must be an integer.')
+        raise JWTClaimsError('Not Before claim (nbf) must be an integer.')
 
     now = timegm(datetime.utcnow().utctimetuple())
 
     if nbf > (now + leeway):
-        raise JWTError('The token is not yet valid (nbf)')
+        raise JWTClaimsError('The token is not yet valid (nbf)')
 
 
 def _validate_exp(claims, leeway=0):
@@ -182,7 +183,7 @@ def _validate_exp(claims, leeway=0):
     try:
         exp = int(claims['exp'])
     except ValueError:
-        raise JWTError('Expiration Time claim (exp) must be an integer.')
+        raise JWTClaimsError('Expiration Time claim (exp) must be an integer.')
 
     now = timegm(datetime.utcnow().utctimetuple())
 
@@ -219,11 +220,11 @@ def _validate_aud(claims, audience=None):
     if isinstance(audience_claims, string_types):
         audience_claims = [audience_claims]
     if not isinstance(audience_claims, list):
-        raise JWTError('Invalid claim format in token')
+        raise JWTClaimsError('Invalid claim format in token')
     if any(not isinstance(c, string_types) for c in audience_claims):
-        raise JWTError('Invalid claim format in token')
+        raise JWTClaimsError('Invalid claim format in token')
     if audience not in audience_claims:
-        raise JWTError('Invalid audience')
+        raise JWTClaimsError('Invalid audience')
 
 
 def _validate_iss(claims, issuer=None):
@@ -241,7 +242,7 @@ def _validate_iss(claims, issuer=None):
 
     if issuer is not None:
         if claims.get('iss') != issuer:
-            raise JWTError('Invalid issuer')
+            raise JWTClaimsError('Invalid issuer')
 
 
 def _validate_claims(claims, audience=None, issuer=None, options=None):

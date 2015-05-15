@@ -16,6 +16,10 @@ class JWTError(JOSEError):
     pass
 
 
+class JWTClaimsError(JWTError):
+    pass
+
+
 class JWTSignatureError(JWTError):
     pass
 
