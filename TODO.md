@@ -1,6 +1,5 @@
 # TODO
 
-* Refactor Algorithm logic with set Exceptions to return
 * Implement RSA PSS signing
 * Implement JWE
 * Implement JWK
@@ -10,6 +9,7 @@
 
 ## Done
 
+* Refactor Algorithm logic with set Exceptions to return
 * Add HTML documentation
 * Implement ECSDA signing
 * Refactor JWT claims verifcation
