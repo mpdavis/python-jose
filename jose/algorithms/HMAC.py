@@ -19,7 +19,7 @@ class HMACAlgorithm(Algorithm):
     def __init__(self, hash_alg):
         self.hash_alg = hash_alg
 
-    def prepare_key(self, key):
+    def process_prepare_key(self, key):
         if not isinstance(key, six.string_types) and not isinstance(key, bytes):
             raise TypeError('Expecting a string- or bytes-formatted key.')
 
@@ -39,8 +39,9 @@ class HMACAlgorithm(Algorithm):
 
         return key
 
-    def sign(self, msg, key):
+    def process_sign(self, msg, key):
+        print 'huh'
         return hmac.new(key, msg, self.hash_alg).digest()
 
-    def verify(self, msg, key, sig):
+    def process_verify(self, msg, key, sig):
         return sig == self.sign(msg, key)

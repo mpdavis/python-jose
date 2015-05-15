@@ -1,5 +1,6 @@
 
 from jose.algorithms import HMACAlgorithm
+from jose.exceptions import JOSEError
 
 import pytest
 
@@ -12,7 +13,7 @@ def alg():
 class TestHMACAlgorithm:
 
     def test_non_string_key(self, alg):
-        with pytest.raises(TypeError):
+        with pytest.raises(JOSEError):
             alg.prepare_key(object())
 
     def test_unicode_encode(self, alg):
@@ -22,5 +23,5 @@ class TestHMACAlgorithm:
 
     def test_RSA_key(self, alg):
         key = "-----BEGIN PUBLIC KEY-----"
-        with pytest.raises(Exception):
+        with pytest.raises(JOSEError):
             alg.prepare_key(key)

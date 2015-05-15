@@ -1,5 +1,6 @@
 
 from jose.algorithms import RSAAlgorithm
+from jose.exceptions import JOSEError
 
 from Crypto.PublicKey import RSA
 
@@ -72,7 +73,7 @@ class TestRSAAlgorithm:
 
     def test_string_secret(self, alg):
         key = 'secret'
-        with pytest.raises(ValueError):
+        with pytest.raises(JOSEError):
             alg.prepare_key(key)
 
     def test_string_unicode(self, alg):
@@ -81,5 +82,5 @@ class TestRSAAlgorithm:
 
     def test_object(self, alg):
         key = object()
-        with pytest.raises(Exception):
+        with pytest.raises(JOSEError):
             alg.prepare_key(key)

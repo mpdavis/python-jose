@@ -24,7 +24,7 @@ class RSAAlgorithm(Algorithm):
     def __init__(self, hash_alg):
         self.hash_alg = hash_alg
 
-    def prepare_key(self, key):
+    def process_prepare_key(self, key):
 
         if isinstance(key, RSA._RSAobj):
             return key
@@ -39,8 +39,8 @@ class RSAAlgorithm(Algorithm):
 
         return key
 
-    def sign(self, msg, key):
+    def process_sign(self, msg, key):
         return PKCS1_v1_5.new(key).sign(self.hash_alg.new(msg))
 
-    def verify(self, msg, key, sig):
+    def process_verify(self, msg, key, sig):
         return PKCS1_v1_5.new(key).verify(self.hash_alg.new(msg), sig)

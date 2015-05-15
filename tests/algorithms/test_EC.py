@@ -1,6 +1,6 @@
 
-
 from jose.algorithms import ECAlgorithm
+from jose.exceptions import JOSEError
 
 import ecdsa
 import pytest
@@ -25,7 +25,7 @@ class TestECAlgorithm:
 
     def test_string_secret(self, alg):
         key = 'secret'
-        with pytest.raises(TypeError):
+        with pytest.raises(JOSEError):
             alg.prepare_key(key)
 
     def test_string_unicode(self, alg):
@@ -34,5 +34,5 @@ class TestECAlgorithm:
 
     def test_object(self, alg):
         key = object()
-        with pytest.raises(Exception):
+        with pytest.raises(JOSEError):
             alg.prepare_key(key)

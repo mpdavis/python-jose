@@ -108,8 +108,8 @@ def _sign_header_and_claims(encoded_header, encoded_claims, algorithm, key):
         alg_obj = get_algorithm_object(algorithm)
         key = alg_obj.prepare_key(key)
         signature = alg_obj.sign(signing_input, key)
-    except:
-        raise JWSError('Unable to sign header and claims.')
+    except Exception, e:
+        raise JWSError(e)
 
     encoded_signature = base64url_encode(signature)
 
