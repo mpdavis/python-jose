@@ -56,7 +56,6 @@ class Algorithm(object):
             JOSEError: When there is an error creating a signature.
         """
         try:
-            print '?'
             return self.process_sign(msg, key)
         except Exception, e:
             raise JOSEError(e)

@@ -40,7 +40,6 @@ class HMACAlgorithm(Algorithm):
         return key
 
     def process_sign(self, msg, key):
-        print 'huh'
         return hmac.new(key, msg, self.hash_alg).digest()
 
     def process_verify(self, msg, key, sig):
