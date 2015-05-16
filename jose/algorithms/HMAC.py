@@ -4,7 +4,8 @@ import hmac
 
 import six
 
-from .base import Algorithm
+from jose.algorithms.base import Algorithm
+from jose.utils import constant_time_compare
 
 
 class HMACAlgorithm(Algorithm):
@@ -43,4 +44,4 @@ class HMACAlgorithm(Algorithm):
         return hmac.new(key, msg, self.hash_alg).digest()
 
     def process_verify(self, msg, key, sig):
-        return sig == self.sign(msg, key)
+        return constant_time_compare(sig, self.sign(msg, key))
