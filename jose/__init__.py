@@ -1,5 +1,5 @@
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 __author__ = 'Michael Davis'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2015 Michael Davis'
