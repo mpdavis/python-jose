@@ -30,8 +30,8 @@ This library was originally based heavily on the work of the guys over at PyJWT_
 
 .. |Build Status| image:: https://travis-ci.org/mpdavis/python-jose.svg?branch=master
    :target: https://travis-ci.org/mpdavis/python-jose
-.. |Coverage Status| image:: https://coveralls.io/repos/mpdavis/python-jose/badge.svg
-   :target: https://coveralls.io/r/mpdavis/python-jose
+.. |Coverage Status| image:: http://codecov.io/github/mpdavis/python-jose/coverage.svg?branch=master
+   :target: http://codecov.io/github/mpdavis/python-jose?branch=master
 .. |Docs| image:: https://readthedocs.org/projects/python-jose/badge/
    :target: https://python-jose.readthedocs.org/en/latest/
 .. _ReadTheDocs: https://python-jose.readthedocs.org/en/latest/
