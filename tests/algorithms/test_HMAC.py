@@ -1,5 +1,5 @@
 
-from jose.algorithms import HMACAlgorithm
+from jose.jwa import HMACAlgorithm
 from jose.exceptions import JOSEError
 
 import pytest

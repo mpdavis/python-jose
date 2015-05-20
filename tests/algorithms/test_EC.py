@@ -1,5 +1,5 @@
 
-from jose.algorithms import ECAlgorithm
+from jose.jwa import ECAlgorithm
 from jose.exceptions import JOSEError
 
 import ecdsa

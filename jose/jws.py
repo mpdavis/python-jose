@@ -5,11 +5,11 @@ import six
 
 from collections import Mapping
 
-from .algorithms import get_algorithm_object
-from .constants import ALGORITHMS
-from .exceptions import JWSError
-from .utils import base64url_encode
-from .utils import base64url_decode
+from jose.jwa import get_algorithm_object
+from jose.constants import ALGORITHMS
+from jose.exceptions import JWSError
+from jose.utils import base64url_encode
+from jose.utils import base64url_decode
 
 
 def sign(claims, key, headers=None, algorithm=ALGORITHMS.HS256):
@@ -122,28 +122,28 @@ def _load(jwt):
     try:
         signing_input, crypto_segment = jwt.rsplit(b'.', 1)
         header_segment, claims_segment = signing_input.split(b'.', 1)
+        header_data = base64url_decode(header_segment)
     except ValueError:
         raise JWSError('Not enough segments')
-
-    try:
-        header_data = base64url_decode(header_segment)
     except (TypeError, binascii.Error):
         raise JWSError('Invalid header padding')
+
     try:
         header = json.loads(header_data.decode('utf-8'))
     except ValueError as e:
         raise JWSError('Invalid header string: %s' % e)
+
     if not isinstance(header, Mapping):
         raise JWSError('Invalid header string: must be a json object')
 
     try:
         claims_data = base64url_decode(claims_segment)
+        claims = json.loads(claims_data.decode('utf-8'))
     except (TypeError, binascii.Error):
         raise JWSError('Invalid payload padding')
-    try:
-        claims = json.loads(claims_data.decode('utf-8'))
     except ValueError as e:
         raise JWSError('Invalid payload string: %s' % e)
+
     if not isinstance(claims, Mapping):
         raise JWSError('Invalid payload string: must be a json object')
 

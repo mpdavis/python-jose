@@ -1,5 +1,5 @@
 
-from jose.algorithms import get_algorithm_object
+from jose.jwa import get_algorithm_object
 
 import pytest
 

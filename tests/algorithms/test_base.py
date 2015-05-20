@@ -1,5 +1,5 @@
 
-from jose.algorithms import base
+from jose.jwa import Algorithm
 from jose.exceptions import JOSEError
 
 import pytest
@@ -7,7 +7,7 @@ import pytest
 
 @pytest.fixture
 def alg():
-    return base.Algorithm()
+    return Algorithm()
 
 
 class TestBaseAlgorithm:
