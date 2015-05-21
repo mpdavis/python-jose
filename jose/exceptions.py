@@ -26,3 +26,7 @@ class JWTSignatureError(JWTError):
 
 class ExpiredSignatureError(JWTError):
     pass
+
+
+class JWKError(JOSEError):
+    pass
