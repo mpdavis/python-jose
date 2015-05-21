@@ -19,6 +19,8 @@ class Key(object):
     """
 
     public_keys = ["kty", "kid", "alg", "use", "x5t", "x5u", "x5c"]
+    members = public_keys
+    public_members = public_keys
 
     def __init__(self, kty='', kid='', alg='', use='', x5t='', x5u='', x5c=None, key=None):
 
@@ -105,21 +107,6 @@ def deser(val):
     return base64_to_long(_val)
 
 
-def import_rsa_key(key):
-    """
-    Extract an RSA key from a PEM-encoded certificate
-    :param key: RSA key encoded in standard form
-    :return: RSA key instance
-    """
-    return RSA.importKey(key)
-
-
-def rsa_load(filename):
-    """Read a PEM-encoded RSA key pair from a file."""
-    pem = open(filename, 'r').read()
-    return import_rsa_key(pem)
-
-
 class RSAKey(Key):
     """
     JSON Web key representation of a RSA key
@@ -133,7 +120,7 @@ class RSAKey(Key):
     def __init__(self, kty="RSA", alg="", use="", kid="", key=None,
                  x5c=None, x5t="", x5u="", n="", e="", d="", p="", q="",
                  dp="", dq="", di="", qi=""):
-        Key.__init__(self, kty, alg, use, kid, key, x5c, x5t, x5u)
+        Key.__init__(self, kty=kty, kid=kid, alg=alg, use=use, x5t=x5t, x5u=x5u, x5c=x5c)
         self.n = n
         self.e = e
         self.d = d
@@ -166,7 +153,7 @@ class RSAKey(Key):
                 pass
 
             cert = "\n".join([PREFIX, str(self.x5c[0]), POSTFIX])
-            self.key = import_rsa_key(cert)
+            self.key = RSA.importKey(cert)
             self._split()
             if len(self.x5c) > 1:  # verify chain
                 pass
@@ -194,19 +181,22 @@ class RSAKey(Key):
         except AttributeError:
             pass
 
-    def load(self, filename):
+    def load_key_from_file(self, filename):
+        """Load the key from a file.
+
+        Args:
+            filename (str): The filename path
         """
-        Load the key from a file.
-        :param filename: File name
-        """
-        self.key = rsa_load(filename)
+        pem = open(filename, 'r').read()
+        self.key = RSA.importKey(pem)
         self._split()
         return self
 
-    def load_key(self, key):
-        """
-        Use this RSA key
-        :param key: An RSA key instance
+    def load_key_from_rsa_key(self, key):
+        """Load the key from an existing RSA key.
+
+        Args:
+            key (Crypto.RSAKey): An RSA key instance
         """
         self.key = key
         self._split()

@@ -73,8 +73,16 @@ def int_arr_to_long(arr):
     return int(''.join(["%02x" % byte for byte in arr]), 16)
 
 
+def long_to_int_arr(long_int):
+    _bytes = []
+    while long_int:
+        long_int, r = divmod(long_int, 256)
+        _bytes.insert(0, r)
+    return _bytes
+
+
 def long_to_base64(n):
-    bys = int_arr_to_long(n)
+    bys = long_to_int_arr(n)
     data = struct.pack('%sB' % len(bys), *bys)
     if not len(data):
         data = '\x00'
