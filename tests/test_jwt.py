@@ -330,3 +330,49 @@ class TestJWT:
         token = jwt.encode(claims, key)
         with pytest.raises(JWTError):
             jwt.decode(token, key, issuer='another')
+
+    def test_sub_string(self, key):
+
+        sub = 'subject'
+
+        claims = {
+            'sub': sub
+        }
+
+        token = jwt.encode(claims, key)
+        jwt.decode(token, key)
+
+    def test_sub_invalid(self, key):
+
+        sub = 1
+
+        claims = {
+            'sub': sub
+        }
+
+        token = jwt.encode(claims, key)
+        with pytest.raises(JWTError):
+            jwt.decode(token, key)
+
+    def test_jti_string(self, key):
+
+        jti = 'JWT ID'
+
+        claims = {
+            'jti': jti
+        }
+
+        token = jwt.encode(claims, key)
+        jwt.decode(token, key)
+
+    def test_jti_invalid(self, key):
+
+        jti = 1
+
+        claims = {
+            'jti': jti
+        }
+
+        token = jwt.encode(claims, key)
+        with pytest.raises(JWTError):
+            jwt.decode(token, key)

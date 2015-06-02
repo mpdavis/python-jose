@@ -157,7 +157,9 @@ def _load(jwt):
 
 def _verify_signature(payload, signing_input, header, signature, key='', algorithms=None):
 
-        alg = header['alg']
+        alg = header.get('alg')
+        if not alg:
+            raise JWSError('No algorithm was specified in the JWS header.')
 
         if algorithms is not None and alg not in algorithms:
             raise JWSError('The specified alg value is not allowed')

@@ -66,12 +66,15 @@ def decode(token, key, algorithms=None, options=None, audience=None, issuer=None
             the provided claim.
         options (dict): A dictionary of options for skipping validation steps.
 
-            default = {
+            defaults = {
                 'verify_signature': True,
                 'verify_aud': True,
                 'verify_iat': True,
                 'verify_exp': True,
                 'verify_nbf': True,
+                'verify_iss': True,
+                'verify_sub': True,
+                'verify_jti': True,
                 'leeway': 0,
             }
 
@@ -96,6 +99,8 @@ def decode(token, key, algorithms=None, options=None, audience=None, issuer=None
         'verify_exp': True,
         'verify_nbf': True,
         'verify_iss': True,
+        'verify_sub': True,
+        'verify_jti': True,
         'leeway': 0,
     }
 
@@ -245,6 +250,50 @@ def _validate_iss(claims, issuer=None):
             raise JWTClaimsError('Invalid issuer')
 
 
+def _validate_sub(claims):
+    """Validates that the 'sub' claim is valid.
+
+    The "sub" (subject) claim identifies the principal that is the
+    subject of the JWT.  The claims in a JWT are normally statements
+    about the subject.  The subject value MUST either be scoped to be
+    locally unique in the context of the issuer or be globally unique.
+    The processing of this claim is generally application specific.  The
+    "sub" value is a case-sensitive string containing a StringOrURI
+    value.  Use of this claim is OPTIONAL.
+
+    Args:
+        claims (dict): The claims dictionary to validate.
+    """
+
+    if 'sub' not in claims:
+        return
+
+    if not isinstance(claims['sub'], string_types):
+        raise JWTClaimsError('Subject must be a string.')
+
+
+def _validate_jti(claims):
+    """Validates that the 'jti' claim is valid.
+
+    The "jti" (JWT ID) claim provides a unique identifier for the JWT.
+    The identifier value MUST be assigned in a manner that ensures that
+    there is a negligible probability that the same value will be
+    accidentally assigned to a different data object; if the application
+    uses multiple issuers, collisions MUST be prevented among values
+    produced by different issuers as well.  The "jti" claim can be used
+    to prevent the JWT from being replayed.  The "jti" value is a case-
+    sensitive string.  Use of this claim is OPTIONAL.
+
+    Args:
+        claims (dict): The claims dictionary to validate.
+    """
+    if 'jti' not in claims:
+        return
+
+    if not isinstance(claims['jti'], string_types):
+        raise JWTClaimsError('JWT ID must be a string.')
+
+
 def _validate_claims(claims, audience=None, issuer=None, options=None):
 
     leeway = options.get('leeway', 0)
@@ -269,3 +318,9 @@ def _validate_claims(claims, audience=None, issuer=None, options=None):
 
     if options.get('verify_iss'):
         _validate_iss(claims, issuer=issuer)
+
+    if options.get('verify_sub'):
+        _validate_sub(claims)
+
+    if options.get('verify_jti'):
+        _validate_jti(claims)
