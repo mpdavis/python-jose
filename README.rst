@@ -36,3 +36,4 @@ This library was originally based heavily on the work of the guys over at PyJWT_
    :target: https://python-jose.readthedocs.org/en/latest/
 .. _ReadTheDocs: https://python-jose.readthedocs.org/en/latest/
 .. _PyJWT: https://github.com/jpadilla/pyjwt
+
