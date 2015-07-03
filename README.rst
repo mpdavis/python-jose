@@ -55,4 +55,3 @@ This library was originally based heavily on the work of the guys over at PyJWT_
 
 
 
-
