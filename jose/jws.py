@@ -5,7 +5,7 @@ import six
 
 from collections import Mapping
 
-from jose.jwa import get_algorithm_object
+from jose.jwk import get_algorithm_object
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWSError
 from jose.utils import base64url_encode
@@ -108,12 +108,14 @@ def _sign_header_and_claims(encoded_header, encoded_claims, algorithm, key):
         alg_obj = get_algorithm_object(algorithm)
         key = alg_obj.prepare_key(key)
         signature = alg_obj.sign(signing_input, key)
-    except Exception, e:
+    except Exception as e:
         raise JWSError(e)
 
     encoded_signature = base64url_encode(signature)
 
-    return b'.'.join([encoded_header, encoded_claims, encoded_signature])
+    encoded_string = b'.'.join([encoded_header, encoded_claims, encoded_signature])
+
+    return encoded_string.decode('utf-8')
 
 
 def _load(jwt):

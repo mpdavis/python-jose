@@ -1,5 +1,5 @@
 
-from jose.jwa import ECAlgorithm
+from jose.jwk import ECKey
 from jose.exceptions import JOSEError
 
 import ecdsa
@@ -8,7 +8,7 @@ import pytest
 
 @pytest.fixture
 def alg():
-    return ECAlgorithm(ECAlgorithm.SHA256)
+    return ECKey(ECKey.SHA256)
 
 private_key = """-----BEGIN EC PRIVATE KEY-----
 MHQCAQEEIIAK499svJugZZfsTsgL2tc7kH/CpzQbkr4g55CEWQyPoAcGBSuBBAAK
@@ -27,10 +27,6 @@ class TestECAlgorithm:
         key = 'secret'
         with pytest.raises(JOSEError):
             alg.prepare_key(key)
-
-    def test_string_unicode(self, alg):
-        unicode_key = private_key.decode('utf-8')
-        alg.prepare_key(unicode_key)
 
     def test_object(self, alg):
         key = object()

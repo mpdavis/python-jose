@@ -31,14 +31,21 @@ class TestJWT:
     def test_encode(self, claims, key):
 
         expected = (
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'
-            '.eyJhIjoiYiJ9'
-            '.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+            (
+                'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9'
+                '.eyJhIjoiYiJ9'
+                '.xNtk2S0CNbCBZX_f67pFgGRugaP1xi2ICfet3nwOSxw'
+            ),
+            (
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'
+                '.eyJhIjoiYiJ9'
+                '.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+            )
         )
 
         encoded = jwt.encode(claims, key)
 
-        assert encoded == expected
+        assert encoded in expected
 
     def test_decode(self, claims, key):
 
