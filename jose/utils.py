@@ -1,6 +1,5 @@
+
 import base64
-import six
-import struct
 
 
 def base64url_decode(input):
@@ -36,21 +35,3 @@ def timedelta_total_seconds(delta):
         delta (timedelta): A timedelta to convert to seconds.
     """
     return delta.days * 24 * 60 * 60 + delta.seconds
-
-
-def constant_time_compare(a, b):
-    """Helper method to compare two strings in constant time.
-
-    Strings need to be compared in constant time when worried
-    about timing attacks.
-
-    Args:
-        a (str): The first string to compare.
-        b (str): The second string to compare.
-    """
-    if len(a) != len(b):
-        return False
-    result = 0
-    for x, y in zip(a, b):
-        result |= ord(x) ^ ord(y)
-    return result == 0
