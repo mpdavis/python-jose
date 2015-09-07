@@ -1,5 +1,5 @@
 
-from jose.jwa import RSAAlgorithm
+from jose.jwk import RSAKey
 from jose.exceptions import JOSEError
 
 from Crypto.PublicKey import RSA
@@ -9,7 +9,7 @@ import pytest
 
 @pytest.fixture
 def alg():
-    return RSAAlgorithm(RSAAlgorithm.SHA256)
+    return RSAKey(RSAKey.SHA256)
 
 
 private_key = """-----BEGIN RSA PRIVATE KEY-----
@@ -78,8 +78,6 @@ class TestRSAAlgorithm:
             "nt8Is9UzpERV0ePPQdLuW3IS_de3xyIrDaLGdjluPxUAhb6L2aXic1U12podGU0KLUQSE_oI" \
             "-ZnmKJ3F4uOZDnd6QZWJushZ41Axf_fcIe8u9ipH84ogoree7vjbU5y18kDquDg"
 
-
-
     def test_RSA_key(self, alg):
         key = RSA.importKey(private_key)
         alg.prepare_key(key)
@@ -88,10 +86,6 @@ class TestRSAAlgorithm:
         key = 'secret'
         with pytest.raises(JOSEError):
             alg.prepare_key(key)
-
-    def test_string_unicode(self, alg):
-        unicode_key = private_key.decode('utf-8')
-        alg.prepare_key(unicode_key)
 
     def test_object(self, alg):
         key = object()

@@ -2,10 +2,7 @@
 import hashlib
 import hmac
 import six
-
-from jose.constants import ALGORITHMS
-from jose.exceptions import JWSError
-from jose.exceptions import JOSEError
+import struct
 
 import Crypto.Hash.SHA256
 import Crypto.Hash.SHA384
@@ -16,7 +13,10 @@ from Crypto.Signature import PKCS1_v1_5
 
 import ecdsa
 
-from jose.utils import constant_time_compare
+from jose.constants import ALGORITHMS
+from jose.exceptions import JWKError
+from jose.exceptions import JWSError
+from jose.exceptions import JOSEError
 
 
 def get_algorithm_object(algorithm):
@@ -25,39 +25,41 @@ def get_algorithm_object(algorithm):
     """
 
     if algorithm == ALGORITHMS.HS256:
-        return HMACAlgorithm(HMACAlgorithm.SHA256)
+        return HMACKey(HMACKey.SHA256)
 
     if algorithm == ALGORITHMS.HS384:
-        return HMACAlgorithm(HMACAlgorithm.SHA384)
+        return HMACKey(HMACKey.SHA384)
 
     if algorithm == ALGORITHMS.HS512:
-        return HMACAlgorithm(HMACAlgorithm.SHA512)
+        return HMACKey(HMACKey.SHA512)
 
     if algorithm == ALGORITHMS.RS256:
-        return RSAAlgorithm(RSAAlgorithm.SHA256)
+        return RSAKey(RSAKey.SHA256)
 
     if algorithm == ALGORITHMS.RS384:
-        return RSAAlgorithm(RSAAlgorithm.SHA384)
+        return RSAKey(RSAKey.SHA384)
 
     if algorithm == ALGORITHMS.RS512:
-        return RSAAlgorithm(RSAAlgorithm.SHA512)
+        return RSAKey(RSAKey.SHA512)
 
     if algorithm == ALGORITHMS.ES256:
-        return ECAlgorithm(ECAlgorithm.SHA256)
+        return ECKey(ECKey.SHA256)
 
     if algorithm == ALGORITHMS.ES384:
-        return ECAlgorithm(ECAlgorithm.SHA384)
+        return ECKey(ECKey.SHA384)
 
     if algorithm == ALGORITHMS.ES512:
-        return ECAlgorithm(ECAlgorithm.SHA512)
+        return ECKey(ECKey.SHA512)
 
     raise JWSError('Algorithm not supported: %s' % algorithm)
 
 
-class Algorithm(object):
+class Key(object):
     """
-    The interface for an algorithm used to sign and verify tokens.
+    The interface for an JWK used to sign and verify tokens.
     """
+    prepared_key = None
+
     def process_sign(self, msg, key):
         """
         Processes a signature for the given algorithm.
@@ -82,6 +84,22 @@ class Algorithm(object):
         """
         raise NotImplementedError
 
+    def process_deserilialize(self):
+        """
+        Processes deserializing a key into a JWK JSON format.
+
+        This method should be overriden by the implementing Key class.
+        """
+        raise NotImplementedError
+
+    def process_jwk(self, jwk):
+        """
+        Process a JWK dict into a Key object.
+
+        This method shold be overriden by the implementing Key class.
+        """
+        raise NotImplementedError
+
     def prepare_key(self, key):
         """
         Performs necessary validation and conversions on the key and returns
@@ -93,9 +111,12 @@ class Algorithm(object):
             TypeError: If an invalid key is attempted to be used.
         """
         try:
-            return self.process_prepare_key(key)
-        except Exception, e:
+            key = self.process_prepare_key(key)
+        except Exception as e:
             raise JOSEError(e)
+
+        self.prepared_key = key
+        return key
 
     def sign(self, msg, key):
         """
@@ -109,7 +130,7 @@ class Algorithm(object):
         """
         try:
             return self.process_sign(msg, key)
-        except Exception, e:
+        except Exception as e:
             raise JOSEError(e)
 
     def verify(self, msg, key, sig):
@@ -124,11 +145,11 @@ class Algorithm(object):
         """
         try:
             return self.process_verify(msg, key, sig)
-        except Exception, e:
+        except Exception as e:
             raise JOSEError(e)
 
 
-class HMACAlgorithm(Algorithm):
+class HMACKey(Key):
     """
     Performs signing and verification operations using HMAC
     and the specified hash function.
@@ -164,10 +185,10 @@ class HMACAlgorithm(Algorithm):
         return hmac.new(key, msg, self.hash_alg).digest()
 
     def process_verify(self, msg, key, sig):
-        return constant_time_compare(sig, self.sign(msg, key))
+        return sig == self.sign(msg, key)
 
 
-class RSAAlgorithm(Algorithm):
+class RSAKey(Key):
     """
     Performs signing and verification operations using
     RSASSA-PKCS-v1_5 and the specified hash function.
@@ -183,8 +204,11 @@ class RSAAlgorithm(Algorithm):
 
     def process_prepare_key(self, key):
 
-        if isinstance(key, RSA._RSAobj):
+        if isinstance(key, (RSA._RSAobj, RSAKey)):
             return key
+
+        if isinstance(key, dict):
+            return self.process_jwk(key)
 
         if isinstance(key, six.string_types):
             if isinstance(key, six.text_type):
@@ -196,6 +220,25 @@ class RSAAlgorithm(Algorithm):
 
         return key
 
+    def process_jwk(self, jwk):
+
+        def urlsafe_b64decode(encoded):
+            import base64
+            if not encoded:
+                return encoded
+            modulo = len(encoded) % 4
+            if modulo != 0:
+                encoded += ('=' * (4 - modulo))
+            return base64.b64decode(encoded)
+
+        if not jwk.get('kty') == 'RSA':
+            raise JWKError("Incorrect key type.  Expected: 'RSA', Recieved: %s" % jwk.get('kty'))
+
+        e = bytes(jwk.get('e', 256))
+        n = bytes(jwk.get('n'))
+
+        return RSA.construct((long(n), long(e)))
+
     def process_sign(self, msg, key):
         return PKCS1_v1_5.new(key).sign(self.hash_alg.new(msg))
 
@@ -203,7 +246,7 @@ class RSAAlgorithm(Algorithm):
         return PKCS1_v1_5.new(key).verify(self.hash_alg.new(msg), sig)
 
 
-class ECAlgorithm(Algorithm):
+class ECKey(Key):
     """
     Performs signing and verification operations using
     ECDSA and the specified hash function
