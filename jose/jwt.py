@@ -115,6 +115,46 @@ def decode(token, key, algorithms=None, options=None, audience=None, issuer=None
     return token_info
 
 
+def get_unverified_headers(token):
+    """Returns the decoded headers without verification of any kind.
+
+    Args:
+        token (str): A signed JWT to decode the headers from.
+
+    Returns:
+        dict: The dict representation of the token headers.
+
+    Raises:
+        JWTError: If there is an exception decoding the token.
+    """
+    try:
+        headers = jws.get_unverified_headers(token)
+    except:
+        raise JWTError('Error decoding token headers.')
+
+    return headers
+
+
+def get_unverified_claims(token):
+    """Returns the decoded claims without verification of any kind.
+
+    Args:
+        token (str): A signed JWT to decode the headers from.
+
+    Returns:
+        dict: The dict representation of the token claims.
+
+    Raises:
+        JWTError: If there is an exception decoding the token.
+    """
+    try:
+        claims = jws.get_unverified_claims(token)
+    except:
+        raise JWTError('Error decoding token claims.')
+
+    return claims
+
+
 def _validate_iat(claims):
     """Validates that the 'iat' claim is valid.
 

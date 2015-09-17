@@ -76,6 +76,38 @@ def verify(token, key, algorithms, verify=True):
     return claims
 
 
+def get_unverified_headers(token):
+    """Returns the decoded headers without verification of any kind.
+
+    Args:
+        token (str): A signed JWS to decode the headers from.
+
+    Returns:
+        dict: The dict representation of the token headers.
+
+    Raises:
+        JWSError: If there is an exception decoding the token.
+    """
+    header, claims, signing_input, signature = _load(token)
+    return header
+
+
+def get_unverified_claims(token):
+    """Returns the decoded claims without verification of any kind.
+
+    Args:
+        token (str): A signed JWS to decode the headers from.
+
+    Returns:
+        dict: The dict representation of the token claims.
+
+    Raises:
+        JWSError: If there is an exception decoding the token.
+    """
+    header, claims, signing_input, signature = _load(token)
+    return claims
+
+
 def _encode_header(algorithm, additional_headers=None):
     header = {
         "typ": "JWT",
