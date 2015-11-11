@@ -20,6 +20,12 @@ def claims():
 def key():
     return 'secret'
 
+@pytest.fixture
+def headers():
+    headers = {
+        'kid': 'my-key-id',
+    }
+    return headers
 
 class TestJWT:
 
@@ -27,6 +33,19 @@ class TestJWT:
         encoded = jwt.encode(claims, key, algorithm='HS384')
         decoded = jwt.decode(encoded, key, algorithms='HS384')
         assert claims == decoded
+
+    def test_non_default_alg_positional_bwcompat(self, claims, key):
+        encoded = jwt.encode(claims, key, 'HS384')
+        decoded = jwt.decode(encoded, key, 'HS384')
+        assert claims == decoded
+
+    def test_non_default_headers(self, claims, key, headers):
+        encoded = jwt.encode(claims, key, headers=headers)
+        decoded = jwt.decode(encoded, key)
+        assert claims == decoded
+        all_headers = jwt.get_unverified_headers(encoded)
+        custom_headers = {k: all_headers[k] for k in headers.keys()}
+        assert custom_headers == headers
 
     def test_encode(self, claims, key):
 
