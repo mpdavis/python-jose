@@ -12,7 +12,7 @@ from .exceptions import ExpiredSignatureError
 from .utils import timedelta_total_seconds
 
 
-def encode(claims, key, algorithm=None):
+def encode(claims, key, algorithm=None, headers=None):
     """Encodes a claims set and returns a JWT string.
 
     JWTs are JWS signed objects with a few reserved claims.
@@ -20,11 +20,11 @@ def encode(claims, key, algorithm=None):
     Args:
         claims (dict): A claims set to sign
         key (str): The key to use for signing the claim set
+        algorithm (str, optional): The algorithm to use for signing the
+            the claims.  Defaults to HS256.
         headers (dict, optional): A set of headers that will be added to
             the default headers.  Any headers that are added as additional
             headers will override the default headers.
-        algorithm (str, optional): The algorithm to use for signing the
-            the claims.  Defaults to HS256.
 
     Returns:
         str: The string representation of the header, claims, and signature.
@@ -46,9 +46,9 @@ def encode(claims, key, algorithm=None):
             claims[time_claim] = timegm(claims[time_claim].utctimetuple())
 
     if algorithm:
-        return jws.sign(claims, key, algorithm=algorithm)
+        return jws.sign(claims, key, headers=headers, algorithm=algorithm)
 
-    return jws.sign(claims, key)
+    return jws.sign(claims, key, headers=headers)
 
 
 def decode(token, key, algorithms=None, options=None, audience=None, issuer=None):
