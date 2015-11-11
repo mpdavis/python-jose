@@ -44,8 +44,8 @@ class TestJWT:
         decoded = jwt.decode(encoded, key)
         assert claims == decoded
         all_headers = jwt.get_unverified_headers(encoded)
-        custom_headers = {k: all_headers[k] for k in headers.keys()}
-        assert custom_headers == headers
+        for k, v in headers.items():
+            assert all_headers[k] == v
 
     def test_encode(self, claims, key):
 
