@@ -2,7 +2,6 @@
 import hashlib
 import hmac
 import six
-import struct
 
 import Crypto.Hash.SHA256
 import Crypto.Hash.SHA384
@@ -17,6 +16,11 @@ from jose.constants import ALGORITHMS
 from jose.exceptions import JWKError
 from jose.exceptions import JWSError
 from jose.exceptions import JOSEError
+
+if hasattr(RSA, '_RSAobj'):
+    _RSAKey = RSA._RSAobj
+else:
+    _RSAKey = RSA.RsaKey
 
 
 def get_algorithm_object(algorithm):
@@ -204,7 +208,7 @@ class RSAKey(Key):
 
     def process_prepare_key(self, key):
 
-        if isinstance(key, (RSA._RSAobj, RSAKey)):
+        if isinstance(key, (_RSAKey, RSAKey)):
             return key
 
         if isinstance(key, dict):
