@@ -17,6 +17,8 @@ from jose.exceptions import JWKError
 from jose.exceptions import JWSError
 from jose.exceptions import JOSEError
 
+# PyCryptodome's RSA module doesn't have PyCrypto's _RSAobj class
+# Instead it has a class named RsaKey, which serves the same purpose.
 if hasattr(RSA, '_RSAobj'):
     _RSAKey = RSA._RSAobj
 else:
