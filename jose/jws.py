@@ -8,6 +8,7 @@ from collections import Mapping
 from jose.jwk import get_algorithm_object
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWSError
+from jose.exceptions import JWSSignatureError
 from jose.utils import base64url_encode
 from jose.utils import base64url_decode
 
@@ -203,7 +204,9 @@ def _verify_signature(payload, signing_input, header, signature, key='', algorit
             key = alg_obj.prepare_key(key)
 
             if not alg_obj.verify(signing_input, key, signature):
-                raise JWSError('Signature verification failed')
+                raise JWSSignatureError()
 
+        except JWSSignatureError:
+            raise JWSError('Signature verification failed.')
         except JWSError:
             raise JWSError('Invalid or unsupported algorithm: %s' % alg)

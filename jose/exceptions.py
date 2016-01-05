@@ -8,6 +8,10 @@ class JWSError(JOSEError):
     pass
 
 
+class JWSSignatureError(JWSError):
+    pass
+
+
 class JWSAlgorithmError(JWSError):
     pass
 
