@@ -1,2 +1,2 @@
-pycrypto==2.6.1
-six==1.9.0
+pycrypto
+six
