@@ -13,11 +13,11 @@ from jose.utils import base64url_encode
 from jose.utils import base64url_decode
 
 
-def sign(claims, key, headers=None, algorithm=ALGORITHMS.HS256):
+def sign(payload, key, headers=None, algorithm=ALGORITHMS.HS256):
     """Signs a claims set and returns a JWS string.
 
     Args:
-        claims (dict): A claims set to sign
+        payload (str): A string to sign
         key (str): The key to use for signing the claim set
         headers (dict, optional): A set of headers that will be added to
             the default headers.  Any headers that are added as additional
@@ -42,8 +42,8 @@ def sign(claims, key, headers=None, algorithm=ALGORITHMS.HS256):
         raise JWSError('Algorithm %s not supported.' % algorithm)
 
     encoded_header = _encode_header(algorithm, additional_headers=headers)
-    encoded_claims = _encode_claims(claims)
-    signed_output = _sign_header_and_claims(encoded_header, encoded_claims, algorithm, key)
+    encoded_payload = _encode_payload(payload)
+    signed_output = _sign_header_and_claims(encoded_header, encoded_payload, algorithm, key)
 
     return signed_output
 
@@ -57,27 +57,27 @@ def verify(token, key, algorithms, verify=True):
         algorithms (str or list): Valid algorithms that should be used to verify the JWS.
 
     Returns:
-        dict: The dict representation of the claims set, assuming the signature is valid.
+        str: The str representation of the payload, assuming the signature is valid.
 
     Raises:
         JWSError: If there is an exception verifying a token.
 
     Examples:
 
-        >>> payload = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
-        >>> jws.verify(payload, 'secret', algorithms='HS256')
+        >>> token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+        >>> jws.verify(token, 'secret', algorithms='HS256')
 
     """
 
-    header, claims, signing_input, signature = _load(token)
+    header, payload, signing_input, signature = _load(token)
 
     if verify:
-        _verify_signature(claims, signing_input, header, signature, key, algorithms)
+        _verify_signature(payload, signing_input, header, signature, key, algorithms)
 
-    return claims
+    return payload
 
 
-def get_unverified_headers(token):
+def get_unverified_header(token):
     """Returns the decoded headers without verification of any kind.
 
     Args:
@@ -91,6 +91,24 @@ def get_unverified_headers(token):
     """
     header, claims, signing_input, signature = _load(token)
     return header
+
+
+def get_unverified_headers(token):
+    """Returns the decoded headers without verification of any kind.
+
+    This is simply a wrapper of get_unverified_header() for backwards
+    compatibility.
+
+    Args:
+        token (str): A signed JWS to decode the headers from.
+
+    Returns:
+        dict: The dict representation of the token headers.
+
+    Raises:
+        JWSError: If there is an exception decoding the token.
+    """
+    return get_unverified_header(token)
 
 
 def get_unverified_claims(token):
@@ -126,13 +144,17 @@ def _encode_header(algorithm, additional_headers=None):
     return base64url_encode(json_header)
 
 
-def _encode_claims(claims):
-    json_payload = json.dumps(
-        claims,
-        separators=(',', ':'),
-    ).encode('utf-8')
+def _encode_payload(payload):
+    if isinstance(payload, Mapping):
+        try:
+            payload = json.dumps(
+                payload,
+                separators=(',', ':'),
+            ).encode('utf-8')
+        except ValueError:
+            pass
 
-    return base64url_encode(json_payload)
+    return base64url_encode(payload)
 
 
 def _sign_header_and_claims(encoded_header, encoded_claims, algorithm, key):
@@ -172,22 +194,16 @@ def _load(jwt):
         raise JWSError('Invalid header string: must be a json object')
 
     try:
-        claims_data = base64url_decode(claims_segment)
-        claims = json.loads(claims_data.decode('utf-8'))
+        payload = base64url_decode(claims_segment)
     except (TypeError, binascii.Error):
         raise JWSError('Invalid payload padding')
-    except ValueError as e:
-        raise JWSError('Invalid payload string: %s' % e)
-
-    if not isinstance(claims, Mapping):
-        raise JWSError('Invalid payload string: must be a json object')
 
     try:
         signature = base64url_decode(crypto_segment)
     except (TypeError, binascii.Error):
         raise JWSError('Invalid crypto padding')
 
-    return (header, claims, signing_input, signature)
+    return (header, payload, signing_input, signature)
 
 
 def _verify_signature(payload, signing_input, header, signature, key='', algorithms=None):
