@@ -1,5 +1,9 @@
 
+import binascii
+import json
+
 from calendar import timegm
+from collections import Mapping
 from datetime import datetime
 from datetime import timedelta
 from six import string_types
@@ -108,14 +112,24 @@ def decode(token, key, algorithms=None, options=None, audience=None, issuer=None
         defaults.update(options)
 
     verify_signature = defaults.get('verify_signature', True)
-    token_info = jws.verify(token, key, algorithms, verify=verify_signature)
+    payload = jws.verify(token, key, algorithms, verify=verify_signature)
 
-    _validate_claims(token_info, audience=audience, issuer=issuer, options=defaults)
+    try:
+        claims = json.loads(payload.decode('utf-8'))
+    except (TypeError, binascii.Error):
+        raise JWTError('Invalid payload padding')
+    except ValueError as e:
+        raise JWTError('Invalid payload string: %s' % e)
 
-    return token_info
+    if not isinstance(claims, Mapping):
+        raise JWTError('Invalid payload string: must be a json object')
+
+    _validate_claims(claims, audience=audience, issuer=issuer, options=defaults)
+
+    return claims
 
 
-def get_unverified_headers(token):
+def get_unverified_header(token):
     """Returns the decoded headers without verification of any kind.
 
     Args:
@@ -133,6 +147,24 @@ def get_unverified_headers(token):
         raise JWTError('Error decoding token headers.')
 
     return headers
+
+
+def get_unverified_headers(token):
+    """Returns the decoded headers without verification of any kind.
+
+    This is simply a wrapper of get_unverified_header() for backwards
+    compatibility.
+
+    Args:
+        token (str): A signed JWT to decode the headers from.
+
+    Returns:
+        dict: The dict representation of the token headers.
+
+    Raises:
+        JWTError: If there is an exception decoding the token.
+    """
+    return get_unverified_header(token)
 
 
 def get_unverified_claims(token):

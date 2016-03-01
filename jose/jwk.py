@@ -1,7 +1,11 @@
 
+import base64
 import hashlib
 import hmac
+import struct
 import six
+
+from builtins import int
 
 import Crypto.Hash.SHA256
 import Crypto.Hash.SHA384
@@ -58,6 +62,19 @@ def get_algorithm_object(algorithm):
         return ECKey(ECKey.SHA512)
 
     raise JWSError('Algorithm not supported: %s' % algorithm)
+
+
+def int_arr_to_long(arr):
+    return int(''.join(["%02x" % byte for byte in arr]), 16)
+
+
+def base64_to_long(data):
+    if isinstance(data, six.text_type):
+        data = data.encode("ascii")
+
+    # urlsafe_b64decode will happily convert b64encoded data
+    _d = base64.urlsafe_b64decode(bytes(data) + b'==')
+    return int_arr_to_long(struct.unpack('%sB' % len(_d), _d))
 
 
 class Key(object):
@@ -228,22 +245,13 @@ class RSAKey(Key):
 
     def process_jwk(self, jwk):
 
-        def urlsafe_b64decode(encoded):
-            import base64
-            if not encoded:
-                return encoded
-            modulo = len(encoded) % 4
-            if modulo != 0:
-                encoded += ('=' * (4 - modulo))
-            return base64.b64decode(encoded)
-
         if not jwk.get('kty') == 'RSA':
             raise JWKError("Incorrect key type.  Expected: 'RSA', Recieved: %s" % jwk.get('kty'))
 
-        e = bytes(jwk.get('e', 256))
-        n = bytes(jwk.get('n'))
+        e = base64_to_long(jwk.get('e', 256))
+        n = base64_to_long(jwk.get('n'))
 
-        return RSA.construct((long(n), long(e)))
+        return RSA.construct((n, e))
 
     def process_sign(self, msg, key):
         return PKCS1_v1_5.new(key).sign(self.hash_alg.new(msg))
