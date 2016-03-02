@@ -33,6 +33,7 @@ def get_install_requires():
         crypto_lib,
         'six <2.0',
         'ecdsa <1.0',
+        'future <1.0',
     ]
 
 
