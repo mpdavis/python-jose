@@ -119,7 +119,7 @@ class Key(object):
         """
         Process a JWK dict into a Key object.
 
-        This method shold be overriden by the implementing Key class.
+        This method should be overriden by the implementing Key class.
         """
         raise NotImplementedError
 
@@ -203,6 +203,23 @@ class HMACKey(Key):
                 ' should not be used as an HMAC secret.')
 
         return key
+
+    def process_jwk(self, jwk):
+
+        if not jwk.get('kty') == 'oct':
+            raise JWKError("Incorrect key type.  Expected: 'oct', Recieved: %s" % jwk.get('kty'))
+
+        key = jwk.get('k')
+
+        alg = jwk.get('alg', 'HS256') 
+        if alg not in ('HS256', 'HS384', 'HS512'):
+            raise JWKError("Invalid algorithm. Expected one of: 'HS256', 'HS384', 'HS512', Received: %s" % alg) 
+
+        alg_obj = get_algorithm_object(alg)
+        self.hash_alg = alg_obj.hash_alg
+
+        return hmac.new(key, digestmod=self.hash_alg)
+
 
     def process_sign(self, msg, key):
         return hmac.new(key, msg, self.hash_alg).digest()
