@@ -107,7 +107,7 @@ class Key(object):
         """
         raise NotImplementedError
 
-    def process_deserilialize(self):
+    def process_deserialize(self):
         """
         Processes deserializing a key into a JWK JSON format.
 
