@@ -20,12 +20,14 @@ def claims():
 def key():
     return 'secret'
 
+
 @pytest.fixture
 def headers():
     headers = {
         'kid': 'my-key-id',
     }
     return headers
+
 
 class TestJWT:
 

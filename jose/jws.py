@@ -5,7 +5,7 @@ import six
 
 from collections import Mapping
 
-from jose.jwk import get_algorithm_object
+from jose import jwk
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWSError
 from jose.exceptions import JWSSignatureError
@@ -157,12 +157,15 @@ def _encode_payload(payload):
     return base64url_encode(payload)
 
 
-def _sign_header_and_claims(encoded_header, encoded_claims, algorithm, key):
+def _sign_header_and_claims(encoded_header, encoded_claims, algorithm, key_data):
     signing_input = b'.'.join([encoded_header, encoded_claims])
     try:
-        alg_obj = get_algorithm_object(algorithm)
-        key = alg_obj.prepare_key(key)
-        signature = alg_obj.sign(signing_input, key)
+        key = jwk.construct(key_data, algorithm)
+        signature = key.sign(signing_input)
+
+        # alg_obj = get_algorithm_object(algorithm)
+        # key = alg_obj.prepare_key(key)
+        # signature = alg_obj.sign(signing_input, key)
     except Exception as e:
         raise JWSError(e)
 
@@ -216,10 +219,9 @@ def _verify_signature(signing_input, header, signature, key='', algorithms=None)
             raise JWSError('The specified alg value is not allowed')
 
         try:
-            alg_obj = get_algorithm_object(alg)
-            key = alg_obj.prepare_key(key)
+            key = jwk.construct(key, alg)
 
-            if not alg_obj.verify(signing_input, key, signature):
+            if not key.verify(signing_input, signature):
                 raise JWSSignatureError()
 
         except JWSSignatureError:

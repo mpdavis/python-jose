@@ -5,18 +5,21 @@ from jose.exceptions import JOSEError
 import pytest
 
 
-@pytest.fixture
-def alg():
-    return HMACKey(HMACKey.SHA256)
-
-
 class TestHMACAlgorithm:
 
-    def test_non_string_key(self, alg):
+    def test_non_string_key(self):
         with pytest.raises(JOSEError):
-            alg.prepare_key(object())
+            HMACKey(object(), HMACKey.SHA256)
 
-    def test_RSA_key(self, alg):
+    def test_RSA_key(self):
         key = "-----BEGIN PUBLIC KEY-----"
         with pytest.raises(JOSEError):
-            alg.prepare_key(key)
+            HMACKey(key, HMACKey.SHA256)
+
+        key = "-----BEGIN CERTIFICATE-----"
+        with pytest.raises(JOSEError):
+            HMACKey(key, HMACKey.SHA256)
+
+        key = "ssh-rsa"
+        with pytest.raises(JOSEError):
+            HMACKey(key, HMACKey.SHA256)

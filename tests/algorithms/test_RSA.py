@@ -6,12 +6,6 @@ from Crypto.PublicKey import RSA
 
 import pytest
 
-
-@pytest.fixture
-def alg():
-    return RSAKey(RSAKey.SHA256)
-
-
 private_key = """-----BEGIN RSA PRIVATE KEY-----
 MIIJKwIBAAKCAgEAtSKfSeI0fukRIX38AHlKB1YPpX8PUYN2JdvfM+XjNmLfU1M7
 4N0VmdzIX95sneQGO9kC2xMIE+AIlt52Yf/KgBZggAlS9Y0Vx8DsSL2HvOjguAdX
@@ -67,16 +61,15 @@ mdUxHwi1ulkspAn/fmY7f0hZpskDwcHyZmbKZuk+NU/FJ8IAcmvk9y7m25nSSc8=
 
 class TestRSAAlgorithm:
 
-    def test_RSA_key(self, alg):
-        key = RSA.importKey(private_key)
-        alg.prepare_key(key)
+    def test_RSA_key(self):
+        RSAKey(private_key, RSAKey.SHA256)
 
-    def test_string_secret(self, alg):
+    def test_string_secret(self):
         key = 'secret'
         with pytest.raises(JOSEError):
-            alg.prepare_key(key)
+            RSAKey(key, RSAKey.SHA256)
 
-    def test_object(self, alg):
+    def test_object(self):
         key = object()
         with pytest.raises(JOSEError):
-            alg.prepare_key(key)
+            RSAKey(key, RSAKey.SHA256)
