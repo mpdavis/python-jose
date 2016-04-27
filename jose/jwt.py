@@ -184,7 +184,10 @@ def get_unverified_claims(token):
     except:
         raise JWTError('Error decoding token claims.')
 
-    return claims
+    try:
+        return json.loads(claims.decode('utf-8'))
+    except ValueError as e:
+        raise JWTError('Invalid claims string: %s' % e)
 
 
 def _validate_iat(claims):

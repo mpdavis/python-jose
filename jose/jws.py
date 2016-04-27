@@ -124,11 +124,7 @@ def get_unverified_claims(token):
         JWSError: If there is an exception decoding the token.
     """
     header, claims, signing_input, signature = _load(token)
-
-    try:
-        return json.loads(claims.decode('utf-8'))
-    except ValueError as e:
-        raise JWSError('Invalid claims string: %s' % e)
+    return claims
 
 
 def _encode_header(algorithm, additional_headers=None):
