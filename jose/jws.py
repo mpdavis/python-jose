@@ -72,7 +72,7 @@ def verify(token, key, algorithms, verify=True):
     header, payload, signing_input, signature = _load(token)
 
     if verify:
-        _verify_signature(payload, signing_input, header, signature, key, algorithms)
+        _verify_signature(signing_input, header, signature, key, algorithms)
 
     return payload
 
@@ -206,7 +206,7 @@ def _load(jwt):
     return (header, payload, signing_input, signature)
 
 
-def _verify_signature(payload, signing_input, header, signature, key='', algorithms=None):
+def _verify_signature(signing_input, header, signature, key='', algorithms=None):
 
         alg = header.get('alg')
         if not alg:
