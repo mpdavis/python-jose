@@ -10,6 +10,7 @@ from six import string_types
 
 from jose import jws
 
+from .exceptions import JWSError
 from .exceptions import JWTClaimsError
 from .exceptions import JWTError
 from .exceptions import ExpiredSignatureError
@@ -112,12 +113,14 @@ def decode(token, key, algorithms=None, options=None, audience=None, issuer=None
         defaults.update(options)
 
     verify_signature = defaults.get('verify_signature', True)
-    payload = jws.verify(token, key, algorithms, verify=verify_signature)
+
+    try:
+        payload = jws.verify(token, key, algorithms, verify=verify_signature)
+    except JWSError as e:
+        raise JWTError(e)
 
     try:
         claims = json.loads(payload.decode('utf-8'))
-    except (TypeError, binascii.Error):
-        raise JWTError('Invalid payload padding')
     except ValueError as e:
         raise JWTError('Invalid payload string: %s' % e)
 
