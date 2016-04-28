@@ -118,7 +118,7 @@ def get_unverified_claims(token):
         token (str): A signed JWS to decode the headers from.
 
     Returns:
-        dict: The dict representation of the token claims.
+        str: The str representation of the token claims.
 
     Raises:
         JWSError: If there is an exception decoding the token.

@@ -402,3 +402,17 @@ class TestJWT:
         token = jwt.encode(claims, key)
         with pytest.raises(JWTError):
             jwt.decode(token, key)
+
+    def test_unverified_claims_string(self):
+        token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.aW52YWxpZCBjbGFpbQ.iOJ5SiNfaNO_pa2J4Umtb3b3zmk5C18-mhTCVNsjnck'
+        with pytest.raises(JWTError):
+            jwt.get_unverified_claims(token)
+
+    def test_unverified_claims_list(self):
+        token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.WyJpbnZhbGlkIiwgImNsYWltcyJd.nZvw_Rt1FfUPb5OiVbrSYZGtWSE5c-gdJ6nQnTTBkYo'
+        with pytest.raises(JWTError):
+            jwt.get_unverified_claims(token)
+
+    def test_unverified_claims_object(self, claims, key):
+        token = jwt.encode(claims, key)
+        assert jwt.get_unverified_claims(token) == claims

@@ -184,6 +184,14 @@ def get_unverified_claims(token):
     except:
         raise JWTError('Error decoding token claims.')
 
+    try:
+        claims = json.loads(claims.decode('utf-8'))
+    except ValueError as e:
+        raise JWTError('Invalid claims string: %s' % e)
+
+    if not isinstance(claims, Mapping):
+        raise JWTError('Invalid claims string: must be a json object')
+
     return claims
 
 
