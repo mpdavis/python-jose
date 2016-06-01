@@ -380,6 +380,29 @@ class TestJWT:
         with pytest.raises(JWTError):
             jwt.decode(token, key)
 
+    def test_sub_correct(self, key):
+
+        sub = 'subject'
+
+        claims = {
+            'sub': sub
+        }
+
+        token = jwt.encode(claims, key)
+        jwt.decode(token, key, subject=sub)
+
+    def test_sub_incorrect(self, key):
+
+        sub = 'subject'
+
+        claims = {
+            'sub': sub
+        }
+
+        token = jwt.encode(claims, key)
+        with pytest.raises(JWTError):
+            jwt.decode(token, key, subject='another')
+
     def test_jti_string(self, key):
 
         jti = 'JWT ID'
