@@ -4,8 +4,7 @@ import hashlib
 import hmac
 import struct
 import six
-
-from builtins import int
+import sys
 
 import Crypto.Hash.SHA256
 import Crypto.Hash.SHA384
@@ -27,6 +26,11 @@ if hasattr(RSA, '_RSAobj'):
     _RSAKey = RSA._RSAobj
 else:
     _RSAKey = RSA.RsaKey
+
+# Deal with integer compatibilities between Python 2 and 3.
+# Using `from builtins import int` is not supported on AppEngine.
+if sys.version_info > (3,):
+    long = int
 
 
 def get_algorithm_object(algorithm):
@@ -65,7 +69,7 @@ def get_algorithm_object(algorithm):
 
 
 def int_arr_to_long(arr):
-    return int(''.join(["%02x" % byte for byte in arr]), 16)
+    return long(''.join(["%02x" % byte for byte in arr]), 16)
 
 
 def base64_to_long(data):
