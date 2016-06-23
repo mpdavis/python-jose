@@ -17,8 +17,7 @@ import ecdsa
 
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWKError
-from jose.exceptions import JWSError
-from jose.exceptions import JOSEError
+from jose.utils import base64url_decode
 
 # PyCryptodome's RSA module doesn't have PyCrypto's _RSAobj class
 # Instead it has a class named RsaKey, which serves the same purpose.
@@ -31,41 +30,6 @@ else:
 # Using `from builtins import int` is not supported on AppEngine.
 if sys.version_info > (3,):
     long = int
-
-
-def get_algorithm_object(algorithm):
-    """
-    Returns an algorithm object for the given algorithm.
-    """
-
-    if algorithm == ALGORITHMS.HS256:
-        return HMACKey(HMACKey.SHA256)
-
-    if algorithm == ALGORITHMS.HS384:
-        return HMACKey(HMACKey.SHA384)
-
-    if algorithm == ALGORITHMS.HS512:
-        return HMACKey(HMACKey.SHA512)
-
-    if algorithm == ALGORITHMS.RS256:
-        return RSAKey(RSAKey.SHA256)
-
-    if algorithm == ALGORITHMS.RS384:
-        return RSAKey(RSAKey.SHA384)
-
-    if algorithm == ALGORITHMS.RS512:
-        return RSAKey(RSAKey.SHA512)
-
-    if algorithm == ALGORITHMS.ES256:
-        return ECKey(ECKey.SHA256)
-
-    if algorithm == ALGORITHMS.ES384:
-        return ECKey(ECKey.SHA384)
-
-    if algorithm == ALGORITHMS.ES512:
-        return ECKey(ECKey.SHA512)
-
-    raise JWSError('Algorithm not supported: %s' % algorithm)
 
 
 def int_arr_to_long(arr):
@@ -81,99 +45,61 @@ def base64_to_long(data):
     return int_arr_to_long(struct.unpack('%sB' % len(_d), _d))
 
 
+def construct(key_data, algorithm=None):
+    """
+    Construct a Key object for the given algorithm with the given
+    key_data.
+    """
+
+    # Allow for pulling the algorithm off of the passed in jwk.
+    if not algorithm and isinstance(key_data, dict):
+        algorithm = key_data.get('alg', None)
+
+    if not algorithm:
+        raise JWKError('Unable to find a algorithm for key: %s' % key_data)
+
+    if algorithm in ALGORITHMS.HMAC:
+        return HMACKey(key_data, algorithm)
+
+    if algorithm in ALGORITHMS.RSA:
+        return RSAKey(key_data, algorithm)
+
+    if algorithm in ALGORITHMS.EC:
+        return ECKey(key_data, algorithm)
+
+
+def get_algorithm_object(algorithm):
+
+    algorithms = {
+        ALGORITHMS.HS256: HMACKey.SHA256,
+        ALGORITHMS.HS384: HMACKey.SHA384,
+        ALGORITHMS.HS512: HMACKey.SHA512,
+        ALGORITHMS.RS256: RSAKey.SHA256,
+        ALGORITHMS.RS384: RSAKey.SHA384,
+        ALGORITHMS.RS512: RSAKey.SHA512,
+        ALGORITHMS.ES256: ECKey.SHA256,
+        ALGORITHMS.ES384: ECKey.SHA384,
+        ALGORITHMS.ES512: ECKey.SHA512,
+    }
+
+    return algorithms.get(algorithm, None)
+
+
 class Key(object):
     """
-    The interface for an JWK used to sign and verify tokens.
+    A simple interface for implementing JWK keys.
     """
     prepared_key = None
+    hash_alg = None
 
-    def process_sign(self, msg, key):
-        """
-        Processes a signature for the given algorithm.
+    def _process_jwk(self, jwk_dict):
+        raise NotImplementedError()
 
-        This method should be overriden by the implementing algortihm.
-        """
-        raise NotImplementedError
+    def sign(self, msg):
+        raise NotImplementedError()
 
-    def process_verify(self, msg, key, sig):
-        """
-        Processes a verification for the given algorithm.
-
-        This method should be overriden by the implementing algorithm.
-        """
-        raise NotImplementedError
-
-    def process_prepare_key(self, key):
-        """
-        Processes preparing a key for the given algorithm.
-
-        This method should be overriden by the implementing algorithm.
-        """
-        raise NotImplementedError
-
-    def process_deserialize(self):
-        """
-        Processes deserializing a key into a JWK JSON format.
-
-        This method should be overriden by the implementing Key class.
-        """
-        raise NotImplementedError
-
-    def process_jwk(self, jwk):
-        """
-        Process a JWK dict into a Key object.
-
-        This method shold be overriden by the implementing Key class.
-        """
-        raise NotImplementedError
-
-    def prepare_key(self, key):
-        """
-        Performs necessary validation and conversions on the key and returns
-        the key value in the proper format for sign() and verify().
-
-        This is used to catch any library errors and throw a JOSEError.
-
-        Raises:
-            TypeError: If an invalid key is attempted to be used.
-        """
-        try:
-            key = self.process_prepare_key(key)
-        except Exception as e:
-            raise JOSEError(e)
-
-        self.prepared_key = key
-        return key
-
-    def sign(self, msg, key):
-        """
-        Returns a digital signature for the specified message
-        using the specified key value.
-
-        This is used to catch any library errors and throw a JOSEError.
-
-        Raises:
-            JOSEError: When there is an error creating a signature.
-        """
-        try:
-            return self.process_sign(msg, key)
-        except Exception as e:
-            raise JOSEError(e)
-
-    def verify(self, msg, key, sig):
-        """
-        Verifies that the specified digital signature is valid
-        for the specified message and key values.
-
-        This is used to catch any library errors and throw a JOSEError.
-
-        Raises:
-            JOSEError: When there is an error verifiying the signature.
-        """
-        try:
-            return self.process_verify(msg, key, sig)
-        except Exception as e:
-            raise JOSEError(e)
+    def verify(self, msg, sig):
+        raise NotImplementedError()
 
 
 class HMACKey(Key):
@@ -184,13 +110,22 @@ class HMACKey(Key):
     SHA256 = hashlib.sha256
     SHA384 = hashlib.sha384
     SHA512 = hashlib.sha512
+    valid_hash_algs = ALGORITHMS.HMAC
 
-    def __init__(self, hash_alg):
-        self.hash_alg = hash_alg
+    prepared_key = None
+    hash_alg = None
 
-    def process_prepare_key(self, key):
+    def __init__(self, key, algorithm):
+        if algorithm not in self.valid_hash_algs:
+            raise JWKError('hash_alg: %s is not a valid hash algorithm' % algorithm)
+        self.hash_alg = get_algorithm_object(algorithm)
+
+        if isinstance(key, dict):
+            self.prepared_key = self._process_jwk(key)
+            return
+
         if not isinstance(key, six.string_types) and not isinstance(key, bytes):
-            raise TypeError('Expecting a string- or bytes-formatted key.')
+            raise JWKError('Expecting a string- or bytes-formatted key.')
 
         if isinstance(key, six.text_type):
             key = key.encode('utf-8')
@@ -202,17 +137,28 @@ class HMACKey(Key):
         ]
 
         if any([string_value in key for string_value in invalid_strings]):
-            raise Exception(
+            raise JWKError(
                 'The specified key is an asymmetric key or x509 certificate and'
                 ' should not be used as an HMAC secret.')
 
-        return key
+        self.prepared_key = key
 
-    def process_sign(self, msg, key):
-        return hmac.new(key, msg, self.hash_alg).digest()
+    def _process_jwk(self, jwk_dict):
+        if not jwk_dict.get('kty') == 'oct':
+            raise JWKError("Incorrect key type.  Expected: 'oct', Recieved: %s" % jwk_dict.get('kty'))
 
-    def process_verify(self, msg, key, sig):
-        return sig == self.sign(msg, key)
+        k = jwk_dict.get('k')
+        k = k.encode('utf-8')
+        k = bytes(k)
+        k = base64url_decode(k)
+
+        return k
+
+    def sign(self, msg):
+        return hmac.new(self.prepared_key, msg, self.hash_alg).digest()
+
+    def verify(self, msg, sig):
+        return sig == self.sign(msg)
 
 
 class RSAKey(Key):
@@ -222,46 +168,63 @@ class RSAKey(Key):
     This class requires PyCrypto package to be installed.
     This is based off of the implementation in PyJWT 0.3.2
     """
+
     SHA256 = Crypto.Hash.SHA256
     SHA384 = Crypto.Hash.SHA384
     SHA512 = Crypto.Hash.SHA512
+    valid_hash_algs = ALGORITHMS.RSA
 
-    def __init__(self, hash_alg):
-        self.hash_alg = hash_alg
+    prepared_key = None
+    hash_alg = None
 
-    def process_prepare_key(self, key):
+    def __init__(self, key, algorithm):
 
-        if isinstance(key, (_RSAKey, RSAKey)):
-            return key
+        if algorithm not in self.valid_hash_algs:
+            raise JWKError('hash_alg: %s is not a valid hash algorithm' % algorithm)
+        self.hash_alg = get_algorithm_object(algorithm)
+
+        if isinstance(key, _RSAKey):
+            self.prepared_key = key
+            return
 
         if isinstance(key, dict):
-            return self.process_jwk(key)
+            self.prepared_key = self._process_jwk(key)
+            return
 
         if isinstance(key, six.string_types):
             if isinstance(key, six.text_type):
                 key = key.encode('utf-8')
 
-            key = RSA.importKey(key)
-        else:
-            raise TypeError('Expecting a PEM- or RSA-formatted key.')
+            try:
+                self.prepared_key = RSA.importKey(key)
+            except Exception as e:
+                raise JWKError(e)
 
-        return key
+            return
 
-    def process_jwk(self, jwk):
+        raise JWKError('Unable to parse an RSA_JWK from key: %s' % key)
 
-        if not jwk.get('kty') == 'RSA':
-            raise JWKError("Incorrect key type.  Expected: 'RSA', Recieved: %s" % jwk.get('kty'))
+    def _process_jwk(self, jwk_dict):
+        if not jwk_dict.get('kty') == 'RSA':
+            raise JWKError("Incorrect key type.  Expected: 'RSA', Recieved: %s" % jwk_dict.get('kty'))
 
-        e = base64_to_long(jwk.get('e', 256))
-        n = base64_to_long(jwk.get('n'))
+        e = base64_to_long(jwk_dict.get('e', 256))
+        n = base64_to_long(jwk_dict.get('n'))
 
-        return RSA.construct((n, e))
+        self.prepared_key = RSA.construct((n, e))
+        return self.prepared_key
 
-    def process_sign(self, msg, key):
-        return PKCS1_v1_5.new(key).sign(self.hash_alg.new(msg))
+    def sign(self, msg):
+        try:
+            return PKCS1_v1_5.new(self.prepared_key).sign(self.hash_alg.new(msg))
+        except Exception as e:
+            raise JWKError(e)
 
-    def process_verify(self, msg, key, sig):
-        return PKCS1_v1_5.new(key).verify(self.hash_alg.new(msg), sig)
+    def verify(self, msg, sig):
+        try:
+            return PKCS1_v1_5.new(self.prepared_key).verify(self.hash_alg.new(msg), sig)
+        except Exception as e:
+            raise JWKError(e)
 
 
 class ECKey(Key):
@@ -276,15 +239,32 @@ class ECKey(Key):
     SHA256 = hashlib.sha256
     SHA384 = hashlib.sha384
     SHA512 = hashlib.sha512
+    valid_hash_algs = ALGORITHMS.EC
 
-    def __init__(self, hash_alg):
-        self.hash_alg = hash_alg
+    curve_map = {
+        SHA256: ecdsa.curves.NIST256p,
+        SHA384: ecdsa.curves.NIST384p,
+        SHA512: ecdsa.curves.NIST521p,
+    }
 
-    def process_prepare_key(self, key):
+    prepared_key = None
+    hash_alg = None
+    curve = None
 
-        if isinstance(key, ecdsa.SigningKey) or \
-           isinstance(key, ecdsa.VerifyingKey):
-            return key
+    def __init__(self, key, algorithm):
+        if algorithm not in self.valid_hash_algs:
+            raise JWKError('hash_alg: %s is not a valid hash algorithm' % algorithm)
+        self.hash_alg = get_algorithm_object(algorithm)
+
+        self.curve = self.curve_map.get(self.hash_alg)
+
+        if isinstance(key, (ecdsa.SigningKey, ecdsa.VerifyingKey)):
+            self.prepared_key = key
+            return
+
+        if isinstance(key, dict):
+            self.prepared_key = self._process_jwk(key)
+            return
 
         if isinstance(key, six.string_types):
             if isinstance(key, six.text_type):
@@ -297,17 +277,34 @@ class ECKey(Key):
                 key = ecdsa.VerifyingKey.from_pem(key)
             except ecdsa.der.UnexpectedDER:
                 key = ecdsa.SigningKey.from_pem(key)
+            except Exception as e:
+                raise JWKError(e)
 
-        else:
-            raise TypeError('Expecting a PEM-formatted key.')
+            self.prepared_key = key
+            return
 
-        return key
+        raise JWKError('Unable to parse an ECKey from key: %s' % key)
 
-    def process_sign(self, msg, key):
-        return key.sign(msg, hashfunc=self.hash_alg, sigencode=ecdsa.util.sigencode_string)
+    def _process_jwk(self, jwk_dict):
+        if not jwk_dict.get('kty') == 'EC':
+            raise JWKError("Incorrect key type.  Expected: 'EC', Recieved: %s" % jwk_dict.get('kty'))
 
-    def process_verify(self, msg, key, sig):
+        x = base64_to_long(jwk_dict.get('x'))
+        y = base64_to_long(jwk_dict.get('y'))
+
+        if not ecdsa.ecdsa.point_is_valid(self.curve.generator, x, y):
+            raise JWKError("Point: %s, %s is not a valid point" % (x, y))
+
+        point = ecdsa.ellipticcurve.Point(self.curve.curve, x, y, self.curve.order)
+        verifying_key = ecdsa.keys.VerifyingKey.from_public_point(point, self.curve)
+
+        return verifying_key
+
+    def sign(self, msg):
+        return self.prepared_key.sign(msg, hashfunc=self.hash_alg, sigencode=ecdsa.util.sigencode_string)
+
+    def verify(self, msg, sig):
         try:
-            return key.verify(sig, msg, hashfunc=self.hash_alg, sigdecode=ecdsa.util.sigdecode_string)
+            return self.prepared_key.verify(sig, msg, hashfunc=self.hash_alg, sigdecode=ecdsa.util.sigdecode_string)
         except:
             return False

@@ -8,10 +8,10 @@ import pytest
 expected_payload = b"It\xe2\x80\x99s a dangerous business, Frodo, going out your door. You step onto the road, and if you don't keep your feet, there\xe2\x80\x99s no knowing where you might be swept off to."
 
 
-# [Docs] [txt|pdf] [draft-ietf-jose-c...]                                 
-                                                                        
-                                                                        
-                                                                        
+# [Docs] [txt|pdf] [draft-ietf-jose-c...]
+
+
+
 # Internet Engineering Task Force (IETF)                         M. Miller
 # Request for Comments: 7520                           Cisco Systems, Inc.
 # Category: Informational                                         May 2015
@@ -64,7 +64,7 @@ expected_payload = b"It\xe2\x80\x99s a dangerous business, Frodo, going out your
 
 
 # Miller                        Informational                     [Page 1]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -120,7 +120,7 @@ expected_payload = b"It\xe2\x80\x99s a dangerous business, Frodo, going out your
 
 
 # Miller                        Informational                     [Page 2]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -176,7 +176,7 @@ expected_payload = b"It\xe2\x80\x99s a dangerous business, Frodo, going out your
 
 
 # Miller                        Informational                     [Page 3]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -232,7 +232,7 @@ expected_payload = b"It\xe2\x80\x99s a dangerous business, Frodo, going out your
 
 
 # Miller                        Informational                     [Page 4]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -288,7 +288,7 @@ expected_payload = b"It\xe2\x80\x99s a dangerous business, Frodo, going out your
 
 
 # Miller                        Informational                     [Page 5]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -330,6 +330,15 @@ expected_payload = b"It\xe2\x80\x99s a dangerous business, Frodo, going out your
 #          SsUdaQkAgDPrwQrJmbnX9cwlGfP-HqHZR1"
 #    }
 
+ec_public_key = {
+    "kty": "EC",
+    "kid": "bilbo.baggins@hobbiton.example",
+    "use": "sig",
+    "crv": "P-521",
+    "x": "AHKZLLOsCOzz5cY97ewNUajB957y-C-U88c3v13nmGZx6sYl_oJXu9A5RkTKqjqvjyekWF-7ytDyRXYgCF5cj0Kt",
+    "y": "AdymlHvOiLxXkEhayXQnNCvDX4h9htZaCJN34kfmC6pV5OhQHiraVySsUdaQkAgDPrwQrJmbnX9cwlGfP-HqHZR1"
+}
+
 #                  Figure 1: Elliptic Curve P-521 Public Key
 
 #    The field "kty" value of "EC" identifies this as an Elliptic Curve
@@ -344,7 +353,7 @@ expected_payload = b"It\xe2\x80\x99s a dangerous business, Frodo, going out your
 
 
 # Miller                        Informational                     [Page 6]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -400,7 +409,7 @@ expected_payload = b"It\xe2\x80\x99s a dangerous business, Frodo, going out your
 
 
 # Miller                        Informational                     [Page 7]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -425,6 +434,14 @@ expected_payload = b"It\xe2\x80\x99s a dangerous business, Frodo, going out your
 #          HdrNP5zw",
 #      "e": "AQAB"
 #    }
+
+rsa_public_jwk = {
+    "kty": "RSA",
+    "kid": "bilbo.baggins@hobbiton.example",
+    "use": "sig",
+    "n": "n4EPtAOCc9AlkeQHPzHStgAbgs7bTZLwUBZdR8_KuKPEHLd4rHVTeT-O-XV2jRojdNhxJWTDvNd7nqQ0VEiZQHz_AJmSCpMaJMRBSFKrKb2wqVwGU_NsYOYL-QtiWN2lbzcEe6XC0dApr5ydQLrHqkHHig3RBordaZ6Aj-oBHqFEHYpPe7Tpe-OfVfHd1E6cS6M1FZcD1NNLYD5lFHpPI9bTwJlsde3uhGqC0ZCuEHg8lhzwOHrtIQbS0FVbb9k3-tVTU4fg_3L_vniUFAKwuCLqKnS2BYwdq_mzSnbLY7h_qixoR7jig3__kRhuaxwUkRz5iaiQkqgc5gHdrNP5zw",
+    "e": "AQAB"
+}
 
 #                      Figure 3: RSA 2048-Bit Public Key
 
@@ -456,7 +473,7 @@ expected_payload = b"It\xe2\x80\x99s a dangerous business, Frodo, going out your
 
 
 # Miller                        Informational                     [Page 8]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -512,7 +529,7 @@ expected_payload = b"It\xe2\x80\x99s a dangerous business, Frodo, going out your
 
 
 # Miller                        Informational                     [Page 9]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -544,6 +561,14 @@ expected_payload = b"It\xe2\x80\x99s a dangerous business, Frodo, going out your
 #      "k": "hJtXIZ2uSN5kbQfbtTNWbpdmhkV8FJG-Onbc6mxCcYg"
 #    }
 
+hmac_key = {
+    "kty": "oct",
+    "kid": "018c0ae5-4d9b-471b-bfd6-eef314bc7037",
+    "use": "sig",
+    "alg": "HS256",
+    "k": "hJtXIZ2uSN5kbQfbtTNWbpdmhkV8FJG-Onbc6mxCcYg"
+}
+
 #                    Figure 5: HMAC SHA-256 Symmetric Key
 
 #    The field "kty" value of "oct" identifies this as a symmetric key.
@@ -568,7 +593,7 @@ expected_payload = b"It\xe2\x80\x99s a dangerous business, Frodo, going out your
 
 
 # Miller                        Informational                    [Page 10]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -624,7 +649,7 @@ expected_payload = b"It\xe2\x80\x99s a dangerous business, Frodo, going out your
 
 
 # Miller                        Informational                    [Page 11]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -680,7 +705,7 @@ expected_payload = b"It\xe2\x80\x99s a dangerous business, Frodo, going out your
 
 
 # Miller                        Informational                    [Page 12]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -736,7 +761,7 @@ expected_payload = b"It\xe2\x80\x99s a dangerous business, Frodo, going out your
 
 
 # Miller                        Informational                    [Page 13]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -758,6 +783,15 @@ expected_payload = b"It\xe2\x80\x99s a dangerous business, Frodo, going out your
 #    cIe8u9ipH84ogoree7vjbU5y18kDquDg
 
 #                    Figure 13: JWS Compact Serialization
+
+class TestFourOneThree:
+
+    token = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImJpbGJvLmJhZ2dpbnNAaG9iYml0b24uZXhhbXBsZSJ9.SXTigJlzIGEgZGFuZ2Vyb3VzIGJ1c2luZXNzLCBGcm9kbywgZ29pbmcgb3V0IHlvdXIgZG9vci4gWW91IHN0ZXAgb250byB0aGUgcm9hZCwgYW5kIGlmIHlvdSBkb24ndCBrZWVwIHlvdXIgZmVldCwgdGhlcmXigJlzIG5vIGtub3dpbmcgd2hlcmUgeW91IG1pZ2h0IGJlIHN3ZXB0IG9mZiB0by4.MRjdkly7_-oTPTS3AXP41iQIGKa80A0ZmTuV5MEaHoxnW2e5CZ5NlKtainoFmKZopdHM1O2U4mwzJdQx996ivp83xuglII7PNDi84wnB-BDkoBwA78185hX-Es4JIwmDLJK3lfWRa-XtL0RnltuYv746iYTh_qHRD68BNt1uSNCrUCTJDt5aAE6x8wW1Kt9eRo4QPocSadnHXFxnt8Is9UzpERV0ePPQdLuW3IS_de3xyIrDaLGdjluPxUAhb6L2aXic1U12podGU0KLUQSE_oI-ZnmKJ3F4uOZDnd6QZWJushZ41Axf_fcIe8u9ipH84ogoree7vjbU5y18kDquDg"
+
+    def test_signature(self):
+
+        payload = verify(self.token, rsa_public_jwk, 'RS256')
+        assert payload == expected_payload
 
 #    The resulting JWS object using the general JWS JSON Serialization:
 
@@ -792,7 +826,7 @@ expected_payload = b"It\xe2\x80\x99s a dangerous business, Frodo, going out your
 
 
 # Miller                        Informational                    [Page 14]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -816,36 +850,6 @@ expected_payload = b"It\xe2\x80\x99s a dangerous business, Frodo, going out your
 #    }
 
 #                 Figure 15: Flattened JWS JSON Serialization
-
-
-class TestFourOne:
-
-    public_jwk = {
-        "kty": "RSA",
-        "kid": "bilbo.baggins@hobbiton.example",
-        "use": "sig",
-        "n": "n4EPtAOCc9AlkeQHPzHStgAbgs7bTZLwUBZdR8_KuKPEHLd4rHVTeT-O-XV2jRojdNhxJWTDvNd7nqQ0VEiZQHz_AJmSCpMaJMRBSFKrKb2wqVwGU_NsYOYL-QtiWN2lbzcEe6XC0dApr5ydQLrHqkHHig3RBordaZ6Aj-oBHqFEHYpPe7Tpe-OfVfHd1E6cS6M1FZcD1NNLYD5lFHpPI9bTwJlsde3uhGqC0ZCuEHg8lhzwOHrtIQbS0FVbb9k3-tVTU4fg_3L_vniUFAKwuCLqKnS2BYwdq_mzSnbLY7h_qixoR7jig3__kRhuaxwUkRz5iaiQkqgc5gHdrNP5zw",
-        "e": "AQAB"
-    }
-
-    token = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImJpbGJvLmJhZ2dpbnNAaG9iYml0b24uZXhhbXBsZSJ9" \
-            ".SXTigJlzIGEgZGFuZ2Vyb3VzIGJ1c2luZXNzLCBGcm9kbywgZ29pbmcgb3V0IHlvdXIgZG9" \
-            "vci4gWW91IHN0ZXAgb250byB0aGUgcm9hZCwgYW5kIGlmIHlvdSBkb24ndCBrZWVwIHlvdXI" \
-            "gZmVldCwgdGhlcmXigJlzIG5vIGtub3dpbmcgd2hlcmUgeW91IG1pZ2h0IGJlIHN3ZXB0IG9" \
-            "mZiB0by4.MRjdkly7_-oTPTS3AXP41iQIGKa80A0ZmTuV5MEaHoxnW2e5CZ5NlKtainoFmKZ" \
-            "opdHM1O2U4mwzJdQx996ivp83xuglII7PNDi84wnB-BDkoBwA78185hX-Es4JIwmDLJK3lfW" \
-            "Ra-XtL0RnltuYv746iYTh_qHRD68BNt1uSNCrUCTJDt5aAE6x8wW1Kt9eRo4QPocSadnHXFx" \
-            "nt8Is9UzpERV0ePPQdLuW3IS_de3xyIrDaLGdjluPxUAhb6L2aXic1U12podGU0KLUQSE_oI" \
-            "-ZnmKJ3F4uOZDnd6QZWJushZ41Axf_fcIe8u9ipH84ogoree7vjbU5y18kDquDg"
-
-    def test_signature(self):
-
-        key = RSAKey(RSAKey.SHA256)
-
-        prepared_key = key.prepare_key(self.public_jwk)
-        payload = verify(self.token, prepared_key, 'RS256')
-
-        assert payload == expected_payload
 
 # 4.2.  RSA-PSS Signature
 
@@ -878,7 +882,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 15]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -934,7 +938,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 16]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -990,7 +994,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 17]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -1046,7 +1050,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 18]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -1102,7 +1106,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 19]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -1156,9 +1160,19 @@ class TestFourOne:
 #                    Figure 27: JWS Compact Serialization
 
 
+class TestFourThreeThree:
+
+    token = "eyJhbGciOiJFUzUxMiIsImtpZCI6ImJpbGJvLmJhZ2dpbnNAaG9iYml0b24uZXhhbXBsZSJ9.SXTigJlzIGEgZGFuZ2Vyb3VzIGJ1c2luZXNzLCBGcm9kbywgZ29pbmcgb3V0IHlvdXIgZG9vci4gWW91IHN0ZXAgb250byB0aGUgcm9hZCwgYW5kIGlmIHlvdSBkb24ndCBrZWVwIHlvdXIgZmVldCwgdGhlcmXigJlzIG5vIGtub3dpbmcgd2hlcmUgeW91IG1pZ2h0IGJlIHN3ZXB0IG9mZiB0by4.AE_R_YZCChjn4791jSQCrdPZCNYqHXCTZH0-JZGYNlaAjP2kqaluUIIUnC9qvbu9Plon7KRTzoNEuT4Va2cmL1eJAQy3mtPBu_u_sDDyYjnAMDxXPn7XrT0lw-kvAD890jl8e2puQens_IEKBpHABlsbEPX6sFY8OcGDqoRuBomu9xQ2"
+
+    def test_signature(self):
+
+        payload = verify(self.token, ec_public_key, 'ES512')
+        assert payload == expected_payload
+
+
 
 # Miller                        Informational                    [Page 20]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -1214,7 +1228,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 21]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -1270,7 +1284,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 22]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -1306,7 +1320,14 @@ class TestFourOne:
 #                    Figure 34: JWS Compact Serialization
 
 
+class TestFourFourThree:
 
+    token = "eyJhbGciOiJIUzI1NiIsImtpZCI6IjAxOGMwYWU1LTRkOWItNDcxYi1iZmQ2LWVlZjMxNGJjNzAzNyJ9.SXTigJlzIGEgZGFuZ2Vyb3VzIGJ1c2luZXNzLCBGcm9kbywgZ29pbmcgb3V0IHlvdXIgZG9vci4gWW91IHN0ZXAgb250byB0aGUgcm9hZCwgYW5kIGlmIHlvdSBkb24ndCBrZWVwIHlvdXIgZmVldCwgdGhlcmXigJlzIG5vIGtub3dpbmcgd2hlcmUgeW91IG1pZ2h0IGJlIHN3ZXB0IG9mZiB0by4.s0h6KThzkfBBBkLspW1h84VsJZFTsPPqMDA7g1Md7p0"
+
+    def test_signature(self):
+
+        payload = verify(self.token, hmac_key, 'HS256')
+        assert payload == expected_payload
 
 
 
@@ -1326,7 +1347,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 23]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -1382,7 +1403,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 24]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -1438,7 +1459,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 25]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -1494,7 +1515,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 26]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -1550,7 +1571,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 27]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -1606,7 +1627,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 28]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -1662,7 +1683,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 29]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -1718,7 +1739,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 30]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -1774,7 +1795,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 31]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -1830,7 +1851,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 32]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -1886,7 +1907,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 33]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -1942,7 +1963,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 34]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -1998,7 +2019,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 35]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -2054,7 +2075,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 36]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -2110,7 +2131,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 37]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -2166,7 +2187,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 38]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -2222,7 +2243,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 39]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -2278,7 +2299,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 40]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -2334,7 +2355,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 41]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -2390,7 +2411,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 42]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -2446,7 +2467,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 43]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -2502,7 +2523,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 44]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -2558,7 +2579,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 45]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -2614,7 +2635,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 46]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -2670,7 +2691,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 47]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -2726,7 +2747,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 48]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -2782,7 +2803,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 49]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -2838,7 +2859,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 50]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -2894,7 +2915,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 51]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -2950,7 +2971,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 52]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -3006,7 +3027,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 53]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -3062,7 +3083,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 54]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -3118,7 +3139,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 55]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -3174,7 +3195,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 56]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -3230,7 +3251,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 57]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -3286,7 +3307,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 58]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -3342,7 +3363,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 59]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -3398,7 +3419,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 60]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -3454,7 +3475,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 61]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -3510,7 +3531,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 62]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -3566,7 +3587,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 63]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -3622,7 +3643,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 64]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -3678,7 +3699,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 65]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -3734,7 +3755,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 66]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -3790,7 +3811,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 67]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -3846,7 +3867,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 68]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -3902,7 +3923,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 69]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -3958,7 +3979,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 70]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -4014,7 +4035,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 71]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -4070,7 +4091,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 72]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -4126,7 +4147,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 73]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -4182,7 +4203,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 74]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -4238,7 +4259,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 75]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -4294,7 +4315,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 76]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -4350,7 +4371,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 77]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -4406,7 +4427,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 78]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -4462,7 +4483,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 79]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -4518,7 +4539,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 80]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -4574,7 +4595,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 81]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -4630,7 +4651,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 82]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -4686,7 +4707,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 83]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -4742,7 +4763,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 84]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -4798,7 +4819,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 85]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -4854,7 +4875,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 86]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -4910,7 +4931,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 87]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -4966,7 +4987,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 88]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -5022,7 +5043,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 89]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -5078,7 +5099,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 90]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -5134,7 +5155,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 91]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -5190,7 +5211,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 92]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -5246,7 +5267,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 93]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -5302,7 +5323,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 94]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -5358,7 +5379,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 95]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -5414,7 +5435,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 96]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -5470,7 +5491,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 97]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -5526,7 +5547,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 98]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -5582,7 +5603,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                    [Page 99]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -5638,7 +5659,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                   [Page 100]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -5694,7 +5715,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                   [Page 101]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -5750,7 +5771,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                   [Page 102]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -5806,7 +5827,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                   [Page 103]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -5862,7 +5883,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                   [Page 104]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -5918,7 +5939,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                   [Page 105]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -5974,7 +5995,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                   [Page 106]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -6030,7 +6051,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                   [Page 107]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -6086,7 +6107,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                   [Page 108]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -6142,7 +6163,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                   [Page 109]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -6198,7 +6219,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                   [Page 110]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -6254,7 +6275,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                   [Page 111]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -6310,7 +6331,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                   [Page 112]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -6366,7 +6387,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                   [Page 113]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -6422,7 +6443,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                   [Page 114]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -6478,7 +6499,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                   [Page 115]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -6534,7 +6555,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                   [Page 116]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -6590,7 +6611,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                   [Page 117]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -6646,7 +6667,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                   [Page 118]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 
@@ -6702,7 +6723,7 @@ class TestFourOne:
 
 
 # Miller                        Informational                   [Page 119]
- 
+
 # RFC 7520                      JOSE Cookbook                     May 2015
 
 

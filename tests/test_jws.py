@@ -1,5 +1,4 @@
 
-
 from jose import jws
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWSError

@@ -1,14 +1,10 @@
 
-from jose.jwk import ECKey
+from jose.constants import ALGORITHMS
 from jose.exceptions import JOSEError
+from jose.jwk import ECKey
 
 import ecdsa
 import pytest
-
-
-@pytest.fixture
-def alg():
-    return ECKey(ECKey.SHA256)
 
 private_key = """-----BEGIN EC PRIVATE KEY-----
 MHQCAQEEIIAK499svJugZZfsTsgL2tc7kH/CpzQbkr4g55CEWQyPoAcGBSuBBAAK
@@ -19,16 +15,16 @@ W6xQdXHfqGUy3Dx40NDhgTaM8xAdSw==
 
 class TestECAlgorithm:
 
-    def test_EC_key(self, alg):
+    def test_EC_key(self):
         key = ecdsa.SigningKey.from_pem(private_key)
-        alg.prepare_key(key)
+        ECKey(key, ALGORITHMS.ES256)
 
-    def test_string_secret(self, alg):
+    def test_string_secret(self):
         key = 'secret'
         with pytest.raises(JOSEError):
-            alg.prepare_key(key)
+            ECKey(key, ALGORITHMS.ES256)
 
-    def test_object(self, alg):
+    def test_object(self):
         key = object()
         with pytest.raises(JOSEError):
-            alg.prepare_key(key)
+            ECKey(key, ALGORITHMS.ES256)

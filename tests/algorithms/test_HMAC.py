@@ -1,22 +1,26 @@
 
-from jose.jwk import HMACKey
+from jose.constants import ALGORITHMS
 from jose.exceptions import JOSEError
+from jose.jwk import HMACKey
 
 import pytest
 
 
-@pytest.fixture
-def alg():
-    return HMACKey(HMACKey.SHA256)
-
-
 class TestHMACAlgorithm:
 
-    def test_non_string_key(self, alg):
+    def test_non_string_key(self):
         with pytest.raises(JOSEError):
-            alg.prepare_key(object())
+            HMACKey(object(), ALGORITHMS.HS256)
 
-    def test_RSA_key(self, alg):
+    def test_RSA_key(self):
         key = "-----BEGIN PUBLIC KEY-----"
         with pytest.raises(JOSEError):
-            alg.prepare_key(key)
+            HMACKey(key, ALGORITHMS.HS256)
+
+        key = "-----BEGIN CERTIFICATE-----"
+        with pytest.raises(JOSEError):
+            HMACKey(key, ALGORITHMS.HS256)
+
+        key = "ssh-rsa"
+        with pytest.raises(JOSEError):
+            HMACKey(key, ALGORITHMS.HS256)
