@@ -162,10 +162,6 @@ def _sign_header_and_claims(encoded_header, encoded_claims, algorithm, key_data)
     try:
         key = jwk.construct(key_data, algorithm)
         signature = key.sign(signing_input)
-
-        # alg_obj = get_algorithm_object(algorithm)
-        # key = alg_obj.prepare_key(key)
-        # signature = alg_obj.sign(signing_input, key)
     except Exception as e:
         raise JWSError(e)
 
