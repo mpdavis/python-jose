@@ -1,6 +1,7 @@
 
-from jose.jwk import ECKey
+from jose.constants import ALGORITHMS
 from jose.exceptions import JOSEError
+from jose.jwk import ECKey
 
 import ecdsa
 import pytest
@@ -16,14 +17,14 @@ class TestECAlgorithm:
 
     def test_EC_key(self):
         key = ecdsa.SigningKey.from_pem(private_key)
-        ECKey(key, ECKey.SHA256)
+        ECKey(key, ALGORITHMS.ES256)
 
     def test_string_secret(self):
         key = 'secret'
         with pytest.raises(JOSEError):
-            ECKey(key, ECKey.SHA256)
+            ECKey(key, ALGORITHMS.ES256)
 
     def test_object(self):
         key = object()
         with pytest.raises(JOSEError):
-            ECKey(key, ECKey.SHA256)
+            ECKey(key, ALGORITHMS.ES256)

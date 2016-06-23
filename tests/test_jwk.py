@@ -4,6 +4,7 @@ from jose.exceptions import JWKError
 
 import pytest
 
+
 hmac_key = {
     "kty": "oct",
     "kid": "018c0ae5-4d9b-471b-bfd6-eef314bc7037",
@@ -58,13 +59,13 @@ class TestJWK:
     def test_invalid_jwk(self):
 
         with pytest.raises(JWKError):
-            key = jwk.HMACKey(rsa_key, 'HS512')
+            key = jwk.HMACKey(rsa_key, 'HS256')
 
         with pytest.raises(JWKError):
-            key = jwk.HMACKey(hmac_key, 'RS512')
+            key = jwk.RSAKey(hmac_key, 'RS256')
 
         with pytest.raises(JWKError):
-            key = jwk.HMACKey(rsa_key, 'EC512')
+            key = jwk.ECKey(rsa_key, 'ES256')
 
     def test_RSAKey_errors(self):
 
@@ -89,8 +90,6 @@ class TestJWK:
 
         with pytest.raises(JWKError):
             key = jwk.RSAKey(rsa_key, 'RS256')
-
-
 
     def test_construct_from_jwk(self):
 

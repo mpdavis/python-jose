@@ -58,32 +58,31 @@ def construct(key_data, algorithm=None):
     if not algorithm:
         raise JWKError('Unable to find a algorithm for key: %s' % key_data)
 
-    if algorithm == ALGORITHMS.HS256:
-        return HMACKey(key_data, HMACKey.SHA256)
+    if algorithm in ALGORITHMS.HMAC:
+        return HMACKey(key_data, algorithm)
 
-    if algorithm == ALGORITHMS.HS384:
-        return HMACKey(key_data, HMACKey.SHA384)
+    if algorithm in ALGORITHMS.RSA:
+        return RSAKey(key_data, algorithm)
 
-    if algorithm == ALGORITHMS.HS512:
-        return HMACKey(key_data, HMACKey.SHA512)
+    if algorithm in ALGORITHMS.EC:
+        return ECKey(key_data, algorithm)
 
-    if algorithm == ALGORITHMS.RS256:
-        return RSAKey(key_data, RSAKey.SHA256)
 
-    if algorithm == ALGORITHMS.RS384:
-        return RSAKey(key_data, RSAKey.SHA384)
+def get_algorithm_object(algorithm):
 
-    if algorithm == ALGORITHMS.RS512:
-        return RSAKey(key_data, RSAKey.SHA512)
+    algorithms = {
+        ALGORITHMS.HS256: HMACKey.SHA256,
+        ALGORITHMS.HS384: HMACKey.SHA384,
+        ALGORITHMS.HS512: HMACKey.SHA512,
+        ALGORITHMS.RS256: RSAKey.SHA256,
+        ALGORITHMS.RS384: RSAKey.SHA384,
+        ALGORITHMS.RS512: RSAKey.SHA512,
+        ALGORITHMS.ES256: ECKey.SHA256,
+        ALGORITHMS.ES384: ECKey.SHA384,
+        ALGORITHMS.ES512: ECKey.SHA512,
+    }
 
-    if algorithm == ALGORITHMS.ES256:
-        return ECKey(key_data, ECKey.SHA256)
-
-    if algorithm == ALGORITHMS.ES384:
-        return ECKey(key_data, ECKey.SHA384)
-
-    if algorithm == ALGORITHMS.ES512:
-        return ECKey(key_data, ECKey.SHA512)
+    return algorithms.get(algorithm, None)
 
 
 class Key(object):
@@ -111,15 +110,15 @@ class HMACKey(Key):
     SHA256 = hashlib.sha256
     SHA384 = hashlib.sha384
     SHA512 = hashlib.sha512
-    valid_hash_algs = (SHA256, SHA384, SHA512)
+    valid_hash_algs = ALGORITHMS.HMAC
 
     prepared_key = None
     hash_alg = None
 
-    def __init__(self, key, hash_alg):
-        if hash_alg not in self.valid_hash_algs:
-            raise JWKError('hash_alg: %s is not a valid hash algorithm' % hash_alg)
-        self.hash_alg = hash_alg
+    def __init__(self, key, algorithm):
+        if algorithm not in self.valid_hash_algs:
+            raise JWKError('hash_alg: %s is not a valid hash algorithm' % algorithm)
+        self.hash_alg = get_algorithm_object(algorithm)
 
         if isinstance(key, dict):
             self.prepared_key = self._process_jwk(key)
@@ -173,16 +172,16 @@ class RSAKey(Key):
     SHA256 = Crypto.Hash.SHA256
     SHA384 = Crypto.Hash.SHA384
     SHA512 = Crypto.Hash.SHA512
-    valid_hash_algs = (SHA256, SHA384, SHA512)
+    valid_hash_algs = ALGORITHMS.RSA
 
     prepared_key = None
     hash_alg = None
 
-    def __init__(self, key, hash_alg):
+    def __init__(self, key, algorithm):
 
-        if hash_alg not in self.valid_hash_algs:
-            raise JWKError('hash_alg: %s is not a valid hash algorithm' % hash_alg)
-        self.hash_alg = hash_alg
+        if algorithm not in self.valid_hash_algs:
+            raise JWKError('hash_alg: %s is not a valid hash algorithm' % algorithm)
+        self.hash_alg = get_algorithm_object(algorithm)
 
         if isinstance(key, _RSAKey):
             self.prepared_key = key
@@ -240,7 +239,7 @@ class ECKey(Key):
     SHA256 = hashlib.sha256
     SHA384 = hashlib.sha384
     SHA512 = hashlib.sha512
-    valid_hash_algs = (SHA256, SHA384, SHA512)
+    valid_hash_algs = ALGORITHMS.EC
 
     curve_map = {
         SHA256: ecdsa.curves.NIST256p,
@@ -252,10 +251,10 @@ class ECKey(Key):
     hash_alg = None
     curve = None
 
-    def __init__(self, key, hash_alg):
-        if hash_alg not in self.valid_hash_algs:
-            raise JWKError('hash_alg: %s is not a valid hash algorithm' % hash_alg)
-        self.hash_alg = hash_alg
+    def __init__(self, key, algorithm):
+        if algorithm not in self.valid_hash_algs:
+            raise JWKError('hash_alg: %s is not a valid hash algorithm' % algorithm)
+        self.hash_alg = get_algorithm_object(algorithm)
 
         self.curve = self.curve_map.get(self.hash_alg)
 
