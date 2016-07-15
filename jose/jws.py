@@ -205,6 +205,14 @@ def _load(jwt):
     return (header, payload, signing_input, signature)
 
 
+def _sig_matches_keys(keys, signing_input, signature, alg):
+    for key in keys:
+        key = jwk.construct(key, alg)
+        if key.verify(signing_input, signature):
+            return True
+    return False
+
+
 def _verify_signature(signing_input, header, signature, key='', algorithms=None):
 
         alg = header.get('alg')
@@ -214,12 +222,14 @@ def _verify_signature(signing_input, header, signature, key='', algorithms=None)
         if algorithms is not None and alg not in algorithms:
             raise JWSError('The specified alg value is not allowed')
 
+        if 'keys' in key:  # JWK Set per RFC 7517
+            keys = key['keys']
+        else:
+            keys = [key]
+
         try:
-            key = jwk.construct(key, alg)
-
-            if not key.verify(signing_input, signature):
+            if not _sig_matches_keys(keys, signing_input, signature, alg):
                 raise JWSSignatureError()
-
         except JWSSignatureError:
             raise JWSError('Signature verification failed.')
         except JWSError:
