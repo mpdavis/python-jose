@@ -425,7 +425,7 @@ def _validate_at_hash(claims, access_token, algorithm):
     try:
         expected_hash = calculate_at_hash(access_token,
                                           ALGORITHMS.HASHES[algorithm])
-    except TypeError:
+    except (TypeError, ValueError):
         msg = 'Unable to calculate at_hash to verify against token claims.'
         raise JWTClaimsError(msg)
         

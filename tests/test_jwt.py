@@ -449,6 +449,11 @@ class TestJWT:
         with pytest.raises(JWTError):
             jwt.decode(token, key, access_token='<ACCESS_TOKEN>')
 
+    def test_at_hash_unable_to_calculate(self, claims, key):
+        token = jwt.encode(claims, key, access_token='<ACCESS_TOKEN>')
+        with pytest.raises(JWTError):
+            jwt.decode(token, key, access_token='\xe2')
+
     def test_unverified_claims_string(self):
         token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.aW52YWxpZCBjbGFpbQ.iOJ5SiNfaNO_pa2J4Umtb3b3zmk5C18-mhTCVNsjnck'
         with pytest.raises(JWTError):
