@@ -3,7 +3,7 @@ import binascii
 import json
 import six
 
-from collections import Mapping
+from collections import Mapping, Iterable
 
 from jose import jwk
 from jose.constants import ALGORITHMS
@@ -213,6 +213,19 @@ def _sig_matches_keys(keys, signing_input, signature, alg):
     return False
 
 
+def _get_keys(key):
+    if 'keys' in key:  # JWK Set per RFC 7517
+        if not isinstance(key, Mapping):  # Caller didn't JSON-decode
+            key = json.loads(key)
+        return key['keys']
+    # Iterable but not text or mapping => list- or tuple-like
+    elif (isinstance(key, Iterable) and
+          not (isinstance(key, six.string_types) or isinstance(key, Mapping))):
+        return key
+    else:  # Scalar value, wrap in list.
+        return [key]
+
+
 def _verify_signature(signing_input, header, signature, key='', algorithms=None):
 
         alg = header.get('alg')
@@ -222,11 +235,7 @@ def _verify_signature(signing_input, header, signature, key='', algorithms=None)
         if algorithms is not None and alg not in algorithms:
             raise JWSError('The specified alg value is not allowed')
 
-        if 'keys' in key:  # JWK Set per RFC 7517
-            keys = key['keys']
-        else:
-            keys = [key]
-
+        keys = _get_keys(key)
         try:
             if not _sig_matches_keys(keys, signing_input, signature, alg):
                 raise JWSSignatureError()

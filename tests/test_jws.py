@@ -197,6 +197,36 @@ google_id_token = (
     'WNz7vOIbvIlBR9Jrq5MIqbkkg'
 )
 
+
+class TestGetKeys(object):
+
+    def test_dict(self):
+        assert [{}] == jws._get_keys({})
+
+    def test_custom_object(self):
+        class MyDict(dict):
+            pass
+        mydict = MyDict()
+        assert [mydict] == jws._get_keys(mydict)
+
+    def test_RFC7517_string(self):
+        key = '{"keys": [{}, {}]}'
+        assert [{}, {}] == jws._get_keys(key)
+
+    def test_RFC7517_mapping(self):
+        key = {"keys": [{}, {}]}
+        assert [{}, {}] == jws._get_keys(key)
+
+    def test_string(self):
+        assert ['test'] == jws._get_keys('test')
+
+    def test_tuple(self):
+        assert ('test', 'key') == jws._get_keys(('test', 'key'))
+
+    def test_list(self):
+        assert ['test', 'key'] == jws._get_keys(['test', 'key'])
+
+
 class TestRSA(object):
 
     def test_jwk_set(self, jwk_set):
