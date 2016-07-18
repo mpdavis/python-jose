@@ -428,6 +428,27 @@ class TestJWT:
         with pytest.raises(JWTError):
             jwt.decode(token, key)
 
+    def test_at_hash(self, claims, key):
+        access_token = '<ACCESS_TOKEN>'
+        token = jwt.encode(claims, key, access_token=access_token)
+        payload = jwt.decode(token, key, access_token=access_token)
+        assert 'at_hash' in payload
+
+    def test_at_hash_invalid(self, claims, key):
+        token = jwt.encode(claims, key, access_token='<ACCESS_TOKEN>')
+        with pytest.raises(JWTError):
+            jwt.decode(token, key, access_token='<OTHER_TOKEN>')
+
+    def test_at_hash_missing_access_token(self, claims, key):
+        token = jwt.encode(claims, key, access_token='<ACCESS_TOKEN>')
+        with pytest.raises(JWTError):
+            jwt.decode(token, key)
+
+    def test_at_hash_missing_claim(self, claims, key):
+        token = jwt.encode(claims, key)
+        with pytest.raises(JWTError):
+            jwt.decode(token, key, access_token='<ACCESS_TOKEN>')
+
     def test_unverified_claims_string(self):
         token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.aW52YWxpZCBjbGFpbQ.iOJ5SiNfaNO_pa2J4Umtb3b3zmk5C18-mhTCVNsjnck'
         with pytest.raises(JWTError):
