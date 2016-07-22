@@ -28,3 +28,12 @@ Verifying token signatures
     >>> message, encoded_sig = token.rsplit('.', 1)
     >>> decoded_sig = base64url_decode(encoded_sig)
     >>> key.verify(message, decoded_sig)
+
+
+Note
+^^^^
+python-jose requires the use of public keys, as opposed to X.509 certificates.  If you have an X.509 certificate that you would like to convert to a public key that python-jose can consume, you can do so with openssl.
+
+.. code:: bash
+
+    > openssl x509 -pubkey -noout < cert.pem
