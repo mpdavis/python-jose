@@ -1,4 +1,4 @@
-
+import hashlib
 
 class ALGORITHMS(object):
     NONE = 'none'
@@ -19,3 +19,15 @@ class ALGORITHMS(object):
     SUPPORTED = HMAC + RSA + EC
 
     ALL = SUPPORTED + (NONE, )
+
+    HASHES = {
+        HS256: hashlib.sha256,
+        HS384: hashlib.sha384,
+        HS512: hashlib.sha512,
+        RS256: hashlib.sha256,
+        RS384: hashlib.sha384,
+        RS512: hashlib.sha512,
+        ES256: hashlib.sha256,
+        ES384: hashlib.sha384,
+        ES512: hashlib.sha512,
+    }
