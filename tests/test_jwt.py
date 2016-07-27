@@ -358,6 +358,17 @@ class TestJWT:
         token = jwt.encode(claims, key)
         jwt.decode(token, key, issuer=['https://issuer', 'issuer'])
 
+    def test_iss_tuple(self, key):
+
+        iss = 'issuer'
+
+        claims = {
+            'iss': iss
+        }
+
+        token = jwt.encode(claims, key)
+        jwt.decode(token, key, issuer=('https://issuer', 'issuer'))
+
     def test_iss_invalid(self, key):
 
         iss = 'issuer'
