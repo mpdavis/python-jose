@@ -72,9 +72,9 @@ def decode(token, key, algorithms=None, options=None, audience=None,
         audience (str): The intended audience of the token.  If the "aud" claim is
             included in the claim set, then the audience must be included and must equal
             the provided claim.
-        issuer (str): The issuer of the token.  If the "iss" claim is
-            included in the claim set, then the issuer must be included and must equal
-            the provided claim.
+        issuer (str or iterable): Acceptable value(s) for the issuer of the token.
+            If the "iss" claim is included in the claim set, then the issuer must be
+            given and the claim in the token must be among the acceptable values.
         subject (str): The subject of the token.  If the "sub" claim is
             included in the claim set, then the subject must be included and must equal
             the provided claim.
@@ -345,11 +345,14 @@ def _validate_iss(claims, issuer=None):
 
     Args:
         claims (dict): The claims dictionary to validate.
-        issuer (str): The issuer that sent the token.
+        issuer (str or iterable): Acceptable value(s) for the issuer that
+                                  signed the token.
     """
 
     if issuer is not None:
-        if claims.get('iss') != issuer:
+        if isinstance(issuer, string_types):
+            issuer = (issuer,)
+        if claims.get('iss') not in issuer:
             raise JWTClaimsError('Invalid issuer')
 
 
