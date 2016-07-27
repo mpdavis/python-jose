@@ -222,8 +222,8 @@ def _get_keys(key):
     elif (isinstance(key, Iterable) and
           not (isinstance(key, six.string_types) or isinstance(key, Mapping))):
         return key
-    else:  # Scalar value, wrap in list.
-        return [key]
+    else:  # Scalar value, wrap in tuple.
+        return (key,)
 
 
 def _verify_signature(signing_input, header, signature, key='', algorithms=None):

@@ -351,7 +351,7 @@ def _validate_iss(claims, issuer=None):
 
     if issuer is not None:
         if isinstance(issuer, string_types):
-            issuer = [issuer]
+            issuer = (issuer,)
         if claims.get('iss') not in issuer:
             raise JWTClaimsError('Invalid issuer')
 
