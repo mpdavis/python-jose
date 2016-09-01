@@ -12,6 +12,7 @@ import Crypto.Hash.SHA512
 
 from Crypto.PublicKey import RSA
 from Crypto.Signature import PKCS1_v1_5
+from Crypto.Util.asn1 import DerSequence
 
 import ecdsa
 
@@ -188,18 +189,24 @@ class RSAKey(Key):
             return
 
         if isinstance(key, dict):
-            self.prepared_key = self._process_jwk(key)
+            self._process_jwk(key)
             return
 
         if isinstance(key, six.string_types):
             if isinstance(key, six.text_type):
                 key = key.encode('utf-8')
 
+            if key.startswith(b'-----BEGIN CERTIFICATE-----'):
+                try:
+                    self._process_cert(key)
+                except Exception as e:
+                    raise JWKError(e)
+                return
+
             try:
                 self.prepared_key = RSA.importKey(key)
             except Exception as e:
                 raise JWKError(e)
-
             return
 
         raise JWKError('Unable to parse an RSA_JWK from key: %s' % key)
@@ -213,6 +220,16 @@ class RSAKey(Key):
 
         self.prepared_key = RSA.construct((n, e))
         return self.prepared_key
+
+    def _process_cert(self, key):
+        pemLines = key.replace(b' ', b'').split()
+        certDer = base64url_decode(b''.join(pemLines[1:-1]))
+        certSeq = DerSequence()
+        certSeq.decode(certDer)
+        tbsSeq = DerSequence()
+        tbsSeq.decode(certSeq[0])
+        self.prepared_key = RSA.importKey(tbsSeq[6])
+        return
 
     def sign(self, msg):
         try:

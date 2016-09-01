@@ -85,3 +85,8 @@ class TestRSAAlgorithm:
         key = object()
         with pytest.raises(JOSEError):
             RSAKey(key, ALGORITHMS.RS256)
+
+    def test_bad_cert(self):
+        key = '-----BEGIN CERTIFICATE-----'
+        with pytest.raises(JOSEError):
+            RSAKey(key, ALGORITHMS.RS256)

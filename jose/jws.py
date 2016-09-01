@@ -214,15 +214,34 @@ def _sig_matches_keys(keys, signing_input, signature, alg):
 
 
 def _get_keys(key):
-    if 'keys' in key:  # JWK Set per RFC 7517
-        if not isinstance(key, Mapping):  # Caller didn't JSON-decode
-            key = json.loads(key)
+
+    try:
+        key = json.loads(key)
+    except Exception:
+        pass
+
+    # JWK Set per RFC 7517
+    if 'keys' in key:
         return key['keys']
+
+    # Individual JWK per RFC 7517
+    elif 'kty' in key:
+        return (key,)
+
+    # Some other mapping. Firebase uses just dict of kid, cert pairs
+    elif isinstance(key, Mapping):
+        values = key.values()
+        if values:
+            return values
+        return (key,)
+
     # Iterable but not text or mapping => list- or tuple-like
     elif (isinstance(key, Iterable) and
           not (isinstance(key, six.string_types) or isinstance(key, Mapping))):
         return key
-    else:  # Scalar value, wrap in tuple.
+
+    # Scalar value, wrap in tuple.
+    else:
         return (key,)
 
 
