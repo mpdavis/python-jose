@@ -213,6 +213,10 @@ class TestGetKeys(object):
         key = '{"keys": [{}, {}]}'
         assert [{}, {}] == jws._get_keys(key)
 
+    def test_RFC7517_jwk(self):
+        key = {'kty': 'hsa', 'k': 'secret', 'alg': 'HS256', 'use': 'sig'}
+        assert (key, ) == jws._get_keys(key)
+
     def test_RFC7517_mapping(self):
         key = {"keys": [{}, {}]}
         assert [{}, {}] == jws._get_keys(key)
