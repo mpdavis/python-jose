@@ -208,8 +208,11 @@ def _load(jwt):
 def _sig_matches_keys(keys, signing_input, signature, alg):
     for key in keys:
         key = jwk.construct(key, alg)
-        if key.verify(signing_input, signature):
-            return True
+        try:
+            if key.verify(signing_input, signature):
+                return True
+        except:
+            pass
     return False
 
 
