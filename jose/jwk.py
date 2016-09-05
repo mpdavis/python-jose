@@ -19,6 +19,7 @@ import ecdsa
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWKError
 from jose.utils import base64url_decode
+from jose.utils import constant_time_string_compare
 
 # PyCryptodome's RSA module doesn't have PyCrypto's _RSAobj class
 # Instead it has a class named RsaKey, which serves the same purpose.
@@ -159,7 +160,7 @@ class HMACKey(Key):
         return hmac.new(self.prepared_key, msg, self.hash_alg).digest()
 
     def verify(self, msg, sig):
-        return sig == self.sign(msg)
+        return constant_time_string_compare(sig, self.sign(msg))
 
 
 class RSAKey(Key):
