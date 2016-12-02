@@ -1,6 +1,7 @@
+import os
 
-from jose.jwk import RSAKey
-from jose.jws import verify
+from jose.jwk import RSAKey, ECKey
+from jose.jws import verify, sign
 
 import pytest
 
@@ -336,7 +337,10 @@ ec_public_key = {
     "use": "sig",
     "crv": "P-521",
     "x": "AHKZLLOsCOzz5cY97ewNUajB957y-C-U88c3v13nmGZx6sYl_oJXu9A5RkTKqjqvjyekWF-7ytDyRXYgCF5cj0Kt",
-    "y": "AdymlHvOiLxXkEhayXQnNCvDX4h9htZaCJN34kfmC6pV5OhQHiraVySsUdaQkAgDPrwQrJmbnX9cwlGfP-HqHZR1"
+    "y": "AdymlHvOiLxXkEhayXQnNCvDX4h9htZaCJN34kfmC6pV5OhQHiraVySsUdaQkAgDPrwQrJmbnX9cwlGfP-HqHZR1",
+    # The following is part of the private key. It's recorded here for
+    # testing and diagnostics.
+    # "d": "CFE43av1ypdfWGD5GgjpHW1fmnatQBh2akdmgLVc0znoq2xytfrNsqKlCsJb0IZkfdPi5umehMosNgn98Xf-sm0"
 }
 
 #                  Figure 1: Elliptic Curve P-521 Public Key
@@ -1162,10 +1166,17 @@ class TestFourOneThree:
 
 class TestFourThreeThree:
 
+    # The original token doesn't validate because the original 521 key
+    # is not on curve. I've created a new token that uses a signature that
+    # is derived from a point that is on curve. NOTE: the original token
+    # signature is also a few octets short.
     token = "eyJhbGciOiJFUzUxMiIsImtpZCI6ImJpbGJvLmJhZ2dpbnNAaG9iYml0b24uZXhhbXBsZSJ9.SXTigJlzIGEgZGFuZ2Vyb3VzIGJ1c2luZXNzLCBGcm9kbywgZ29pbmcgb3V0IHlvdXIgZG9vci4gWW91IHN0ZXAgb250byB0aGUgcm9hZCwgYW5kIGlmIHlvdSBkb24ndCBrZWVwIHlvdXIgZmVldCwgdGhlcmXigJlzIG5vIGtub3dpbmcgd2hlcmUgeW91IG1pZ2h0IGJlIHN3ZXB0IG9mZiB0by4.AE_R_YZCChjn4791jSQCrdPZCNYqHXCTZH0-JZGYNlaAjP2kqaluUIIUnC9qvbu9Plon7KRTzoNEuT4Va2cmL1eJAQy3mtPBu_u_sDDyYjnAMDxXPn7XrT0lw-kvAD890jl8e2puQens_IEKBpHABlsbEPX6sFY8OcGDqoRuBomu9xQ2"
 
     def test_signature(self):
-
+        # # If not using ecdsa lib, try to generate a sig value to see if it
+        # # passes
+        # if not os.environ.get('JOSE_USE_PYTHON', False):
+        #     sig = sign(expected_payload, ec_public_key, None, 'ES512')
         payload = verify(self.token, ec_public_key, 'ES512')
         assert payload == expected_payload
 

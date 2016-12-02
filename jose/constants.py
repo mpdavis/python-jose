@@ -1,5 +1,6 @@
 import hashlib
 
+
 class ALGORITHMS(object):
     NONE = 'none'
     HS256 = 'HS256'

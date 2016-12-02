@@ -16,8 +16,7 @@ W6xQdXHfqGUy3Dx40NDhgTaM8xAdSw==
 class TestECAlgorithm:
 
     def test_EC_key(self):
-        key = ecdsa.SigningKey.from_pem(private_key)
-        ECKey(key, ALGORITHMS.ES256)
+        ECKey(private_key, ALGORITHMS.ES256)
 
     def test_string_secret(self):
         key = 'secret'
