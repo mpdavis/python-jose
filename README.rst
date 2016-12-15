@@ -47,7 +47,7 @@ Usage
 Thanks
 ------
 
-This library was originally based heavily on the work of the guys over at PyJWT_.
+This library was originally based heavily on the work of the folks over at PyJWT_.
 
 .. |Build Status| image:: https://travis-ci.org/mpdavis/python-jose.svg?branch=master
    :target: https://travis-ci.org/mpdavis/python-jose
@@ -57,7 +57,3 @@ This library was originally based heavily on the work of the guys over at PyJWT_
    :target: https://python-jose.readthedocs.org/en/latest/
 .. _ReadTheDocs: https://python-jose.readthedocs.org/en/latest/
 .. _PyJWT: https://github.com/jpadilla/pyjwt
-
-
-
-
