@@ -40,11 +40,9 @@ def sign(payload, key, headers=None, algorithm=ALGORITHMS.HS256):
 
     if algorithm not in ALGORITHMS.SUPPORTED:
         raise JWSError('Algorithm %s not supported.' % algorithm)
-
     encoded_header = _encode_header(algorithm, additional_headers=headers)
     encoded_payload = _encode_payload(payload)
     signed_output = _sign_header_and_claims(encoded_header, encoded_payload, algorithm, key)
-
     return signed_output
 
 
@@ -161,7 +159,11 @@ def _sign_header_and_claims(encoded_header, encoded_claims, algorithm, key_data)
     signing_input = b'.'.join([encoded_header, encoded_claims])
     try:
         key = jwk.construct(key_data, algorithm)
-        signature = key.sign(signing_input)
+        # signing_input is a binary stream, which we need to re-encode to
+        # a base string. Decoding produces a ustring, encoding produces a
+        # base string. This resolves compatibility for 2.7+ and 3.x
+        dat = signing_input.decode('utf8').encode('utf8')
+        signature = key.sign(dat)
     except Exception as e:
         raise JWSError(e)
 
@@ -211,7 +213,7 @@ def _sig_matches_keys(keys, signing_input, signature, alg):
         try:
             if key.verify(signing_input, signature):
                 return True
-        except:
+        except Exception:
             pass
     return False
 

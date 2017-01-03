@@ -1,3 +1,4 @@
+# flake8: noqa
 
 __version__ = "1.3.2"
 __author__ = 'Michael Davis'
@@ -9,3 +10,4 @@ from .exceptions import JOSEError
 from .exceptions import JWSError
 from .exceptions import ExpiredSignatureError
 from .exceptions import JWTError
+
