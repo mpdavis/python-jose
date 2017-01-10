@@ -45,9 +45,15 @@ class Algorithms(object):
             return RSAKey
         elif algorithm in self.EC:
             return ECKey
+        return None
 
     def register_key(self, algorithm, key_class):
-        self.KEYS[algorithm] = key_class
-        self.SUPPORTED.add(algorithm)
+        from jose.jwk import Key
+        if issubclass(key_class, Key):
+            self.KEYS[algorithm] = key_class
+            self.SUPPORTED.add(algorithm)
+            return True
+        else:
+            return False
 
 ALGORITHMS = Algorithms()

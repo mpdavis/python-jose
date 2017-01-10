@@ -35,10 +35,7 @@ class TestJWK:
 
     def test_interface(self):
 
-        key = jwk.Key()
-
-        with pytest.raises(NotImplementedError):
-            key._process_jwk(None)
+        key = jwk.Key("key", "ALG")
 
         with pytest.raises(NotImplementedError):
             key.sign('')
@@ -115,3 +112,6 @@ class TestJWK:
 
         with pytest.raises(JWKError):
             key = jwk.construct(hmac_key)
+
+        with pytest.raises(JWKError):
+            key = jwk.construct("key", algorithm="NONEXISTENT")

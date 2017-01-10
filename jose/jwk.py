@@ -87,11 +87,8 @@ class Key(object):
     """
     A simple interface for implementing JWK keys.
     """
-    prepared_key = None
-    hash_alg = None
-
-    def _process_jwk(self, jwk_dict):
-        raise NotImplementedError()
+    def __init__(self, key, algorithm):
+        pass
 
     def sign(self, msg):
         raise NotImplementedError()
@@ -108,9 +105,6 @@ class HMACKey(Key):
     SHA256 = hashlib.sha256
     SHA384 = hashlib.sha384
     SHA512 = hashlib.sha512
-
-    prepared_key = None
-    hash_alg = None
 
     def __init__(self, key, algorithm):
         if algorithm not in ALGORITHMS.HMAC:
@@ -169,9 +163,6 @@ class RSAKey(Key):
     SHA256 = Crypto.Hash.SHA256
     SHA384 = Crypto.Hash.SHA384
     SHA512 = Crypto.Hash.SHA512
-
-    prepared_key = None
-    hash_alg = None
 
     def __init__(self, key, algorithm):
 
@@ -236,7 +227,7 @@ class RSAKey(Key):
         try:
             return PKCS1_v1_5.new(self.prepared_key).verify(self.hash_alg.new(msg), sig)
         except Exception as e:
-            raise JWKError(e)
+            return False
 
 
 class ECKey(Key):
@@ -252,22 +243,18 @@ class ECKey(Key):
     SHA384 = hashlib.sha384
     SHA512 = hashlib.sha512
 
-    curve_map = {
+    CURVE_MAP = {
         SHA256: ecdsa.curves.NIST256p,
         SHA384: ecdsa.curves.NIST384p,
         SHA512: ecdsa.curves.NIST521p,
     }
-
-    prepared_key = None
-    hash_alg = None
-    curve = None
 
     def __init__(self, key, algorithm):
         if algorithm not in ALGORITHMS.EC:
             raise JWKError('hash_alg: %s is not a valid hash algorithm' % algorithm)
         self.hash_alg = get_algorithm_object(algorithm)
 
-        self.curve = self.curve_map.get(self.hash_alg)
+        self.curve = self.CURVE_MAP.get(self.hash_alg)
 
         if isinstance(key, (ecdsa.SigningKey, ecdsa.VerifyingKey)):
             self.prepared_key = key
