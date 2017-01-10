@@ -60,14 +60,10 @@ def construct(key_data, algorithm=None):
     if not algorithm:
         raise JWKError('Unable to find a algorithm for key: %s' % key_data)
 
-    if algorithm in ALGORITHMS.HMAC:
-        return HMACKey(key_data, algorithm)
-
-    if algorithm in ALGORITHMS.RSA:
-        return RSAKey(key_data, algorithm)
-
-    if algorithm in ALGORITHMS.EC:
-        return ECKey(key_data, algorithm)
+    key_class = ALGORITHMS.get_key(algorithm)
+    if not key_class:
+        raise JWKError('Unable to find a algorithm for key: %s' % key_data)
+    return key_class(key_data, algorithm)
 
 
 def get_algorithm_object(algorithm):
@@ -112,13 +108,12 @@ class HMACKey(Key):
     SHA256 = hashlib.sha256
     SHA384 = hashlib.sha384
     SHA512 = hashlib.sha512
-    valid_hash_algs = ALGORITHMS.HMAC
 
     prepared_key = None
     hash_alg = None
 
     def __init__(self, key, algorithm):
-        if algorithm not in self.valid_hash_algs:
+        if algorithm not in ALGORITHMS.HMAC:
             raise JWKError('hash_alg: %s is not a valid hash algorithm' % algorithm)
         self.hash_alg = get_algorithm_object(algorithm)
 
@@ -174,14 +169,13 @@ class RSAKey(Key):
     SHA256 = Crypto.Hash.SHA256
     SHA384 = Crypto.Hash.SHA384
     SHA512 = Crypto.Hash.SHA512
-    valid_hash_algs = ALGORITHMS.RSA
 
     prepared_key = None
     hash_alg = None
 
     def __init__(self, key, algorithm):
 
-        if algorithm not in self.valid_hash_algs:
+        if algorithm not in ALGORITHMS.RSA:
             raise JWKError('hash_alg: %s is not a valid hash algorithm' % algorithm)
         self.hash_alg = get_algorithm_object(algorithm)
 
@@ -257,7 +251,6 @@ class ECKey(Key):
     SHA256 = hashlib.sha256
     SHA384 = hashlib.sha384
     SHA512 = hashlib.sha512
-    valid_hash_algs = ALGORITHMS.EC
 
     curve_map = {
         SHA256: ecdsa.curves.NIST256p,
@@ -270,7 +263,7 @@ class ECKey(Key):
     curve = None
 
     def __init__(self, key, algorithm):
-        if algorithm not in self.valid_hash_algs:
+        if algorithm not in ALGORITHMS.EC:
             raise JWKError('hash_alg: %s is not a valid hash algorithm' % algorithm)
         self.hash_alg = get_algorithm_object(algorithm)
 
