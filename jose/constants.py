@@ -35,25 +35,13 @@ class Algorithms(object):
 
     KEYS = {}
 
-    def get_key(self, algorithm):
-        from jose.jwk import HMACKey, RSAKey, ECKey
-        if algorithm in self.KEYS:
-            return self.KEYS[algorithm]
-        elif algorithm in self.HMAC:
-            return HMACKey
-        elif algorithm in self.RSA:
-            return RSAKey
-        elif algorithm in self.EC:
-            return ECKey
-        return None
-
     def register_key(self, algorithm, key_class):
         from jose.jwk import Key
-        if issubclass(key_class, Key):
-            self.KEYS[algorithm] = key_class
-            self.SUPPORTED.add(algorithm)
-            return True
-        else:
-            return False
+        if not issubclass(key_class, Key):
+            raise TypeError("Key class not a subclass of jwk.Key")
+        self.KEYS[algorithm] = key_class
+        self.SUPPORTED.add(algorithm)
+        return True
+
 
 ALGORITHMS = Algorithms()

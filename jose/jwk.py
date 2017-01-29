@@ -47,6 +47,18 @@ def base64_to_long(data):
     return int_arr_to_long(struct.unpack('%sB' % len(_d), _d))
 
 
+def get_key(algorithm):
+    if algorithm in ALGORITHMS.KEYS:
+        return ALGORITHMS.KEYS[algorithm]
+    elif algorithm in ALGORITHMS.HMAC:
+        return HMACKey
+    elif algorithm in ALGORITHMS.RSA:
+        return RSAKey
+    elif algorithm in ALGORITHMS.EC:
+        return ECKey
+    return None
+
+
 def construct(key_data, algorithm=None):
     """
     Construct a Key object for the given algorithm with the given
@@ -60,7 +72,7 @@ def construct(key_data, algorithm=None):
     if not algorithm:
         raise JWKError('Unable to find a algorithm for key: %s' % key_data)
 
-    key_class = ALGORITHMS.get_key(algorithm)
+    key_class = get_key(algorithm)
     if not key_class:
         raise JWKError('Unable to find a algorithm for key: %s' % key_data)
     return key_class(key_data, algorithm)

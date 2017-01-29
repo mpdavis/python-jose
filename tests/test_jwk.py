@@ -115,3 +115,10 @@ class TestJWK:
 
         with pytest.raises(JWKError):
             key = jwk.construct("key", algorithm="NONEXISTENT")
+
+    def test_get_key(self):
+        assert jwk.get_key("HS256") == jwk.HMACKey
+        assert jwk.get_key("RS256") == jwk.RSAKey
+        assert jwk.get_key("ES256") == jwk.ECKey
+
+        assert jwk.get_key("NONEXISTENT") == None

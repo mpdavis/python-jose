@@ -23,15 +23,10 @@ class TestBaseAlgorithm:
 
 class TestAlgorithms:
 
-    def test_get_key(self):
-        assert ALGORITHMS.get_key("HS256") == HMACKey
-        assert ALGORITHMS.get_key("RS256") == RSAKey
-        assert ALGORITHMS.get_key("ES256") == ECKey
-
-        assert ALGORITHMS.get_key("NONEXISTENT") == None
-    
     def test_register_key(self):
-        assert ALGORITHMS.register_key("ALG", Key) == True
-        assert ALGORITHMS.get_key("ALG") == Key
-
-        assert ALGORITHMS.register_key("ALG", object) == False
+        assert ALGORITHMS.register_key("ALG", Key)
+        from jose.jwk import get_key
+        assert get_key("ALG") == Key
+    
+        with pytest.raises(TypeError):
+            assert ALGORITHMS.register_key("ALG", object)
