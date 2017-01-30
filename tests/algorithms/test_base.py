@@ -1,6 +1,4 @@
-
-from jose.jwk import Key, HMACKey, RSAKey, ECKey
-from jose.constants import ALGORITHMS
+from jose.jwk import Key
 
 import pytest
 
@@ -20,13 +18,3 @@ class TestBaseAlgorithm:
         with pytest.raises(NotImplementedError):
             alg.verify('msg', 'sig')
 
-
-class TestAlgorithms:
-
-    def test_register_key(self):
-        assert ALGORITHMS.register_key("ALG", Key)
-        from jose.jwk import get_key
-        assert get_key("ALG") == Key
-    
-        with pytest.raises(TypeError):
-            assert ALGORITHMS.register_key("ALG", object)

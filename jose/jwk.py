@@ -59,6 +59,14 @@ def get_key(algorithm):
     return None
 
 
+def register_key(algorithm, key_class):
+    if not issubclass(key_class, Key):
+        raise TypeError("Key class not a subclass of jwk.Key")
+    ALGORITHMS.KEYS[algorithm] = key_class
+    ALGORITHMS.SUPPORTED.add(algorithm)
+    return True
+
+
 def construct(key_data, algorithm=None):
     """
     Construct a Key object for the given algorithm with the given

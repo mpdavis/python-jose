@@ -1,9 +1,7 @@
-
 from jose import jwk
 from jose.exceptions import JWKError
 
 import pytest
-
 
 hmac_key = {
     "kty": "oct",
@@ -122,3 +120,10 @@ class TestJWK:
         assert jwk.get_key("ES256") == jwk.ECKey
 
         assert jwk.get_key("NONEXISTENT") == None
+
+    def test_register_key(self):
+        assert jwk.register_key("ALG", jwk.Key)
+        assert jwk.get_key("ALG") == jwk.Key
+
+        with pytest.raises(TypeError):
+            assert jwk.register_key("ALG", object)

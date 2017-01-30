@@ -35,13 +35,5 @@ class Algorithms(object):
 
     KEYS = {}
 
-    def register_key(self, algorithm, key_class):
-        from jose.jwk import Key
-        if not issubclass(key_class, Key):
-            raise TypeError("Key class not a subclass of jwk.Key")
-        self.KEYS[algorithm] = key_class
-        self.SUPPORTED.add(algorithm)
-        return True
-
 
 ALGORITHMS = Algorithms()
