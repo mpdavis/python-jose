@@ -1,6 +1,7 @@
 import hashlib
 
-class ALGORITHMS(object):
+
+class Algorithms(object):
     NONE = 'none'
     HS256 = 'HS256'
     HS384 = 'HS384'
@@ -12,13 +13,13 @@ class ALGORITHMS(object):
     ES384 = 'ES384'
     ES512 = 'ES512'
 
-    HMAC = (HS256, HS384, HS512)
-    RSA = (RS256, RS384, RS512)
-    EC = (ES256, ES384, ES512)
+    HMAC = set([HS256, HS384, HS512])
+    RSA = set([RS256, RS384, RS512])
+    EC = set([ES256, ES384, ES512])
 
-    SUPPORTED = HMAC + RSA + EC
+    SUPPORTED = HMAC.union(RSA).union(EC)
 
-    ALL = SUPPORTED + (NONE, )
+    ALL = SUPPORTED.union([NONE])
 
     HASHES = {
         HS256: hashlib.sha256,
@@ -31,3 +32,8 @@ class ALGORITHMS(object):
         ES384: hashlib.sha384,
         ES512: hashlib.sha512,
     }
+
+    KEYS = {}
+
+
+ALGORITHMS = Algorithms()

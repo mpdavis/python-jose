@@ -1,9 +1,7 @@
-
 from jose import jwk
 from jose.exceptions import JWKError
 
 import pytest
-
 
 hmac_key = {
     "kty": "oct",
@@ -35,10 +33,7 @@ class TestJWK:
 
     def test_interface(self):
 
-        key = jwk.Key()
-
-        with pytest.raises(NotImplementedError):
-            key._process_jwk(None)
+        key = jwk.Key("key", "ALG")
 
         with pytest.raises(NotImplementedError):
             key.sign('')
@@ -115,3 +110,20 @@ class TestJWK:
 
         with pytest.raises(JWKError):
             key = jwk.construct(hmac_key)
+
+        with pytest.raises(JWKError):
+            key = jwk.construct("key", algorithm="NONEXISTENT")
+
+    def test_get_key(self):
+        assert jwk.get_key("HS256") == jwk.HMACKey
+        assert jwk.get_key("RS256") == jwk.RSAKey
+        assert jwk.get_key("ES256") == jwk.ECKey
+
+        assert jwk.get_key("NONEXISTENT") == None
+
+    def test_register_key(self):
+        assert jwk.register_key("ALG", jwk.Key)
+        assert jwk.get_key("ALG") == jwk.Key
+
+        with pytest.raises(TypeError):
+            assert jwk.register_key("ALG", object)

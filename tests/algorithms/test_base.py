@@ -1,25 +1,20 @@
+from jose.jwk import Key
 
-# from jose.jwk import Key
-# from jose.exceptions import JOSEError
-
-# import pytest
+import pytest
 
 
-# @pytest.fixture
-# def alg():
-#     return Key()
+@pytest.fixture
+def alg():
+    return Key("key", "ALG")
 
 
-# class TestBaseAlgorithm:
+class TestBaseAlgorithm:
 
-#     def test_prepare_key_is_interface(self, alg):
-#         with pytest.raises(JOSEError):
-#             alg.prepare_key('secret')
+    def test_sign_is_interface(self, alg):
+        with pytest.raises(NotImplementedError):
+            alg.sign('msg')
 
-#     def test_sign_is_interface(self, alg):
-#         with pytest.raises(JOSEError):
-#             alg.sign('msg', 'secret')
+    def test_verify_is_interface(self, alg):
+        with pytest.raises(NotImplementedError):
+            alg.verify('msg', 'sig')
 
-#     def test_verify_is_interface(self, alg):
-#         with pytest.raises(JOSEError):
-#             alg.verify('msg', 'secret', 'sig')
