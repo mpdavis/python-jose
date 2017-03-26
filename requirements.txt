@@ -1,3 +1,2 @@
-pycrypto
 six
 future

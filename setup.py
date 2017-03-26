@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
-
+import sys
 import jose
 
 import platform
 
 from setuptools import setup
-
 
 with open(os.path.join(os.path.dirname(__file__), 'README.rst')) as readme:
     long_description = readme.read()
@@ -18,19 +17,20 @@ def get_packages(package):
     Return root package and all sub-packages.
     """
     return [
-        dirpath
-        for dirpath, dirnames, filenames in os.walk(package)
+        dirpath for dirpath, dirnames, filenames in os.walk(package)
         if os.path.exists(os.path.join(dirpath, '__init__.py'))
     ]
 
 
 def get_install_requires():
-    if platform.python_implementation() == 'PyPy':
-        crypto_lib = 'pycryptodome >=3.3.1, <3.4.0'
+    if platform.python_implementation().lower(
+    ) == 'pypy' and sys.version_info < ('2', '6'):
+        crypto_library = 'PyCrypto'
     else:
-        crypto_lib = 'pycrypto >=2.6.0, <2.7.0'
+        crypto_library = 'cryptography > 1.0'
+
     return [
-        crypto_lib,
+        crypto_library,
         'six <2.0',
         'ecdsa <1.0',
         'future <1.0',
@@ -61,5 +61,4 @@ setup(
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Utilities',
     ],
-    install_requires=get_install_requires()
-)
+    install_requires=get_install_requires())
