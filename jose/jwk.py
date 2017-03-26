@@ -20,6 +20,7 @@ from jose.constants import ALGORITHMS
 from jose.exceptions import JWKError
 from jose.utils import base64url_decode
 from jose.utils import constant_time_string_compare
+from .key import Key, register_algorithm_objects, get_algorithm_object, int_arr_to_long, base64_to_long
 
 # PyCryptodome's RSA module doesn't have PyCrypto's _RSAobj class
 # Instead it has a class named RsaKey, which serves the same purpose.
@@ -32,19 +33,6 @@ else:
 # Using `from builtins import int` is not supported on AppEngine.
 if sys.version_info > (3,):
     long = int
-
-
-def int_arr_to_long(arr):
-    return long(''.join(["%02x" % byte for byte in arr]), 16)
-
-
-def base64_to_long(data):
-    if isinstance(data, six.text_type):
-        data = data.encode("ascii")
-
-    # urlsafe_b64decode will happily convert b64encoded data
-    _d = base64.urlsafe_b64decode(bytes(data) + b'==')
-    return int_arr_to_long(struct.unpack('%sB' % len(_d), _d))
 
 
 def get_key(algorithm):
@@ -84,37 +72,6 @@ def construct(key_data, algorithm=None):
     if not key_class:
         raise JWKError('Unable to find a algorithm for key: %s' % key_data)
     return key_class(key_data, algorithm)
-
-
-def get_algorithm_object(algorithm):
-
-    algorithms = {
-        ALGORITHMS.HS256: HMACKey.SHA256,
-        ALGORITHMS.HS384: HMACKey.SHA384,
-        ALGORITHMS.HS512: HMACKey.SHA512,
-        ALGORITHMS.RS256: RSAKey.SHA256,
-        ALGORITHMS.RS384: RSAKey.SHA384,
-        ALGORITHMS.RS512: RSAKey.SHA512,
-        ALGORITHMS.ES256: ECKey.SHA256,
-        ALGORITHMS.ES384: ECKey.SHA384,
-        ALGORITHMS.ES512: ECKey.SHA512,
-    }
-
-    return algorithms.get(algorithm, None)
-
-
-class Key(object):
-    """
-    A simple interface for implementing JWK keys.
-    """
-    def __init__(self, key, algorithm):
-        pass
-
-    def sign(self, msg):
-        raise NotImplementedError()
-
-    def verify(self, msg, sig):
-        raise NotImplementedError()
 
 
 class HMACKey(Key):
@@ -326,3 +283,18 @@ class ECKey(Key):
             return self.prepared_key.verify(sig, msg, hashfunc=self.hash_alg, sigdecode=ecdsa.util.sigdecode_string)
         except:
             return False
+
+
+# Registration must be done here to avoid recursive imports.
+
+register_algorithm_objects({
+    ALGORITHMS.HS256: HMACKey.SHA256,
+    ALGORITHMS.HS384: HMACKey.SHA384,
+    ALGORITHMS.HS512: HMACKey.SHA512,
+    ALGORITHMS.RS256: RSAKey.SHA256,
+    ALGORITHMS.RS384: RSAKey.SHA384,
+    ALGORITHMS.RS512: RSAKey.SHA512,
+    ALGORITHMS.ES256: ECKey.SHA256,
+    ALGORITHMS.ES384: ECKey.SHA384,
+    ALGORITHMS.ES512: ECKey.SHA512,
+})
