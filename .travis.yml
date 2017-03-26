@@ -1,14 +1,25 @@
 language: python
-env:
-  - TOXENV=py26
-  - TOXENV=py27
-  - TOXENV=py33
-  - TOXENV=py34
-  - TOXENV=pypy
+
+python:
+  - "2.6"
+  - "2.7"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+  - "3.6"
+  - "pypy"
+
+cache:
+  directories:
+    - $HOME/.cache/pip
+
 install: 
+  - pip install -U pip setuptools wheel
   - pip install -r requirements-dev.txt
-  - pip install -U tox codecov
+  - pip install -e .
+
 script: 
-  - tox
+  - py.test --cov-report term-missing --cov jose
+
 after_success:
 - codecov
