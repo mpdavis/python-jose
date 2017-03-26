@@ -1,10 +1,10 @@
-
 import base64
 import hashlib
 import hmac
 import struct
 import six
 import sys
+import os
 
 import ecdsa
 
@@ -21,7 +21,7 @@ except ImportError:
 
 # Deal with integer compatibilities between Python 2 and 3.
 # Using `from builtins import int` is not supported on AppEngine.
-if sys.version_info > (3,):
+if sys.version_info > (3, ):
     long = int
 
 
@@ -75,22 +75,23 @@ class HMACKey(Key):
 
     def __init__(self, key, algorithm):
         if algorithm not in ALGORITHMS.HMAC:
-            raise JWKError('hash_alg: %s is not a valid hash algorithm' % algorithm)
+            raise JWKError(
+                'hash_alg: %s is not a valid hash algorithm' % algorithm)
         self.hash_alg = get_algorithm_object(algorithm)
 
         if isinstance(key, dict):
             self.prepared_key = self._process_jwk(key)
             return
 
-        if not isinstance(key, six.string_types) and not isinstance(key, bytes):
+        if not isinstance(key, six.string_types) and not isinstance(
+                key, bytes):
             raise JWKError('Expecting a string- or bytes-formatted key.')
 
         if isinstance(key, six.text_type):
             key = key.encode('utf-8')
 
         invalid_strings = [
-            b'-----BEGIN PUBLIC KEY-----',
-            b'-----BEGIN CERTIFICATE-----',
+            b'-----BEGIN PUBLIC KEY-----', b'-----BEGIN CERTIFICATE-----',
             b'ssh-rsa'
         ]
 
@@ -103,7 +104,8 @@ class HMACKey(Key):
 
     def _process_jwk(self, jwk_dict):
         if not jwk_dict.get('kty') == 'oct':
-            raise JWKError("Incorrect key type.  Expected: 'oct', Recieved: %s" % jwk_dict.get('kty'))
+            raise JWKError("Incorrect key type.  Expected: 'oct', Recieved: %s"
+                           % jwk_dict.get('kty'))
 
         k = jwk_dict.get('k')
         k = k.encode('utf-8')
@@ -140,7 +142,8 @@ class ECKey(Key):
 
     def __init__(self, key, algorithm):
         if algorithm not in ALGORITHMS.EC:
-            raise JWKError('hash_alg: %s is not a valid hash algorithm' % algorithm)
+            raise JWKError(
+                'hash_alg: %s is not a valid hash algorithm' % algorithm)
         self.hash_alg = get_algorithm_object(algorithm)
 
         self.curve = self.CURVE_MAP.get(self.hash_alg)
@@ -174,7 +177,8 @@ class ECKey(Key):
 
     def _process_jwk(self, jwk_dict):
         if not jwk_dict.get('kty') == 'EC':
-            raise JWKError("Incorrect key type.  Expected: 'EC', Recieved: %s" % jwk_dict.get('kty'))
+            raise JWKError("Incorrect key type.  Expected: 'EC', Recieved: %s"
+                           % jwk_dict.get('kty'))
 
         x = base64_to_long(jwk_dict.get('x'))
         y = base64_to_long(jwk_dict.get('y'))
@@ -182,17 +186,24 @@ class ECKey(Key):
         if not ecdsa.ecdsa.point_is_valid(self.curve.generator, x, y):
             raise JWKError("Point: %s, %s is not a valid point" % (x, y))
 
-        point = ecdsa.ellipticcurve.Point(self.curve.curve, x, y, self.curve.order)
-        verifying_key = ecdsa.keys.VerifyingKey.from_public_point(point, self.curve)
+        point = ecdsa.ellipticcurve.Point(self.curve.curve, x, y,
+                                          self.curve.order)
+        verifying_key = ecdsa.keys.VerifyingKey.from_public_point(
+            point, self.curve)
 
         return verifying_key
 
     def sign(self, msg):
-        return self.prepared_key.sign(msg, hashfunc=self.hash_alg, sigencode=ecdsa.util.sigencode_string)
+        return self.prepared_key.sign(
+            msg, hashfunc=self.hash_alg, sigencode=ecdsa.util.sigencode_string)
 
     def verify(self, msg, sig):
         try:
-            return self.prepared_key.verify(sig, msg, hashfunc=self.hash_alg, sigdecode=ecdsa.util.sigdecode_string)
+            return self.prepared_key.verify(
+                sig,
+                msg,
+                hashfunc=self.hash_alg,
+                sigdecode=ecdsa.util.sigdecode_string)
         except:
             return False
 
