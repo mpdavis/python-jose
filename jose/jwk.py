@@ -6,27 +6,12 @@ import struct
 import six
 import sys
 
-import Crypto.Hash.SHA256
-import Crypto.Hash.SHA384
-import Crypto.Hash.SHA512
-
-from Crypto.PublicKey import RSA
-from Crypto.Signature import PKCS1_v1_5
-from Crypto.Util.asn1 import DerSequence
-
 import ecdsa
 
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWKError
 from jose.utils import base64url_decode
 from jose.utils import constant_time_string_compare
-
-# PyCryptodome's RSA module doesn't have PyCrypto's _RSAobj class
-# Instead it has a class named RsaKey, which serves the same purpose.
-if hasattr(RSA, '_RSAobj'):
-    _RSAKey = RSA._RSAobj
-else:
-    _RSAKey = RSA.RsaKey
 
 # Deal with integer compatibilities between Python 2 and 3.
 # Using `from builtins import int` is not supported on AppEngine.
@@ -87,20 +72,20 @@ def construct(key_data, algorithm=None):
 
 
 def get_algorithm_object(algorithm):
-
     algorithms = {
-        ALGORITHMS.HS256: HMACKey.SHA256,
-        ALGORITHMS.HS384: HMACKey.SHA384,
-        ALGORITHMS.HS512: HMACKey.SHA512,
-        ALGORITHMS.RS256: RSAKey.SHA256,
-        ALGORITHMS.RS384: RSAKey.SHA384,
-        ALGORITHMS.RS512: RSAKey.SHA512,
-        ALGORITHMS.ES256: ECKey.SHA256,
-        ALGORITHMS.ES384: ECKey.SHA384,
-        ALGORITHMS.ES512: ECKey.SHA512,
+        ALGORITHMS.HS256: 'SHA256',
+        ALGORITHMS.HS384: 'SHA384',
+        ALGORITHMS.HS512: 'SHA512',
+        ALGORITHMS.RS256: 'SHA256',
+        ALGORITHMS.RS384: 'SHA384',
+        ALGORITHMS.RS512: 'SHA512',
+        ALGORITHMS.ES256: 'SHA256',
+        ALGORITHMS.ES384: 'SHA384',
+        ALGORITHMS.ES512: 'SHA512',
     }
-
-    return algorithms.get(algorithm, None)
+    key = get_key(algorithm)
+    attr = algorithms.get(algorithm, None)
+    return getattr(key, attr)
 
 
 class Key(object):
@@ -170,84 +155,6 @@ class HMACKey(Key):
 
     def verify(self, msg, sig):
         return constant_time_string_compare(sig, self.sign(msg))
-
-
-class RSAKey(Key):
-    """
-    Performs signing and verification operations using
-    RSASSA-PKCS-v1_5 and the specified hash function.
-    This class requires PyCrypto package to be installed.
-    This is based off of the implementation in PyJWT 0.3.2
-    """
-
-    SHA256 = Crypto.Hash.SHA256
-    SHA384 = Crypto.Hash.SHA384
-    SHA512 = Crypto.Hash.SHA512
-
-    def __init__(self, key, algorithm):
-
-        if algorithm not in ALGORITHMS.RSA:
-            raise JWKError('hash_alg: %s is not a valid hash algorithm' % algorithm)
-        self.hash_alg = get_algorithm_object(algorithm)
-
-        if isinstance(key, _RSAKey):
-            self.prepared_key = key
-            return
-
-        if isinstance(key, dict):
-            self._process_jwk(key)
-            return
-
-        if isinstance(key, six.string_types):
-            if isinstance(key, six.text_type):
-                key = key.encode('utf-8')
-
-            if key.startswith(b'-----BEGIN CERTIFICATE-----'):
-                try:
-                    self._process_cert(key)
-                except Exception as e:
-                    raise JWKError(e)
-                return
-
-            try:
-                self.prepared_key = RSA.importKey(key)
-            except Exception as e:
-                raise JWKError(e)
-            return
-
-        raise JWKError('Unable to parse an RSA_JWK from key: %s' % key)
-
-    def _process_jwk(self, jwk_dict):
-        if not jwk_dict.get('kty') == 'RSA':
-            raise JWKError("Incorrect key type.  Expected: 'RSA', Recieved: %s" % jwk_dict.get('kty'))
-
-        e = base64_to_long(jwk_dict.get('e', 256))
-        n = base64_to_long(jwk_dict.get('n'))
-
-        self.prepared_key = RSA.construct((n, e))
-        return self.prepared_key
-
-    def _process_cert(self, key):
-        pemLines = key.replace(b' ', b'').split()
-        certDer = base64url_decode(b''.join(pemLines[1:-1]))
-        certSeq = DerSequence()
-        certSeq.decode(certDer)
-        tbsSeq = DerSequence()
-        tbsSeq.decode(certSeq[0])
-        self.prepared_key = RSA.importKey(tbsSeq[6])
-        return
-
-    def sign(self, msg):
-        try:
-            return PKCS1_v1_5.new(self.prepared_key).sign(self.hash_alg.new(msg))
-        except Exception as e:
-            raise JWKError(e)
-
-    def verify(self, msg, sig):
-        try:
-            return PKCS1_v1_5.new(self.prepared_key).verify(self.hash_alg.new(msg), sig)
-        except Exception as e:
-            return False
 
 
 class ECKey(Key):
@@ -326,3 +233,9 @@ class ECKey(Key):
             return self.prepared_key.verify(sig, msg, hashfunc=self.hash_alg, sigdecode=ecdsa.util.sigdecode_string)
         except:
             return False
+
+
+from jose.backends.pycrypto_backend import RSAKey
+#ALGORITHMS.register_key('RS256', RSAKey)
+#ALGORITHMS.register_key('RS384', RSAKey)
+#ALGORITHMS.register_key('RS512', RSAKey)
