@@ -108,7 +108,7 @@ class TestRSACryptography:
 
         pubkey = CryptographyRSAKey(key, ALGORITHMS.RS256)
         pem = pubkey.to_pem()
-        assert pem.startswith('-----BEGIN PUBLIC KEY-----')
+        assert pem.startswith(b'-----BEGIN PUBLIC KEY-----')
 
     def test_RSA_jwk(self):
         d = {

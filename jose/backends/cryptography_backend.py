@@ -52,9 +52,9 @@ class CryptographyECKey(Key):
             return
 
         if isinstance(key, six.string_types):
-            if isinstance(key, six.text_type):
-                key = key.encode('utf-8')
+            key = key.encode('utf-8')
 
+        if isinstance(key, six.binary_type):
             # Attempt to load key. We don't know if it's
             # a Public Key or a Private Key, so we try
             # the Public Key first.
@@ -109,13 +109,13 @@ class CryptographyECKey(Key):
                 encoding=serialization.Encoding.PEM,
                 format=serialization.PublicFormat.SubjectPublicKeyInfo
             )
-            return pem.decode('utf-8')
+            return pem
         pem = self.prepared_key.private_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PrivateFormat.TraditionalOpenSSL,
             encryption_algorithm=serialization.NoEncryption()
         )
-        return pem.decode('utf-8')
+        return pem
 
 
 class CryptographyRSAKey(Key):
@@ -146,9 +146,9 @@ class CryptographyRSAKey(Key):
             return
 
         if isinstance(key, six.string_types):
-            if isinstance(key, six.text_type):
-                key = key.encode('utf-8')
+            key = key.encode('utf-8')
 
+        if isinstance(key, six.binary_type):
             try:
                 try:
                     key = load_pem_public_key(key, self.cryptography_backend())
@@ -203,10 +203,10 @@ class CryptographyRSAKey(Key):
             return self.prepared_key.public_bytes(
                 encoding=serialization.Encoding.PEM,
                 format=serialization.PublicFormat.SubjectPublicKeyInfo
-            ).decode('utf-8')
+            )
 
         return self.prepared_key.private_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PrivateFormat.TraditionalOpenSSL,
             encryption_algorithm=serialization.NoEncryption()
-        ).decode('utf-8')
+        )

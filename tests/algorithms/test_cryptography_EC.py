@@ -7,7 +7,7 @@ from jose.jwk import ECKey
 import ecdsa
 import pytest
 
-private_key = """-----BEGIN EC PRIVATE KEY-----
+private_key = b"""-----BEGIN EC PRIVATE KEY-----
 MHQCAQEEIIAK499svJugZZfsTsgL2tc7kH/CpzQbkr4g55CEWQyPoAcGBSuBBAAK
 oUQDQgAEsOnVqWVPfjte2nI0Ay3oTZVehCUtH66nJM8z6flUluHxhLG8ZTTCkJAZ
 W6xQdXHfqGUy3Dx40NDhgTaM8xAdSw==
@@ -20,8 +20,6 @@ class TestCryptographyECAlgorithm:
         key = ecdsa.SigningKey.from_pem(private_key)
         k = CryptographyECKey(key, ALGORITHMS.ES256)
 
-        print(repr(k.to_pem().strip()))
-        print(repr(private_key.strip()))
         assert k.to_pem().strip() == private_key.strip()
         public_pem = k.public_key().to_pem()
         public_key = CryptographyECKey(public_pem, ALGORITHMS.ES256)
@@ -42,7 +40,7 @@ class TestCryptographyECAlgorithm:
 
     def test_signing_parity(self):
         key1 = ECKey(private_key, ALGORITHMS.ES256)
-        public_key = key1.prepared_key.get_verifying_key().to_pem().decode('utf-8')
+        public_key = key1.public_key().to_pem()
         vkey1 = ECKey(public_key, ALGORITHMS.ES256)
         key2 = CryptographyECKey(private_key, ALGORITHMS.ES256)
         vkey2 = CryptographyECKey(public_key, ALGORITHMS.ES256)

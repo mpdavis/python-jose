@@ -9,7 +9,7 @@ from Crypto.Signature import PKCS1_v1_5
 from Crypto.Util.asn1 import DerSequence
 
 from jose.backends.base import Key
-from jose.jwk import base64_to_long
+from jose.utils import base64_to_long
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWKError
 from jose.utils import base64url_decode
@@ -55,9 +55,9 @@ class RSAKey(Key):
             return
 
         if isinstance(key, six.string_types):
-            if isinstance(key, six.text_type):
-                key = key.encode('utf-8')
+            key = key.encode('utf-8')
 
+        if isinstance(key, six.binary_type):
             if key.startswith(b'-----BEGIN CERTIFICATE-----'):
                 try:
                     self._process_cert(key)
