@@ -1,35 +1,16 @@
 
-import base64
 import hashlib
 import hmac
-import struct
 import six
-import sys
 
 import ecdsa
 
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWKError
-from jose.utils import base64url_decode
+from jose.utils import base64url_decode, base64_to_long
 from jose.utils import constant_time_string_compare
-
-# Deal with integer compatibilities between Python 2 and 3.
-# Using `from builtins import int` is not supported on AppEngine.
-if sys.version_info > (3,):
-    long = int
-
-
-def int_arr_to_long(arr):
-    return long(''.join(["%02x" % byte for byte in arr]), 16)
-
-
-def base64_to_long(data):
-    if isinstance(data, six.text_type):
-        data = data.encode("ascii")
-
-    # urlsafe_b64decode will happily convert b64encoded data
-    _d = base64.urlsafe_b64decode(bytes(data) + b'==')
-    return int_arr_to_long(struct.unpack('%sB' % len(_d), _d))
+from jose.backends.base import Key
+from jose.backends import RSAKey
 
 
 def get_key(algorithm):
@@ -86,20 +67,6 @@ def get_algorithm_object(algorithm):
     key = get_key(algorithm)
     attr = algorithms.get(algorithm, None)
     return getattr(key, attr)
-
-
-class Key(object):
-    """
-    A simple interface for implementing JWK keys.
-    """
-    def __init__(self, key, algorithm):
-        pass
-
-    def sign(self, msg):
-        raise NotImplementedError()
-
-    def verify(self, msg, sig):
-        raise NotImplementedError()
 
 
 class HMACKey(Key):
@@ -180,6 +147,7 @@ class ECKey(Key):
         if algorithm not in ALGORITHMS.EC:
             raise JWKError('hash_alg: %s is not a valid hash algorithm' % algorithm)
         self.hash_alg = get_algorithm_object(algorithm)
+        self._algorithm = algorithm
 
         self.curve = self.CURVE_MAP.get(self.hash_alg)
 
@@ -234,8 +202,10 @@ class ECKey(Key):
         except:
             return False
 
+    def public_key(self):
+        if isinstance(self.prepared_key, ecdsa.VerifyingKey):
+            return self
+        return self.__class__(self.prepared_key.get_verifying_key(), self._algorithm)
 
-from jose.backends.pycrypto_backend import RSAKey
-#ALGORITHMS.register_key('RS256', RSAKey)
-#ALGORITHMS.register_key('RS384', RSAKey)
-#ALGORITHMS.register_key('RS512', RSAKey)
+    def to_pem(self):
+        return self.prepared_key.to_pem()

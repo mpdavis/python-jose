@@ -18,7 +18,13 @@ class TestCryptographyECAlgorithm:
 
     def test_EC_key(self):
         key = ecdsa.SigningKey.from_pem(private_key)
-        CryptographyECKey(key, ALGORITHMS.ES256)
+        k = CryptographyECKey(key, ALGORITHMS.ES256)
+
+        print(repr(k.to_pem().strip()))
+        print(repr(private_key.strip()))
+        assert k.to_pem().strip() == private_key.strip()
+        public_pem = k.public_key().to_pem()
+        public_key = CryptographyECKey(public_pem, ALGORITHMS.ES256)
 
     def test_string_secret(self):
         key = 'secret'

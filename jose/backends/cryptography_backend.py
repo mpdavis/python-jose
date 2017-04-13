@@ -2,14 +2,14 @@ import six
 import ecdsa
 from ecdsa.util import sigdecode_string, sigencode_string, sigdecode_der, sigencode_der
 
-from jose.jwk import Key, base64_to_long
+from jose.backends.base import Key
+from jose.utils import base64_to_long
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWKError
 
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.backends.openssl.rsa import _RSAPublicKey
-from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import ec, rsa, padding
 from cryptography.hazmat.primitives.serialization import load_pem_private_key, load_pem_public_key
 
@@ -34,9 +34,14 @@ class CryptographyECKey(Key):
             ALGORITHMS.ES384: self.SHA384,
             ALGORITHMS.ES512: self.SHA512
         }.get(algorithm)
+        self._algorithm = algorithm
 
         self.curve = self.CURVE_MAP.get(self.hash_alg)
         self.cryptography_backend = cryptography_backend
+
+        if hasattr(key, 'public_bytes') or hasattr(key, 'private_bytes'):
+            self.prepared_key = key
+            return
 
         if isinstance(key, (ecdsa.SigningKey, ecdsa.VerifyingKey)):
             # convert to PEM and let cryptography below load it as PEM
@@ -93,6 +98,25 @@ class CryptographyECKey(Key):
         except:
             return False
 
+    def public_key(self):
+        if hasattr(self.prepared_key, 'public_bytes'):
+            return self
+        return self.__class__(self.prepared_key.public_key(), self._algorithm)
+
+    def to_pem(self):
+        if hasattr(self.prepared_key, 'public_bytes'):
+            pem = self.prepared_key.public_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PublicFormat.SubjectPublicKeyInfo
+            )
+            return pem.decode('utf-8')
+        pem = self.prepared_key.private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.TraditionalOpenSSL,
+            encryption_algorithm=serialization.NoEncryption()
+        )
+        return pem.decode('utf-8')
+
 
 class CryptographyRSAKey(Key):
     SHA256 = hashes.SHA256
@@ -108,10 +132,12 @@ class CryptographyRSAKey(Key):
             ALGORITHMS.RS384: self.SHA384,
             ALGORITHMS.RS512: self.SHA512
         }.get(algorithm)
+        self._algorithm = algorithm
 
         self.cryptography_backend = cryptography_backend
 
-        if isinstance(key, _RSAPublicKey):
+        # if it conforms to RSAPublicKey interface
+        if hasattr(key, 'public_bytes') and hasattr(key, 'public_numbers'):
             self.prepared_key = key
             return
 
@@ -166,3 +192,21 @@ class CryptographyRSAKey(Key):
             return True
         except InvalidSignature:
             return False
+
+    def public_key(self):
+        if hasattr(self.prepared_key, 'public_bytes'):
+            return self
+        return self.__class__(self.prepared_key.public_key(), self._algorithm)
+
+    def to_pem(self):
+        if hasattr(self.prepared_key, 'public_bytes'):
+            return self.prepared_key.public_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PublicFormat.SubjectPublicKeyInfo
+            ).decode('utf-8')
+
+        return self.prepared_key.private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.TraditionalOpenSSL,
+            encryption_algorithm=serialization.NoEncryption()
+        ).decode('utf-8')

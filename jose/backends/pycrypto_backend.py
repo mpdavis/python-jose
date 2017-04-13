@@ -8,7 +8,8 @@ from Crypto.PublicKey import RSA
 from Crypto.Signature import PKCS1_v1_5
 from Crypto.Util.asn1 import DerSequence
 
-from jose.jwk import Key, base64_to_long
+from jose.backends.base import Key
+from jose.jwk import base64_to_long
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWKError
 from jose.utils import base64url_decode
@@ -43,6 +44,7 @@ class RSAKey(Key):
             ALGORITHMS.RS384: self.SHA384,
             ALGORITHMS.RS512: self.SHA512
         }.get(algorithm)
+        self._algorithm = algorithm
 
         if isinstance(key, _RSAKey):
             self.prepared_key = key
@@ -102,3 +104,11 @@ class RSAKey(Key):
             return PKCS1_v1_5.new(self.prepared_key).verify(self.hash_alg.new(msg), sig)
         except Exception as e:
             return False
+
+    def public_key(self):
+        if not self.prepared_key.key.has_private():
+            return self
+        return self.__class__(self.prepared_key.publickey(), self._algorithm)
+
+    def to_pem(self):
+        return self.prepared_key.exportKey('PEM')
