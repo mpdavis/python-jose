@@ -9,7 +9,7 @@ from jose.exceptions import JWKError
 from jose.utils import base64_to_long
 
 
-class ECKey(Key):
+class ECDSAECKey(Key):
     """
     Performs signing and verification operations using
     ECDSA and the specified hash function

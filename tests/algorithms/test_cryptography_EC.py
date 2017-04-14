@@ -2,7 +2,7 @@
 from jose.constants import ALGORITHMS
 from jose.exceptions import JOSEError
 from jose.backends.cryptography_backend import CryptographyECKey
-from jose.jwk import ECKey
+from jose.backends.ecdsa_backend import ECDSAECKey
 
 import ecdsa
 import pytest
@@ -39,9 +39,9 @@ class TestCryptographyECAlgorithm:
         CryptographyECKey(key, ALGORITHMS.ES256)
 
     def test_signing_parity(self):
-        key1 = ECKey(private_key, ALGORITHMS.ES256)
+        key1 = ECDSAECKey(private_key, ALGORITHMS.ES256)
         public_key = key1.public_key().to_pem()
-        vkey1 = ECKey(public_key, ALGORITHMS.ES256)
+        vkey1 = ECDSAECKey(public_key, ALGORITHMS.ES256)
         key2 = CryptographyECKey(private_key, ALGORITHMS.ES256)
         vkey2 = CryptographyECKey(public_key, ALGORITHMS.ES256)
 

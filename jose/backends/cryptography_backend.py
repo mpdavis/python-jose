@@ -19,12 +19,6 @@ class CryptographyECKey(Key):
     SHA384 = hashes.SHA384
     SHA512 = hashes.SHA512
 
-    CURVE_MAP = {
-        SHA256: ec.SECP256R1,
-        SHA384: ec.SECP384R1,
-        SHA512: ec.SECP521R1,
-    }
-
     def __init__(self, key, algorithm, cryptography_backend=default_backend):
         if algorithm not in ALGORITHMS.EC:
             raise JWKError('hash_alg: %s is not a valid hash algorithm' % algorithm)
@@ -36,7 +30,6 @@ class CryptographyECKey(Key):
         }.get(algorithm)
         self._algorithm = algorithm
 
-        self.curve = self.CURVE_MAP.get(self.hash_alg)
         self.cryptography_backend = cryptography_backend
 
         if hasattr(key, 'public_bytes') or hasattr(key, 'private_bytes'):
@@ -78,18 +71,28 @@ class CryptographyECKey(Key):
         x = base64_to_long(jwk_dict.get('x'))
         y = base64_to_long(jwk_dict.get('y'))
 
-        ec_pn = ec.EllipticCurvePublicNumbers(x, y, self.curve())
+        curve = {
+            'P-256': ec.SECP256R1,
+            'P-384': ec.SECP384R1,
+            'P-521': ec.SECP521R1,
+        }[jwk_dict['crv']]
+
+        ec_pn = ec.EllipticCurvePublicNumbers(x, y, curve())
         verifying_key = ec_pn.public_key(self.cryptography_backend())
 
         return verifying_key
 
     def sign(self, msg):
+        if self.hash_alg.digest_size * 8 > self.prepared_key.curve.key_size:
+            raise TypeError("this curve (%s) is too short "
+                            "for your digest (%d)" % (self.prepared_key.curve.name,
+                                                      8*self.hash_alg.digest_size))
         signature = self.prepared_key.sign(msg, ec.ECDSA(self.hash_alg()))
-        order = (2 ** self.curve.key_size) - 1
+        order = (2 ** self.prepared_key.curve.key_size) - 1
         return sigencode_string(*sigdecode_der(signature, order), order=order)
 
     def verify(self, msg, sig):
-        order = (2 ** self.curve.key_size) - 1
+        order = (2 ** self.prepared_key.curve.key_size) - 1
         signature = sigencode_der(*sigdecode_string(sig, order), order=order)
         verifier = self.prepared_key.verifier(signature, ec.ECDSA(self.hash_alg()))
         verifier.update(msg)

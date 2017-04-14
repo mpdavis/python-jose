@@ -1,6 +1,7 @@
 from jose import jwk
 from jose.exceptions import JWKError
 from jose.backends.cryptography_backend import CryptographyECKey
+from jose.backends.ecdsa_backend import ECDSAECKey
 
 import pytest
 
@@ -102,6 +103,8 @@ class TestJWK:
 
     def test_construct_EC_from_jwk(self):
         key = CryptographyECKey(ec_key, algorithm='ES512')
+        assert isinstance(key, jwk.Key)
+        key = ECDSAECKey(ec_key, algorithm='ES512')
         assert isinstance(key, jwk.Key)
 
     def test_construct_from_jwk_missing_alg(self):
