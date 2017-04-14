@@ -8,7 +8,16 @@ from jose.exceptions import JWKError
 from jose.utils import base64url_decode
 from jose.utils import constant_time_string_compare
 from jose.backends.base import Key
-from jose.backends import RSAKey, ECKey
+
+try:
+    from jose.backends import RSAKey
+except ImportError:
+    pass
+
+try:
+    from jose.backends import ECKey
+except ImportError:
+    pass
 
 
 def get_key(algorithm):
@@ -17,8 +26,10 @@ def get_key(algorithm):
     elif algorithm in ALGORITHMS.HMAC:
         return HMACKey
     elif algorithm in ALGORITHMS.RSA:
+        from jose.backends import RSAKey
         return RSAKey
     elif algorithm in ALGORITHMS.EC:
+        from jose.backends import ECKey
         return ECKey
     return None
 

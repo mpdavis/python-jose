@@ -117,5 +117,7 @@ class RSAKey(Key):
         begin = b'-----BEGIN RSA PUBLIC KEY-----'
         end = b'-----END RSA PUBLIC KEY-----'
         if pem.startswith(begin) and pem.strip().endswith(end):
-            pem = b'-----BEGIN PUBLIC KEY-----' + pem.strip()[len(begin):-len(end)] + b'-----END PUBLIC KEY-----\n'
+            pem = b'-----BEGIN PUBLIC KEY-----' + pem.strip()[len(begin):-len(end)] + b'-----END PUBLIC KEY-----'
+        if not pem.endswith(b'\n'):
+            pem = pem + b'\n'
         return pem

@@ -1,7 +1,7 @@
 
 import sys
 
-from jose.jwk import RSAKey
+from jose.backends.pycrypto_backend import RSAKey
 from jose.backends.cryptography_backend import CryptographyRSAKey
 from jose.constants import ALGORITHMS
 from jose.exceptions import JOSEError
@@ -135,10 +135,12 @@ class TestRSACryptography:
 
     def test_signing_parity(self):
         key1 = RSAKey(private_key, ALGORITHMS.RS256)
-        public_key = key1.public_key().to_pem().decode('utf-8')
+        public_key = key1.public_key().to_pem()
         vkey1 = RSAKey(public_key, ALGORITHMS.RS256)
         key2 = CryptographyRSAKey(private_key, ALGORITHMS.RS256)
         vkey2 = CryptographyRSAKey(public_key, ALGORITHMS.RS256)
+
+        assert key2.public_key().to_pem() == public_key
 
         msg = b'test'
         sig1 = key1.sign(msg)
