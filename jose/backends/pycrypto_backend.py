@@ -106,9 +106,16 @@ class RSAKey(Key):
             return False
 
     def public_key(self):
-        if not self.prepared_key.key.has_private():
+        if not self.prepared_key.has_private():
             return self
         return self.__class__(self.prepared_key.publickey(), self._algorithm)
 
     def to_pem(self):
-        return self.prepared_key.exportKey('PEM')
+        pem = self.prepared_key.exportKey('PEM', pkcs=1)
+
+        # pycryptodome fix
+        begin = b'-----BEGIN RSA PUBLIC KEY-----'
+        end = b'-----END RSA PUBLIC KEY-----'
+        if pem.startswith(begin) and pem.strip().endswith(end):
+            pem = b'-----BEGIN PUBLIC KEY-----' + pem.strip()[len(begin):-len(end)] + b'-----END PUBLIC KEY-----\n'
+        return pem
