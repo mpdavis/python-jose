@@ -1,20 +1,14 @@
+sudo: false
 language: python
 python:
   - "2.6"
   - "2.7"
   - "3.3"
   - "3.4"
-  - "pypy-3.4.1"
-env:
-  - TOXENV=py26
-  - TOXENV=py27
-  - TOXENV=py33
-  - TOXENV=py34
-  - TOXENV=pypy
-install: 
-  - pip install -r requirements-dev.txt
-  - pip install -U tox codecov
-script: 
+  - "pypy-5.3.1"
+install:
+  - pip install -U tox codecov tox-travis
+script:
   - tox
 after_success:
 - codecov
