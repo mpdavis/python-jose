@@ -1,6 +1,6 @@
 
 from jose.constants import ALGORITHMS
-from jose.exceptions import JOSEError
+from jose.exceptions import JOSEError, JWKError
 from jose.backends.cryptography_backend import CryptographyECKey
 from jose.backends.ecdsa_backend import ECDSAECKey
 
@@ -23,6 +23,25 @@ class TestCryptographyECAlgorithm:
         assert k.to_pem().strip() == private_key.strip()
         public_pem = k.public_key().to_pem()
         public_key = CryptographyECKey(public_pem, ALGORITHMS.ES256)
+
+    def test_invalid_algorithm(self):
+        with pytest.raises(JWKError):
+            CryptographyECKey(private_key, 'nonexistent')
+
+        with pytest.raises(JWKError):
+            CryptographyECKey({'kty': 'bla'}, ALGORITHMS.ES256)
+
+    def test_key_too_short(self):
+        priv_key = ecdsa.SigningKey.generate(curve=ecdsa.NIST256p).to_pem()
+        key = CryptographyECKey(priv_key, ALGORITHMS.ES512)
+        with pytest.raises(TypeError):
+            key.sign('foo')
+
+    def test_get_public_key(self):
+        key = CryptographyECKey(private_key, ALGORITHMS.ES256)
+        pubkey = key.public_key()
+        pubkey2 = pubkey.public_key()
+        assert pubkey == pubkey2
 
     def test_string_secret(self):
         key = 'secret'

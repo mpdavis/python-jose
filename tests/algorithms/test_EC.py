@@ -1,6 +1,6 @@
 
 from jose.constants import ALGORITHMS
-from jose.exceptions import JOSEError
+from jose.exceptions import JOSEError, JWKError
 
 from jose.backends.ecdsa_backend import ECDSAECKey
 from jose.backends.cryptography_backend import CryptographyECKey
@@ -40,3 +40,16 @@ class TestECAlgorithm:
 
         with pytest.raises(JOSEError):
             CryptographyECKey(key, ALGORITHMS.ES256)
+
+    def test_invalid_algorithm(self):
+        with pytest.raises(JWKError):
+            ECDSAECKey({'kty': 'bla'}, ALGORITHMS.ES256)
+
+    def test_verify(self):
+        key = ECDSAECKey(private_key, ALGORITHMS.ES256)
+        msg = b'test'
+        signature = key.sign(msg)
+        public_key = key.public_key()
+
+        assert public_key.verify(msg, signature) == True
+        assert public_key.verify(msg, b'not a signature') == False

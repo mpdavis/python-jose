@@ -4,7 +4,7 @@ import sys
 from jose.backends.pycrypto_backend import RSAKey
 from jose.backends.cryptography_backend import CryptographyRSAKey
 from jose.constants import ALGORITHMS
-from jose.exceptions import JOSEError
+from jose.exceptions import JOSEError, JWKError
 
 from Crypto.PublicKey import RSA
 
@@ -15,7 +15,7 @@ import pytest
 if sys.version_info > (3,):
     long = int
 
-private_key = """-----BEGIN RSA PRIVATE KEY-----
+private_key = b"""-----BEGIN RSA PRIVATE KEY-----
 MIIJKwIBAAKCAgEAtSKfSeI0fukRIX38AHlKB1YPpX8PUYN2JdvfM+XjNmLfU1M7
 4N0VmdzIX95sneQGO9kC2xMIE+AIlt52Yf/KgBZggAlS9Y0Vx8DsSL2HvOjguAdX
 ir3vYLvAyyHin/mUisJOqccFKChHKjnk0uXy/38+1r17/cYTp76brKpU1I4kM20M
@@ -110,6 +110,13 @@ class TestRSACryptography:
         pem = pubkey.to_pem()
         assert pem.startswith(b'-----BEGIN PUBLIC KEY-----')
 
+    def test_invalid_algorithm(self):
+        with pytest.raises(JWKError):
+            CryptographyRSAKey(private_key, ALGORITHMS.ES256)
+
+        with pytest.raises(JWKError):
+            CryptographyRSAKey({'kty': 'bla'}, ALGORITHMS.RS256)
+
     def test_RSA_jwk(self):
         d = {
             "kty": "RSA",
@@ -133,14 +140,29 @@ class TestRSACryptography:
         with pytest.raises(JOSEError):
             CryptographyRSAKey(key, ALGORITHMS.RS256)
 
+    def test_get_public_key(self):
+        key = CryptographyRSAKey(private_key, ALGORITHMS.RS256)
+        public_key = key.public_key()
+        public_key2 = public_key.public_key()
+        assert public_key == public_key2
+
+        key = RSAKey(private_key, ALGORITHMS.RS256)
+        public_key = key.public_key()
+        public_key2 = public_key.public_key()
+        assert public_key == public_key2
+
+    def test_to_pem(self):
+        key = CryptographyRSAKey(private_key, ALGORITHMS.RS256)
+        assert key.to_pem().strip() == private_key.strip()
+
+        key = RSAKey(private_key, ALGORITHMS.RS256)
+        assert key.to_pem().strip() == private_key.strip()
+
     def test_signing_parity(self):
         key1 = RSAKey(private_key, ALGORITHMS.RS256)
-        public_key = key1.public_key().to_pem()
-        vkey1 = RSAKey(public_key, ALGORITHMS.RS256)
+        vkey1 = key1.public_key()
         key2 = CryptographyRSAKey(private_key, ALGORITHMS.RS256)
-        vkey2 = CryptographyRSAKey(public_key, ALGORITHMS.RS256)
-
-        assert key2.public_key().to_pem() == public_key
+        vkey2 = key2.public_key()
 
         msg = b'test'
         sig1 = key1.sign(msg)
@@ -153,3 +175,13 @@ class TestRSACryptography:
 
         # invalid signature
         assert not vkey2.verify(msg, b'n' * 64)
+
+    def test_pycrypto_invalid_signature(self):
+
+        key = RSAKey(private_key, ALGORITHMS.RS256)
+        msg = b'test'
+        signature = key.sign(msg)
+        public_key = key.public_key()
+
+        assert public_key.verify(msg, signature) == True
+        assert public_key.verify(msg, 1) == False
