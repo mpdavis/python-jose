@@ -1,5 +1,4 @@
 
-from jose.jwk import RSAKey
 from jose.jws import verify
 
 import pytest

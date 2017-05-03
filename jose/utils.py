@@ -1,6 +1,27 @@
 
 import base64
 import hmac
+import six
+import struct
+import sys
+
+# Deal with integer compatibilities between Python 2 and 3.
+# Using `from builtins import int` is not supported on AppEngine.
+if sys.version_info > (3,):
+    long = int
+
+
+def int_arr_to_long(arr):
+    return long(''.join(["%02x" % byte for byte in arr]), 16)
+
+
+def base64_to_long(data):
+    if isinstance(data, six.text_type):
+        data = data.encode("ascii")
+
+    # urlsafe_b64decode will happily convert b64encoded data
+    _d = base64.urlsafe_b64decode(bytes(data) + b'==')
+    return int_arr_to_long(struct.unpack('%sB' % len(_d), _d))
 
 
 def calculate_at_hash(access_token, hash_alg):
@@ -83,3 +104,5 @@ def constant_time_string_compare(a, b):
             result |= ord(x) ^ ord(y)
 
         return result == 0
+
+
