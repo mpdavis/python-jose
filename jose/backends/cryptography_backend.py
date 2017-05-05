@@ -3,7 +3,7 @@ import ecdsa
 from ecdsa.util import sigdecode_string, sigencode_string, sigdecode_der, sigencode_der
 
 from jose.backends.base import Key
-from jose.utils import base64_to_long
+from jose.utils import base64_to_long, long_to_base64
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWKError
 
@@ -101,13 +101,16 @@ class CryptographyECKey(Key):
         except:
             return False
 
+    def is_public(self):
+        return hasattr(self.prepared_key, 'public_bytes')
+
     def public_key(self):
-        if hasattr(self.prepared_key, 'public_bytes'):
+        if self.is_public():
             return self
         return self.__class__(self.prepared_key.public_key(), self._algorithm)
 
     def to_pem(self):
-        if hasattr(self.prepared_key, 'public_bytes'):
+        if self.is_public():
             pem = self.prepared_key.public_bytes(
                 encoding=serialization.Encoding.PEM,
                 format=serialization.PublicFormat.SubjectPublicKeyInfo
@@ -119,6 +122,39 @@ class CryptographyECKey(Key):
             encryption_algorithm=serialization.NoEncryption()
         )
         return pem
+
+    def to_dict(self):
+        if not self.is_public():
+            public_key = self.prepared_key.public_key()
+        else:
+            public_key = self.prepared_key
+
+        crv = {
+            'secp256r1': 'P-256',
+            'secp384r1': 'P-384',
+            'secp521r1': 'P-521',
+        }[self.prepared_key.curve.name]
+
+        # Calculate the key size in bytes. Section 6.2.1.2 and 6.2.1.3 of
+        # RFC7518 prescribes that the 'x', 'y' and 'd' parameters of the curve
+        # points must be encoded as octed-strings of this length.
+        key_size = (self.prepared_key.curve.key_size + 7) // 8
+
+        data = {
+            'alg': self._algorithm,
+            'kty': 'EC',
+            'crv': crv,
+            'x': long_to_base64(public_key.public_numbers().x, size=key_size),
+            'y': long_to_base64(public_key.public_numbers().y, size=key_size),
+        }
+
+        if not self.is_public():
+            data['d'] = long_to_base64(
+                self.prepared_key.private_numbers().private_value,
+                size=key_size
+            )
+
+        return data
 
 
 class CryptographyRSAKey(Key):
@@ -196,13 +232,16 @@ class CryptographyRSAKey(Key):
         except InvalidSignature:
             return False
 
+    def is_public(self):
+        return hasattr(self.prepared_key, 'public_bytes')
+
     def public_key(self):
-        if hasattr(self.prepared_key, 'public_bytes'):
+        if self.is_public():
             return self
         return self.__class__(self.prepared_key.public_key(), self._algorithm)
 
     def to_pem(self):
-        if hasattr(self.prepared_key, 'public_bytes'):
+        if self.is_public():
             return self.prepared_key.public_bytes(
                 encoding=serialization.Encoding.PEM,
                 format=serialization.PublicFormat.SubjectPublicKeyInfo
@@ -213,3 +252,28 @@ class CryptographyRSAKey(Key):
             format=serialization.PrivateFormat.TraditionalOpenSSL,
             encryption_algorithm=serialization.NoEncryption()
         )
+
+    def to_dict(self):
+        if not self.is_public():
+            public_key = self.prepared_key.public_key()
+        else:
+            public_key = self.prepared_key
+
+        data = {
+            'alg': self._algorithm,
+            'kty': 'RSA',
+            'n': long_to_base64(public_key.public_numbers().n),
+            'e': long_to_base64(public_key.public_numbers().e),
+        }
+
+        if not self.is_public():
+            data.update({
+                'd': long_to_base64(self.prepared_key.private_numbers().d),
+                'p': long_to_base64(self.prepared_key.private_numbers().p),
+                'q': long_to_base64(self.prepared_key.private_numbers().q),
+                'dp': long_to_base64(self.prepared_key.private_numbers().dmp1),
+                'dq': long_to_base64(self.prepared_key.private_numbers().dmq1),
+                'qi': long_to_base64(self.prepared_key.private_numbers().iqmp),
+            })
+
+        return data

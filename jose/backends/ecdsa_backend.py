@@ -6,7 +6,7 @@ import ecdsa
 
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWKError
-from jose.utils import base64_to_long
+from jose.utils import base64_to_long, long_to_base64
 
 
 class ECDSAECKey(Key):
@@ -92,10 +92,46 @@ class ECDSAECKey(Key):
         except:
             return False
 
+    def is_public(self):
+        return isinstance(self.prepared_key, ecdsa.VerifyingKey)
+
     def public_key(self):
-        if isinstance(self.prepared_key, ecdsa.VerifyingKey):
+        if self.is_public():
             return self
         return self.__class__(self.prepared_key.get_verifying_key(), self._algorithm)
 
     def to_pem(self):
         return self.prepared_key.to_pem()
+
+    def to_dict(self):
+        if not self.is_public():
+            public_key = self.prepared_key.get_verifying_key()
+        else:
+            public_key = self.prepared_key
+
+        crv = {
+            ecdsa.curves.NIST256p: 'P-256',
+            ecdsa.curves.NIST384p: 'P-384',
+            ecdsa.curves.NIST521p: 'P-521',
+        }[self.prepared_key.curve]
+
+        # Calculate the key size in bytes. Section 6.2.1.2 and 6.2.1.3 of
+        # RFC7518 prescribes that the 'x', 'y' and 'd' parameters of the curve
+        # points must be encoded as octed-strings of this length.
+        key_size = self.prepared_key.curve.baselen
+
+        data = {
+            'alg': self._algorithm,
+            'kty': 'EC',
+            'crv': crv,
+            'x': long_to_base64(public_key.pubkey.point.x(), size=key_size),
+            'y': long_to_base64(public_key.pubkey.point.y(), size=key_size),
+        }
+
+        if not self.is_public():
+            data['d'] = long_to_base64(
+                self.prepared_key.privkey.secret_multiplier,
+                size=key_size
+            )
+
+        return data

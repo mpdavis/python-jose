@@ -158,6 +158,39 @@ class TestRSACryptography:
         key = RSAKey(private_key, ALGORITHMS.RS256)
         assert key.to_pem().strip() == private_key.strip()
 
+    def assert_parameters(self, as_dict, private):
+        assert isinstance(as_dict, dict)
+
+        # Public parameters should always be there.
+        assert 'n' in as_dict
+        assert 'e' in as_dict
+
+        if private:
+            # Private parameters as well
+            assert 'd' in as_dict
+            assert 'p' in as_dict
+            assert 'q' in as_dict
+            assert 'dp' in as_dict
+            assert 'dq' in as_dict
+            assert 'qi' in as_dict
+        else:
+            # Private parameters should be absent
+            assert 'd' not in as_dict
+            assert 'p' not in as_dict
+            assert 'q' not in as_dict
+            assert 'dp' not in as_dict
+            assert 'dq' not in as_dict
+            assert 'qi' not in as_dict
+
+    def test_to_dict(self):
+        key = CryptographyRSAKey(private_key, ALGORITHMS.RS256)
+        self.assert_parameters(key.to_dict(), private=True)
+        self.assert_parameters(key.public_key().to_dict(), private=False)
+
+        key = RSAKey(private_key, ALGORITHMS.RS256)
+        self.assert_parameters(key.to_dict(), private=True)
+        self.assert_parameters(key.public_key().to_dict(), private=False)
+
     def test_signing_parity(self):
         key1 = RSAKey(private_key, ALGORITHMS.RS256)
         vkey1 = key1.public_key()

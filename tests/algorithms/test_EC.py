@@ -53,3 +53,31 @@ class TestECAlgorithm:
 
         assert public_key.verify(msg, signature) == True
         assert public_key.verify(msg, b'not a signature') == False
+
+    def assert_parameters(self, as_dict, private):
+        assert isinstance(as_dict, dict)
+
+        # Public parameters should always be there.
+        assert 'x' in as_dict
+        assert 'y' in as_dict
+        assert 'crv' in as_dict
+
+        assert 'kty' in as_dict
+        assert as_dict['kty'] == 'EC'
+
+        if private:
+            # Private parameters as well
+            assert 'd' in as_dict
+
+        else:
+            # Private parameters should be absent
+            assert 'd' not in as_dict
+
+    def test_to_dict(self):
+        key = CryptographyECKey(private_key, ALGORITHMS.ES256)
+        self.assert_parameters(key.to_dict(), private=True)
+        self.assert_parameters(key.public_key().to_dict(), private=False)
+
+        key = ECDSAECKey(private_key, ALGORITHMS.ES256)
+        self.assert_parameters(key.to_dict(), private=True)
+        self.assert_parameters(key.public_key().to_dict(), private=False)

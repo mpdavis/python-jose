@@ -9,7 +9,7 @@ from Crypto.Signature import PKCS1_v1_5
 from Crypto.Util.asn1 import DerSequence
 
 from jose.backends.base import Key
-from jose.utils import base64_to_long
+from jose.utils import base64_to_long, long_to_base64
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWKError
 from jose.utils import base64url_decode
@@ -121,3 +121,33 @@ class RSAKey(Key):
         if not pem.endswith(b'\n'):
             pem = pem + b'\n'
         return pem
+
+    def to_dict(self):
+        data = {
+            'alg': self._algorithm,
+            'kty': 'RSA',
+            'n': long_to_base64(self.prepared_key.n),
+            'e': long_to_base64(self.prepared_key.e),
+        }
+
+        if self.prepared_key.has_private():
+            # Section 6.3.2 of RFC7518 prescribes that when we include the
+            # optional parameters p and q, we must also include the values of
+            # dp and dq, which are not readily available from PyCrypto - so we
+            # calculate them. Moreover, PyCrypto stores the inverse of p
+            # modulo q rather than the inverse of q modulo p, so we switch
+            # p and q. As far as I can tell, this is OK - RFC7518 only
+            # asserts that p is the 'first factor', but does not specify
+            # what 'first' means in this case.
+            dp = self.prepared_key.d % (self.prepared_key.p - 1)
+            dq = self.prepared_key.d % (self.prepared_key.q - 1)
+            data.update({
+                'd': long_to_base64(self.prepared_key.d),
+                'p': long_to_base64(self.prepared_key.q),
+                'q': long_to_base64(self.prepared_key.p),
+                'dp': long_to_base64(dq),
+                'dq': long_to_base64(dp),
+                'qi': long_to_base64(self.prepared_key.u),
+            })
+
+        return data
