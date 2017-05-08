@@ -79,8 +79,35 @@ class RSAKey(Key):
 
         e = base64_to_long(jwk_dict.get('e', 256))
         n = base64_to_long(jwk_dict.get('n'))
+        params = (n, e)
 
-        self.prepared_key = RSA.construct((n, e))
+        if 'd' in jwk_dict:
+            params += (base64_to_long(jwk_dict.get('d')),)
+
+            extra_params = ['p', 'q', 'dp', 'dq', 'qi']
+
+            if any(k in jwk_dict for k in extra_params):
+                # Precomputed private key parameters are available.
+                if not all(k in jwk_dict for k in extra_params):
+                    # These values must be present when 'p' is according to
+                    # Section 6.3.2 of RFC7518, so if they are not we raise
+                    # an error.
+                    raise JWKError('Precomputed private key parameters are incomplete.')
+
+                p = base64_to_long(jwk_dict.get('p'))
+                q = base64_to_long(jwk_dict.get('q'))
+                qi = base64_to_long(jwk_dict.get('qi'))
+
+                # PyCrypto does not take the dp and dq as arguments, so we do
+                # not pass them. Furthermore, the parameter qi specified in
+                # the JWK is the inverse of q modulo p, whereas PyCrypto
+                # takes the inverse of p modulo q. We therefore switch the
+                # parameters to make the third parameter the inverse of the
+                # second parameter modulo the first parameter.
+                params += (q, p, qi)
+
+        self.prepared_key = RSA.construct(params)
+
         return self.prepared_key
 
     def _process_cert(self, key):

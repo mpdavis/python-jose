@@ -68,19 +68,26 @@ class CryptographyECKey(Key):
         if not jwk_dict.get('kty') == 'EC':
             raise JWKError("Incorrect key type.  Expected: 'EC', Recieved: %s" % jwk_dict.get('kty'))
 
+        if not all(k in jwk_dict for k in ['x', 'y', 'crv']):
+            raise JWKError('Mandatory parameters are missing')
+
         x = base64_to_long(jwk_dict.get('x'))
         y = base64_to_long(jwk_dict.get('y'))
-
         curve = {
             'P-256': ec.SECP256R1,
             'P-384': ec.SECP384R1,
             'P-521': ec.SECP521R1,
         }[jwk_dict['crv']]
 
-        ec_pn = ec.EllipticCurvePublicNumbers(x, y, curve())
-        verifying_key = ec_pn.public_key(self.cryptography_backend())
+        public = ec.EllipticCurvePublicNumbers(x, y, curve())
 
-        return verifying_key
+        if 'd' in jwk_dict:
+            d = base64_to_long(jwk_dict.get('d'))
+            private = ec.EllipticCurvePrivateNumbers(d, public)
+
+            return private.private_key(self.cryptography_backend())
+        else:
+            return public.public_key(self.cryptography_backend())
 
     def sign(self, msg):
         if self.hash_alg.digest_size * 8 > self.prepared_key.curve.key_size:
@@ -206,9 +213,40 @@ class CryptographyRSAKey(Key):
 
         e = base64_to_long(jwk_dict.get('e', 256))
         n = base64_to_long(jwk_dict.get('n'))
+        public = rsa.RSAPublicNumbers(e, n)
 
-        verifying_key = rsa.RSAPublicNumbers(e, n).public_key(self.cryptography_backend())
-        return verifying_key
+        if 'd' not in jwk_dict:
+            return public.public_key(self.cryptography_backend())
+        else:
+            # This is a private key.
+            d = base64_to_long(jwk_dict.get('d'))
+
+            extra_params = ['p', 'q', 'dp', 'dq', 'qi']
+
+            if any(k in jwk_dict for k in extra_params):
+                # Precomputed private key parameters are available.
+                if not all(k in jwk_dict for k in extra_params):
+                    # These values must be present when 'p' is according to
+                    # Section 6.3.2 of RFC7518, so if they are not we raise
+                    # an error.
+                    raise JWKError('Precomputed private key parameters are incomplete.')
+
+                p = base64_to_long(jwk_dict['p'])
+                q = base64_to_long(jwk_dict['q'])
+                dp = base64_to_long(jwk_dict['dp'])
+                dq = base64_to_long(jwk_dict['dq'])
+                qi = base64_to_long(jwk_dict['qi'])
+            else:
+                # The precomputed private key parameters are not available,
+                # so we use cryptography's API to fill them in.
+                p, q = rsa.rsa_recover_prime_factors(n, e, d)
+                dp = rsa.rsa_crt_dmp1(d, p)
+                dq = rsa.rsa_crt_dmq1(d, q)
+                qi = rsa.rsa_crt_iqmp(p, q)
+
+            private = rsa.RSAPrivateNumbers(p, q, d, dp, dq, qi, public)
+
+            return private.private_key(self.cryptography_backend())
 
     def sign(self, msg):
         signer = self.prepared_key.signer(
