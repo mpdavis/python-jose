@@ -9,9 +9,9 @@ import ecdsa
 import pytest
 
 private_key = """-----BEGIN EC PRIVATE KEY-----
-MHQCAQEEIIAK499svJugZZfsTsgL2tc7kH/CpzQbkr4g55CEWQyPoAcGBSuBBAAK
-oUQDQgAEsOnVqWVPfjte2nI0Ay3oTZVehCUtH66nJM8z6flUluHxhLG8ZTTCkJAZ
-W6xQdXHfqGUy3Dx40NDhgTaM8xAdSw==
+MHcCAQEEIOiSs10XnBlfykk5zsJRmzYybKdMlGniSJcssDvUcF6DoAoGCCqGSM49
+AwEHoUQDQgAE7gb4edKJ7ul9IgomCdcOebQTZ8qktqtBfRKboa71CfEKzBruUi+D
+WkG0HJWIORlPbvXME+DRh6G/yVOKnTm88Q==
 -----END EC PRIVATE KEY-----"""
 
 
