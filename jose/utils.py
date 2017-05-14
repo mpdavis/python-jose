@@ -30,7 +30,7 @@ except ImportError:
             if blocksize == 0:
                 return ret
             else:
-                assert len(ret) >= blocksize
+                assert len(ret) <= blocksize
                 padding = blocksize - len(ret)
                 return b'\x00' * padding + ret
 
