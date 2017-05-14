@@ -132,8 +132,11 @@ class RSAKey(Key):
         except Exception as e:
             return False
 
+    def is_public(self):
+        return not self.prepared_key.has_private()
+
     def public_key(self):
-        if not self.prepared_key.has_private():
+        if self.is_public():
             return self
         return self.__class__(self.prepared_key.publickey(), self._algorithm)
 
@@ -157,7 +160,7 @@ class RSAKey(Key):
             'e': long_to_base64(self.prepared_key.e),
         }
 
-        if self.prepared_key.has_private():
+        if not self.is_public():
             # Section 6.3.2 of RFC7518 prescribes that when we include the
             # optional parameters p and q, we must also include the values of
             # dp and dq, which are not readily available from PyCrypto - so we

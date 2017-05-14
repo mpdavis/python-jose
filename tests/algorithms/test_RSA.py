@@ -95,7 +95,7 @@ class TestRSAAlgorithm:
 
 class TestRSACryptography:
     def test_RSA_key(self):
-        CryptographyRSAKey(private_key, ALGORITHMS.RS256)
+        assert not CryptographyRSAKey(private_key, ALGORITHMS.RS256).is_public()
 
     def test_RSA_key_instance(self):
         from cryptography.hazmat.backends import default_backend
@@ -107,6 +107,8 @@ class TestRSACryptography:
             ).public_key(default_backend())
 
         pubkey = CryptographyRSAKey(key, ALGORITHMS.RS256)
+        assert pubkey.is_public()
+
         pem = pubkey.to_pem()
         assert pem.startswith(b'-----BEGIN PUBLIC KEY-----')
 
@@ -123,8 +125,8 @@ class TestRSACryptography:
             "n": "0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx4cbbfAAtVT86zwu1RK7aPFFxuhDR1L6tSoc_BJECPebWKRXjBZCiFV4n3oknjhMstn64tZ_2W-5JsGY4Hc5n9yBXArwl93lqt7_RN5w6Cf0h4QyQ5v-65YGjQR0_FDW2QvzqY368QQMicAtaSqzs8KJZgnYb9c7d0zgdAZHzu6qMQvRL5hajrn1n91CbOpbISD08qNLyrdkt-bFTWhAI4vMQFh6WeZu0fM4lFd2NcRwr3XPksINHaQ-G_xBniIqbw0Ls1jF44-csFCur-kEgU8awapJzKnqDKgw",
             "e": "AQAB",
         }
-        CryptographyRSAKey(key, ALGORITHMS.RS256)
-        RSAKey(key, ALGORITHMS.RS256)
+        assert CryptographyRSAKey(key, ALGORITHMS.RS256).is_public()
+        assert RSAKey(key, ALGORITHMS.RS256).is_public()
 
         key = {
             "kty": "RSA",
@@ -139,8 +141,8 @@ class TestRSACryptography:
             "dq": "CLDmDGduhylc9o7r84rEUVn7pzQ6PF83Y-iBZx5NT-TpnOZKF1pErAMVeKzFEl41DlHHqqBLSM0W1sOFbwTxYWZDm6sI6og5iTbwQGIC3gnJKbi_7k_vJgGHwHxgPaX2PnvP-zyEkDERuf-ry4c_Z11Cq9AqC2yeL6kdKT1cYF8",
             "qi": "3PiqvXQN0zwMeE-sBvZgi289XP9XCQF3VWqPzMKnIgQp7_Tugo6-NZBKCQsMf3HaEGBjTVJs_jcK8-TRXvaKe-7ZMaQj8VfBdYkssbu0NKDDhjJ-GtiseaDVWt7dcH0cfwxgFUHpQh7FoCrjFJ6h6ZEpMF6xmujs4qMpPz8aaI4"
         }
-        CryptographyRSAKey(key, ALGORITHMS.RS256)
-        RSAKey(key, ALGORITHMS.RS256)
+        assert not CryptographyRSAKey(key, ALGORITHMS.RS256).is_public()
+        assert not RSAKey(key, ALGORITHMS.RS256).is_public()
 
         del key['p']
 
@@ -157,8 +159,8 @@ class TestRSACryptography:
         del key['qi']
 
         # None of the extra parameters are present, but 'key' is still private.
-        CryptographyRSAKey(key, ALGORITHMS.RS256)
-        RSAKey(key, ALGORITHMS.RS256)
+        assert not CryptographyRSAKey(key, ALGORITHMS.RS256).is_public()
+        assert not RSAKey(key, ALGORITHMS.RS256).is_public()
 
     def test_string_secret(self):
         key = 'secret'
@@ -179,11 +181,15 @@ class TestRSACryptography:
         key = CryptographyRSAKey(private_key, ALGORITHMS.RS256)
         public_key = key.public_key()
         public_key2 = public_key.public_key()
+        assert public_key.is_public()
+        assert public_key2.is_public()
         assert public_key == public_key2
 
         key = RSAKey(private_key, ALGORITHMS.RS256)
         public_key = key.public_key()
         public_key2 = public_key.public_key()
+        assert public_key.is_public()
+        assert public_key2.is_public()
         assert public_key == public_key2
 
     def test_to_pem(self):

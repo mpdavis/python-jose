@@ -19,11 +19,11 @@ class TestECAlgorithm:
 
     def test_EC_key(self):
         key = ecdsa.SigningKey.from_pem(private_key)
-        ECDSAECKey(key, ALGORITHMS.ES256)
-        CryptographyECKey(key, ALGORITHMS.ES256)
+        assert not ECDSAECKey(key, ALGORITHMS.ES256).is_public()
+        assert not CryptographyECKey(key, ALGORITHMS.ES256).is_public()
 
-        ECDSAECKey(private_key, ALGORITHMS.ES256)
-        CryptographyECKey(private_key, ALGORITHMS.ES256)
+        assert not ECDSAECKey(private_key, ALGORITHMS.ES256).is_public()
+        assert not CryptographyECKey(private_key, ALGORITHMS.ES256).is_public()
 
     def test_string_secret(self):
         key = 'secret'
@@ -56,14 +56,14 @@ class TestECAlgorithm:
             "d": "AAhRON2r9cqXX1hg-RoI6R1tX5p2rUAYdmpHZoC1XNM56KtscrX6zbKipQrCW9CGZH3T4ubpnoTKLDYJ_fF3_rJt",
         }
 
-        ECDSAECKey(key, ALGORITHMS.ES512)
-        CryptographyECKey(key, ALGORITHMS.ES512)
+        assert not ECDSAECKey(key, ALGORITHMS.ES512).is_public()
+        assert not CryptographyECKey(key, ALGORITHMS.ES512).is_public()
 
         del key['d']
 
         # We are now dealing with a public key.
-        ECDSAECKey(key, ALGORITHMS.ES512)
-        CryptographyECKey(key, ALGORITHMS.ES512)
+        assert ECDSAECKey(key, ALGORITHMS.ES512).is_public()
+        assert CryptographyECKey(key, ALGORITHMS.ES512).is_public()
 
         del key['x']
 
