@@ -249,12 +249,15 @@ class CryptographyRSAKey(Key):
             return private.private_key(self.cryptography_backend())
 
     def sign(self, msg):
-        signer = self.prepared_key.signer(
-            padding.PKCS1v15(),
-            self.hash_alg()
-        )
-        signer.update(msg)
-        signature = signer.finalize()
+        try:
+            signer = self.prepared_key.signer(
+                padding.PKCS1v15(),
+                self.hash_alg()
+            )
+            signer.update(msg)
+            signature = signer.finalize()
+        except Exception as e:
+            raise JWKError(e)
         return signature
 
     def verify(self, msg, sig):
