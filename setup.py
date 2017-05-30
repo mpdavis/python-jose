@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
-
+import sys
 import jose
 
 import platform
@@ -25,7 +25,7 @@ def get_packages(package):
 
 
 def get_install_requires():
-    if platform.python_implementation() == 'PyPy':
+    if sys.platform == "win32" or platform.python_implementation() == 'PyPy':
         crypto_lib = 'pycryptodome >=3.3.1, <3.4.0'
     else:
         crypto_lib = 'pycrypto >=2.6.0, <2.7.0'
