@@ -97,7 +97,8 @@ class CryptographyECKey(Key):
         verifier = self.prepared_key.verifier(signature, ec.ECDSA(self.hash_alg()))
         verifier.update(msg)
         try:
-            return verifier.verify()
+            verifier.verify()
+            return True
         except:
             return False
 
