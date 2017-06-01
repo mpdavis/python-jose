@@ -49,7 +49,7 @@ class RSAKey(Key):
         if not jwk_dict.get('kty') == 'RSA':
             raise JWKError("Incorrect key type.  Expected: 'RSA', Recieved: %s" % jwk_dict.get('kty'))
 
-        e = base64_to_long(jwk_dict.get('e', 256))
+        e = base64_to_long(jwk_dict.get('e'))
         n = base64_to_long(jwk_dict.get('n'))
 
         verifying_key = pyrsa.PublicKey(e=e, n=n)
