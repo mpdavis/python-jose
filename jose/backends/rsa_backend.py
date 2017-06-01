@@ -56,12 +56,12 @@ class RSAKey(Key):
         return verifying_key
 
     def sign(self, msg):
-        print(self._algorithm)
         return pyrsa.sign(msg, self._prepared_key, self.hash_alg)
 
     def verify(self, msg, sig):
         try:
-            return pyrsa.verify(msg, sig, self._prepared_key)
+            pyrsa.verify(msg, sig, self._prepared_key)
+            return True
         except pyrsa.pkcs1.VerificationError:
             return False
 
@@ -73,7 +73,7 @@ class RSAKey(Key):
     def to_pem(self):
         import rsa.pem
 
-        if isinstance(self._prepared_key, rsa.PrivateKey):
+        if isinstance(self._prepared_key, pyrsa.PrivateKey):
             pem = self._prepared_key.save_pkcs1()
         else:
             # this is a PKCS#8 DER header to identify rsaEncryption
