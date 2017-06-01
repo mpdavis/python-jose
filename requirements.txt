@@ -1,3 +1,5 @@
 pycrypto
 six
 future
+rsa
+ecdsa
