@@ -5,10 +5,38 @@ import six
 import struct
 import sys
 
-# Deal with integer compatibilities between Python 2 and 3.
-# Using `from builtins import int` is not supported on AppEngine.
 if sys.version_info > (3,):
+    # Deal with integer compatibilities between Python 2 and 3.
+    # Using `from builtins import int` is not supported on AppEngine.
     long = int
+
+
+# Piggyback of the backends implementation of the function that converts a long
+# to a bytes stream. Some plumbing is necessary to have the signatures match.
+try:
+    from Crypto.Util.number import long_to_bytes
+except ImportError:
+    try:
+        from cryptography.utils import int_to_bytes as _long_to_bytes
+
+        def long_to_bytes(n, blocksize=0):
+            return _long_to_bytes(n, blocksize or None)
+
+    except ImportError:
+        from ecdsa.ecdsa import int_to_string as _long_to_bytes
+
+        def long_to_bytes(n, blocksize=0):
+            ret = _long_to_bytes(n)
+            if blocksize == 0:
+                return ret
+            else:
+                assert len(ret) <= blocksize
+                padding = blocksize - len(ret)
+                return b'\x00' * padding + ret
+
+
+def long_to_base64(data, size=0):
+    return base64.urlsafe_b64encode(long_to_bytes(data, size)).strip(b'=')
 
 
 def int_arr_to_long(arr):
@@ -104,5 +132,3 @@ def constant_time_string_compare(a, b):
             result |= ord(x) ^ ord(y)
 
         return result == 0
-
-

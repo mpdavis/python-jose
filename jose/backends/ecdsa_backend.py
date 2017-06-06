@@ -6,7 +6,7 @@ import ecdsa
 
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWKError
-from jose.utils import base64_to_long
+from jose.utils import base64_to_long, long_to_base64
 
 
 class ECDSAECKey(Key):
@@ -72,16 +72,23 @@ class ECDSAECKey(Key):
         if not jwk_dict.get('kty') == 'EC':
             raise JWKError("Incorrect key type.  Expected: 'EC', Recieved: %s" % jwk_dict.get('kty'))
 
-        x = base64_to_long(jwk_dict.get('x'))
-        y = base64_to_long(jwk_dict.get('y'))
+        if not all(k in jwk_dict for k in ['x', 'y', 'crv']):
+            raise JWKError('Mandatory parameters are missing')
 
-        if not ecdsa.ecdsa.point_is_valid(self.curve.generator, x, y):
-            raise JWKError("Point: %s, %s is not a valid point" % (x, y))
+        if 'd' in jwk_dict:
+            # We are dealing with a private key; the secret exponent is enough
+            # to create an ecdsa key.
+            d = base64_to_long(jwk_dict.get('d'))
+            return ecdsa.keys.SigningKey.from_secret_exponent(d, self.curve)
+        else:
+            x = base64_to_long(jwk_dict.get('x'))
+            y = base64_to_long(jwk_dict.get('y'))
 
-        point = ecdsa.ellipticcurve.Point(self.curve.curve, x, y, self.curve.order)
-        verifying_key = ecdsa.keys.VerifyingKey.from_public_point(point, self.curve)
+            if not ecdsa.ecdsa.point_is_valid(self.curve.generator, x, y):
+                raise JWKError("Point: %s, %s is not a valid point" % (x, y))
 
-        return verifying_key
+            point = ecdsa.ellipticcurve.Point(self.curve.curve, x, y, self.curve.order)
+            return ecdsa.keys.VerifyingKey.from_public_point(point, self.curve)
 
     def sign(self, msg):
         return self.prepared_key.sign(msg, hashfunc=self.hash_alg, sigencode=ecdsa.util.sigencode_string)
@@ -92,10 +99,46 @@ class ECDSAECKey(Key):
         except:
             return False
 
+    def is_public(self):
+        return isinstance(self.prepared_key, ecdsa.VerifyingKey)
+
     def public_key(self):
-        if isinstance(self.prepared_key, ecdsa.VerifyingKey):
+        if self.is_public():
             return self
         return self.__class__(self.prepared_key.get_verifying_key(), self._algorithm)
 
     def to_pem(self):
         return self.prepared_key.to_pem()
+
+    def to_dict(self):
+        if not self.is_public():
+            public_key = self.prepared_key.get_verifying_key()
+        else:
+            public_key = self.prepared_key
+
+        crv = {
+            ecdsa.curves.NIST256p: 'P-256',
+            ecdsa.curves.NIST384p: 'P-384',
+            ecdsa.curves.NIST521p: 'P-521',
+        }[self.prepared_key.curve]
+
+        # Calculate the key size in bytes. Section 6.2.1.2 and 6.2.1.3 of
+        # RFC7518 prescribes that the 'x', 'y' and 'd' parameters of the curve
+        # points must be encoded as octed-strings of this length.
+        key_size = self.prepared_key.curve.baselen
+
+        data = {
+            'alg': self._algorithm,
+            'kty': 'EC',
+            'crv': crv,
+            'x': long_to_base64(public_key.pubkey.point.x(), size=key_size),
+            'y': long_to_base64(public_key.pubkey.point.y(), size=key_size),
+        }
+
+        if not self.is_public():
+            data['d'] = long_to_base64(
+                self.prepared_key.privkey.secret_multiplier,
+                size=key_size
+            )
+
+        return data
