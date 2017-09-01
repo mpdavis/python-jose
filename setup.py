@@ -4,8 +4,6 @@ import os
 
 import jose
 
-import platform
-
 from setuptools import setup
 
 
@@ -24,9 +22,28 @@ def get_packages(package):
     ]
 
 
+def on_google_appengine():
+    """
+    Check if running on google appengine.
+    Will also return True on the GAE testbed.
+    """
+    try:
+        from google import appengine
+        # satisfy pyflakes, but if this is falsey, that's weird...
+        if appengine:
+            return True
+    except ImportError:
+        pass
+    return False
+
+
 def get_install_requires():
+    crypto_lib = 'pycryptodome >=3.3.1, <3.4.0'
+    if on_google_appengine():
+        crypto_lib = 'pycrypto >=2.6.0, <2.7.0'
+
     return [
-        'pycryptodome >=3.3.1, <3.4.0',
+        crypto_lib,
         'six <2.0',
         'ecdsa <1.0',
         'future <1.0',
