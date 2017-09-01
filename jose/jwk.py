@@ -105,6 +105,7 @@ class HMACKey(Key):
 
         invalid_strings = [
             b'-----BEGIN PUBLIC KEY-----',
+            b'-----BEGIN RSA PUBLIC KEY-----',
             b'-----BEGIN CERTIFICATE-----',
             b'ssh-rsa'
         ]

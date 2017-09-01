@@ -17,6 +17,10 @@ class TestHMACAlgorithm:
         with pytest.raises(JOSEError):
             HMACKey(key, ALGORITHMS.HS256)
 
+        key = "-----BEGIN RSA PUBLIC KEY-----"
+        with pytest.raises(JOSEError):
+            HMACKey(key, ALGORITHMS.HS256)
+
         key = "-----BEGIN CERTIFICATE-----"
         with pytest.raises(JOSEError):
             HMACKey(key, ALGORITHMS.HS256)
