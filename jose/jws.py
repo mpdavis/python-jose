@@ -219,7 +219,7 @@ def _sig_matches_keys(keys, signing_input, signature, alg):
 def _get_keys(key):
 
     try:
-        key = json.loads(key)
+        key = json.loads(key.decode('utf-8'))
     except Exception:
         pass
 
