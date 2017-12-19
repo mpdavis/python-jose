@@ -129,7 +129,7 @@ class RSAKey(Key):
     def verify(self, msg, sig):
         try:
             return PKCS1_v1_5.new(self.prepared_key).verify(self.hash_alg.new(msg), sig)
-        except Exception as e:
+        except Exception:
             return False
 
     def is_public(self):

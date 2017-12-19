@@ -211,7 +211,7 @@ def _sig_matches_keys(keys, signing_input, signature, alg):
         try:
             if key.verify(signing_input, signature):
                 return True
-        except:
+        except Exception:
             pass
     return False
 

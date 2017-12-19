@@ -1,4 +1,6 @@
 
+__all__ = ["ECKey", "RSAKey"]
+
 try:
     from jose.backends.pycrypto_backend import RSAKey
 except ImportError:

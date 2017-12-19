@@ -106,7 +106,7 @@ class CryptographyECKey(Key):
         try:
             verifier.verify()
             return True
-        except:
+        except Exception:
             return False
 
     def is_public(self):

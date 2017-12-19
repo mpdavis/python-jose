@@ -96,7 +96,7 @@ class ECDSAECKey(Key):
     def verify(self, msg, sig):
         try:
             return self.prepared_key.verify(sig, msg, hashfunc=self.hash_alg, sigdecode=ecdsa.util.sigdecode_string)
-        except:
+        except Exception:
             return False
 
     def is_public(self):

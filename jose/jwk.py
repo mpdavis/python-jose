@@ -9,16 +9,6 @@ from jose.utils import base64url_decode, base64url_encode
 from jose.utils import constant_time_string_compare
 from jose.backends.base import Key
 
-try:
-    from jose.backends import RSAKey
-except ImportError:
-    pass
-
-try:
-    from jose.backends import ECKey
-except ImportError:
-    pass
-
 
 def get_key(algorithm):
     if algorithm in ALGORITHMS.KEYS:
