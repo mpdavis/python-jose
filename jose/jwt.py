@@ -420,11 +420,10 @@ def _validate_at_hash(claims, access_token, algorithm):
     """
     if 'at_hash' not in claims and not access_token:
         return
+    elif access_token and 'at_hash' not in claims:
+        return
     elif 'at_hash' in claims and not access_token:
         msg = 'No access_token provided to compare against at_hash claim.'
-        raise JWTClaimsError(msg)
-    elif access_token and 'at_hash' not in claims:
-        msg = 'at_hash claim missing from token.'
         raise JWTClaimsError(msg)
 
     try:
