@@ -408,21 +408,26 @@ def _validate_jti(claims):
 
 def _validate_at_hash(claims, access_token, algorithm):
     """
-    Validates that the 'at_hash' parameter included in the claims matches
-    with the access_token returned alongside the id token as part of
-    the authorization_code flow.
+    Validates that the 'at_hash' is valid.
+
+    Its value is the base64url encoding of the left-most half of the hash
+    of the octets of the ASCII representation of the access_token value,
+    where the hash algorithm used is the hash algorithm used in the alg
+    Header Parameter of the ID Token's JOSE Header. For instance, if the
+    alg is RS256, hash the access_token value with SHA-256, then take the
+    left-most 128 bits and base64url encode them. The at_hash value is a
+    case sensitive string.  Use of this claim is OPTIONAL.
 
     Args:
-        claims (dict): The claims dictionary to validate.
-        access_token (str): The access token returned by the OpenID Provider.
-        algorithm (str): The algorithm used to sign the JWT, as specified by
-            the token headers.
+      claims (dict): The claims dictionary to validate.
+      access_token (str): The access token returned by the OpenID Provider.
+      algorithm (str): The algorithm used to sign the JWT, as specified by
+          the token headers.
     """
-    if 'at_hash' not in claims and not access_token:
+    if 'at_hash' not in claims:
         return
-    elif access_token and 'at_hash' not in claims:
-        return
-    elif 'at_hash' in claims and not access_token:
+
+    if not access_token:
         msg = 'No access_token provided to compare against at_hash claim.'
         raise JWTClaimsError(msg)
 
@@ -432,7 +437,7 @@ def _validate_at_hash(claims, access_token, algorithm):
     except (TypeError, ValueError):
         msg = 'Unable to calculate at_hash to verify against token claims.'
         raise JWTClaimsError(msg)
-        
+
     if claims['at_hash'] != expected_hash:
         raise JWTClaimsError('at_hash claim does not match access_token.')
 
