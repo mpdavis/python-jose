@@ -26,7 +26,7 @@ def get_key(algorithm):
 
 def register_key(algorithm, key_class):
     if not issubclass(key_class, Key):
-        raise TypeError("Key class not a subclass of jwk.Key")
+        raise TypeError('Key class not a subclass of jwk.Key')
     ALGORITHMS.KEYS[algorithm] = key_class
     ALGORITHMS.SUPPORTED.add(algorithm)
     return True

@@ -85,7 +85,7 @@ class ECDSAECKey(Key):
             y = base64_to_long(jwk_dict.get('y'))
 
             if not ecdsa.ecdsa.point_is_valid(self.curve.generator, x, y):
-                raise JWKError("Point: %s, %s is not a valid point" % (x, y))
+                raise JWKError('Point: %s, %s is not a valid point' % (x, y))
 
             point = ecdsa.ellipticcurve.Point(self.curve.curve, x, y, self.curve.order)
             return ecdsa.keys.VerifyingKey.from_public_point(point, self.curve)

@@ -91,8 +91,8 @@ class CryptographyECKey(Key):
 
     def sign(self, msg):
         if self.hash_alg.digest_size * 8 > self.prepared_key.curve.key_size:
-            raise TypeError("this curve (%s) is too short "
-                            "for your digest (%d)" % (self.prepared_key.curve.name,
+            raise TypeError('this curve (%s) is too short '
+                            'for your digest (%d)' % (self.prepared_key.curve.name,
                                                       8*self.hash_alg.digest_size))
         signature = self.prepared_key.sign(msg, ec.ECDSA(self.hash_alg()))
         order = (2 ** self.prepared_key.curve.key_size) - 1

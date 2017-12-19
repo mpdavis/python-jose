@@ -40,12 +40,12 @@ def long_to_base64(data, size=0):
 
 
 def int_arr_to_long(arr):
-    return long(''.join(["%02x" % byte for byte in arr]), 16)
+    return long(''.join(['%02x' % byte for byte in arr]), 16)
 
 
 def base64_to_long(data):
     if isinstance(data, six.text_type):
-        data = data.encode("ascii")
+        data = data.encode('ascii')
 
     # urlsafe_b64decode will happily convert b64encoded data
     _d = base64.urlsafe_b64decode(bytes(data) + b'==')

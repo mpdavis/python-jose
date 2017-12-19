@@ -1,5 +1,5 @@
 
-__all__ = ["ECKey", "RSAKey"]
+__all__ = ['ECKey', 'RSAKey']
 
 try:
     from jose.backends.pycrypto_backend import RSAKey

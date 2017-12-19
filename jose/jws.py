@@ -129,8 +129,8 @@ def get_unverified_claims(token):
 
 def _encode_header(algorithm, additional_headers=None):
     header = {
-        "typ": "JWT",
-        "alg": algorithm
+        'typ': 'JWT',
+        'alg': algorithm
     }
 
     if additional_headers:
