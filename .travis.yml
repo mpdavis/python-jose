@@ -17,3 +17,9 @@ script:
   - tox
 after_success:
   - codecov
+matrix:
+  include:
+    - python: 3.6
+      env:
+        - TOX_ENV=flake8
+      script: tox -e $TOX_ENV
