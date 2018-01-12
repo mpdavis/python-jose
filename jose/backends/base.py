@@ -16,3 +16,6 @@ class Key(object):
 
     def to_pem(self):
         raise NotImplementedError()
+
+    def to_dict(self):
+        raise NotImplementedError()

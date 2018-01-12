@@ -1,0 +1,9 @@
+# codecov.yml file, spec is visible:
+# https://github.com/codecov/support/wiki/Codecov-Yaml
+coverage:
+  status:
+    # pull-requests only
+    patch:
+      default:
+        # coverage may fall by <1% and still be considered "passing"
+        threshold: 1%

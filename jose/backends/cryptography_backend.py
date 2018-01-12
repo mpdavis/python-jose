@@ -3,7 +3,7 @@ import ecdsa
 from ecdsa.util import sigdecode_string, sigencode_string, sigdecode_der, sigencode_der
 
 from jose.backends.base import Key
-from jose.utils import base64_to_long
+from jose.utils import base64_to_long, long_to_base64
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWKError
 
@@ -68,19 +68,26 @@ class CryptographyECKey(Key):
         if not jwk_dict.get('kty') == 'EC':
             raise JWKError("Incorrect key type.  Expected: 'EC', Recieved: %s" % jwk_dict.get('kty'))
 
+        if not all(k in jwk_dict for k in ['x', 'y', 'crv']):
+            raise JWKError('Mandatory parameters are missing')
+
         x = base64_to_long(jwk_dict.get('x'))
         y = base64_to_long(jwk_dict.get('y'))
-
         curve = {
             'P-256': ec.SECP256R1,
             'P-384': ec.SECP384R1,
             'P-521': ec.SECP521R1,
         }[jwk_dict['crv']]
 
-        ec_pn = ec.EllipticCurvePublicNumbers(x, y, curve())
-        verifying_key = ec_pn.public_key(self.cryptography_backend())
+        public = ec.EllipticCurvePublicNumbers(x, y, curve())
 
-        return verifying_key
+        if 'd' in jwk_dict:
+            d = base64_to_long(jwk_dict.get('d'))
+            private = ec.EllipticCurvePrivateNumbers(d, public)
+
+            return private.private_key(self.cryptography_backend())
+        else:
+            return public.public_key(self.cryptography_backend())
 
     def sign(self, msg):
         if self.hash_alg.digest_size * 8 > self.prepared_key.curve.key_size:
@@ -97,17 +104,21 @@ class CryptographyECKey(Key):
         verifier = self.prepared_key.verifier(signature, ec.ECDSA(self.hash_alg()))
         verifier.update(msg)
         try:
-            return verifier.verify()
+            verifier.verify()
+            return True
         except:
             return False
 
+    def is_public(self):
+        return hasattr(self.prepared_key, 'public_bytes')
+
     def public_key(self):
-        if hasattr(self.prepared_key, 'public_bytes'):
+        if self.is_public():
             return self
         return self.__class__(self.prepared_key.public_key(), self._algorithm)
 
     def to_pem(self):
-        if hasattr(self.prepared_key, 'public_bytes'):
+        if self.is_public():
             pem = self.prepared_key.public_bytes(
                 encoding=serialization.Encoding.PEM,
                 format=serialization.PublicFormat.SubjectPublicKeyInfo
@@ -119,6 +130,39 @@ class CryptographyECKey(Key):
             encryption_algorithm=serialization.NoEncryption()
         )
         return pem
+
+    def to_dict(self):
+        if not self.is_public():
+            public_key = self.prepared_key.public_key()
+        else:
+            public_key = self.prepared_key
+
+        crv = {
+            'secp256r1': 'P-256',
+            'secp384r1': 'P-384',
+            'secp521r1': 'P-521',
+        }[self.prepared_key.curve.name]
+
+        # Calculate the key size in bytes. Section 6.2.1.2 and 6.2.1.3 of
+        # RFC7518 prescribes that the 'x', 'y' and 'd' parameters of the curve
+        # points must be encoded as octed-strings of this length.
+        key_size = (self.prepared_key.curve.key_size + 7) // 8
+
+        data = {
+            'alg': self._algorithm,
+            'kty': 'EC',
+            'crv': crv,
+            'x': long_to_base64(public_key.public_numbers().x, size=key_size),
+            'y': long_to_base64(public_key.public_numbers().y, size=key_size),
+        }
+
+        if not self.is_public():
+            data['d'] = long_to_base64(
+                self.prepared_key.private_numbers().private_value,
+                size=key_size
+            )
+
+        return data
 
 
 class CryptographyRSAKey(Key):
@@ -170,17 +214,51 @@ class CryptographyRSAKey(Key):
 
         e = base64_to_long(jwk_dict.get('e', 256))
         n = base64_to_long(jwk_dict.get('n'))
+        public = rsa.RSAPublicNumbers(e, n)
 
-        verifying_key = rsa.RSAPublicNumbers(e, n).public_key(self.cryptography_backend())
-        return verifying_key
+        if 'd' not in jwk_dict:
+            return public.public_key(self.cryptography_backend())
+        else:
+            # This is a private key.
+            d = base64_to_long(jwk_dict.get('d'))
+
+            extra_params = ['p', 'q', 'dp', 'dq', 'qi']
+
+            if any(k in jwk_dict for k in extra_params):
+                # Precomputed private key parameters are available.
+                if not all(k in jwk_dict for k in extra_params):
+                    # These values must be present when 'p' is according to
+                    # Section 6.3.2 of RFC7518, so if they are not we raise
+                    # an error.
+                    raise JWKError('Precomputed private key parameters are incomplete.')
+
+                p = base64_to_long(jwk_dict['p'])
+                q = base64_to_long(jwk_dict['q'])
+                dp = base64_to_long(jwk_dict['dp'])
+                dq = base64_to_long(jwk_dict['dq'])
+                qi = base64_to_long(jwk_dict['qi'])
+            else:
+                # The precomputed private key parameters are not available,
+                # so we use cryptography's API to fill them in.
+                p, q = rsa.rsa_recover_prime_factors(n, e, d)
+                dp = rsa.rsa_crt_dmp1(d, p)
+                dq = rsa.rsa_crt_dmq1(d, q)
+                qi = rsa.rsa_crt_iqmp(p, q)
+
+            private = rsa.RSAPrivateNumbers(p, q, d, dp, dq, qi, public)
+
+            return private.private_key(self.cryptography_backend())
 
     def sign(self, msg):
-        signer = self.prepared_key.signer(
-            padding.PKCS1v15(),
-            self.hash_alg()
-        )
-        signer.update(msg)
-        signature = signer.finalize()
+        try:
+            signer = self.prepared_key.signer(
+                padding.PKCS1v15(),
+                self.hash_alg()
+            )
+            signer.update(msg)
+            signature = signer.finalize()
+        except Exception as e:
+            raise JWKError(e)
         return signature
 
     def verify(self, msg, sig):
@@ -196,13 +274,16 @@ class CryptographyRSAKey(Key):
         except InvalidSignature:
             return False
 
+    def is_public(self):
+        return hasattr(self.prepared_key, 'public_bytes')
+
     def public_key(self):
-        if hasattr(self.prepared_key, 'public_bytes'):
+        if self.is_public():
             return self
         return self.__class__(self.prepared_key.public_key(), self._algorithm)
 
     def to_pem(self):
-        if hasattr(self.prepared_key, 'public_bytes'):
+        if self.is_public():
             return self.prepared_key.public_bytes(
                 encoding=serialization.Encoding.PEM,
                 format=serialization.PublicFormat.SubjectPublicKeyInfo
@@ -213,3 +294,28 @@ class CryptographyRSAKey(Key):
             format=serialization.PrivateFormat.TraditionalOpenSSL,
             encryption_algorithm=serialization.NoEncryption()
         )
+
+    def to_dict(self):
+        if not self.is_public():
+            public_key = self.prepared_key.public_key()
+        else:
+            public_key = self.prepared_key
+
+        data = {
+            'alg': self._algorithm,
+            'kty': 'RSA',
+            'n': long_to_base64(public_key.public_numbers().n),
+            'e': long_to_base64(public_key.public_numbers().e),
+        }
+
+        if not self.is_public():
+            data.update({
+                'd': long_to_base64(self.prepared_key.private_numbers().d),
+                'p': long_to_base64(self.prepared_key.private_numbers().p),
+                'q': long_to_base64(self.prepared_key.private_numbers().q),
+                'dp': long_to_base64(self.prepared_key.private_numbers().dmp1),
+                'dq': long_to_base64(self.prepared_key.private_numbers().dmq1),
+                'qi': long_to_base64(self.prepared_key.private_numbers().iqmp),
+            })
+
+        return data

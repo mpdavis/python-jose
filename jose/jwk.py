@@ -5,7 +5,7 @@ import six
 
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWKError
-from jose.utils import base64url_decode
+from jose.utils import base64url_decode, base64url_encode
 from jose.utils import constant_time_string_compare
 from jose.backends.base import Key
 
@@ -90,6 +90,7 @@ class HMACKey(Key):
     def __init__(self, key, algorithm):
         if algorithm not in ALGORITHMS.HMAC:
             raise JWKError('hash_alg: %s is not a valid hash algorithm' % algorithm)
+        self._algorithm = algorithm
         self.hash_alg = get_algorithm_object(algorithm)
 
         if isinstance(key, dict):
@@ -104,6 +105,7 @@ class HMACKey(Key):
 
         invalid_strings = [
             b'-----BEGIN PUBLIC KEY-----',
+            b'-----BEGIN RSA PUBLIC KEY-----',
             b'-----BEGIN CERTIFICATE-----',
             b'ssh-rsa'
         ]
@@ -131,3 +133,10 @@ class HMACKey(Key):
 
     def verify(self, msg, sig):
         return constant_time_string_compare(sig, self.sign(msg))
+
+    def to_dict(self):
+        return {
+            'alg': self._algorithm,
+            'kty': 'oct',
+            'k': base64url_encode(self.prepared_key),
+        }
