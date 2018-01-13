@@ -1,4 +1,7 @@
 sudo: false
+# Travis infra requires pinning dist:precise, at least as of 2017-09-01
+# detail: https://blog.travis-ci.com/2017-06-21-trusty-updates-2017-Q2-launch
+dist: precise
 language: python
 python:
   - "2.6"
