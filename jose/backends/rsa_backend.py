@@ -1,4 +1,5 @@
 import rsa as pyrsa
+import rsa.pem as pyrsa_pem
 import six
 
 from jose.backends.base import Key
@@ -7,6 +8,7 @@ from jose.exceptions import JWKError
 from jose.utils import base64_to_long, long_to_base64
 
 
+PKCS8_RSA_HEADER = b'0\x82\x04\xbd\x02\x01\x000\r\x06\t*\x86H\x86\xf7\r\x01\x01\x01\x05\x00'
 # Functions gcd and rsa_recover_prime_factors were copied from cryptography 1.9
 # to enable pure python rsa module to be in compliance with section 6.3.1 of RFC7518
 # which requires only private exponent (d) for private key.
@@ -103,9 +105,20 @@ class RSAKey(Key):
                 self._prepared_key = pyrsa.PublicKey.load_pkcs1(key)
             except ValueError:
                 try:
-                    self._prepared_key = pyrsa.PrivateKey.load_pkcs1(key)
-                except ValueError as e:
-                    raise JWKError(e)
+                    self._prepared_key = pyrsa.PublicKey.load_pkcs1_openssl_pem(key)
+                except ValueError:
+                    try:
+                        self._prepared_key = pyrsa.PrivateKey.load_pkcs1(key)
+                    except ValueError:
+                        try:
+                            # python-rsa does not support PKCS8 yet so we have to manually remove OID
+                            der = pyrsa_pem.load_pem(key, b'PRIVATE KEY')
+                            header, der = der[:22], der[22:]
+                            if header != PKCS8_RSA_HEADER:
+                                raise ValueError("Invalid PKCS8 header")
+                            self._prepared_key = pyrsa.PrivateKey._load_pkcs1_der(der)
+                        except ValueError as e:
+                            raise JWKError(e)
             return
         raise JWKError('Unable to parse an RSA_JWK from key: %s' % key)
 
@@ -157,11 +170,17 @@ class RSAKey(Key):
             return self
         return self.__class__(pyrsa.PublicKey(n=self._prepared_key.n, e=self._prepared_key.e), self._algorithm)
 
-    def to_pem(self):
+    def to_pem(self, pem_format='PKCS8'):
         import rsa.pem
 
         if isinstance(self._prepared_key, pyrsa.PrivateKey):
-            pem = self._prepared_key.save_pkcs1()
+            der = self._prepared_key.save_pkcs1(format='DER')
+            if pem_format == 'PKCS8':
+                pem = rsa.pem.save_pem(PKCS8_RSA_HEADER + der, pem_marker='PRIVATE KEY')
+            elif pem_format == 'PKCS1':
+                pem = rsa.pem.save_pem(der, pem_marker='RSA PRIVATE KEY')
+            else:
+                raise ValueError("Invalid pem format specified: %r" % (pem_format,))
         else:
             # this is a PKCS#8 DER header to identify rsaEncryption
             header = b'0\x82\x04\xbd\x02\x01\x000\r\x06\t*\x86H\x86\xf7\r\x01\x01\x01\x05\x00'

@@ -176,7 +176,13 @@ class TestRSAAlgorithm:
     @pytest.mark.parametrize("Backend", [RSAKey, CryptographyRSAKey, PurePythonRSAKey])
     def test_to_pem(self, Backend):
         key = Backend(private_key, ALGORITHMS.RS256)
-        assert key.to_pem().strip() == private_key.strip()
+        assert key.to_pem(pem_format='PKCS1').strip() == private_key.strip()
+
+        pkcs8 = key.to_pem(pem_format='PKCS8').strip()
+        assert pkcs8 != private_key.strip()
+
+        newkey = Backend(pkcs8, ALGORITHMS.RS256)
+        assert newkey.to_pem(pem_format='PKCS1').strip() == private_key.strip()
 
     def assert_parameters(self, as_dict, private):
         assert isinstance(as_dict, dict)
