@@ -14,12 +14,15 @@ from jose.constants import ALGORITHMS
 from jose.exceptions import JWKError
 from jose.utils import base64url_decode
 
-# PyCryptodome's RSA module doesn't have PyCrypto's _RSAobj class
-# Instead it has a class named RsaKey, which serves the same purpose.
-if hasattr(RSA, '_RSAobj'):
-    _RSAKey = RSA._RSAobj
-else:
+
+# We default to using PyCryptodome, however, if PyCrypto is installed, it is
+# used instead. This is so that environments that require the use of PyCrypto
+# are still supported.
+if hasattr(RSA, 'RsaKey'):
     _RSAKey = RSA.RsaKey
+else:
+    _RSAKey = RSA._RSAobj
+    
 
 
 class RSAKey(Key):

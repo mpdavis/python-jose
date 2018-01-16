@@ -31,6 +31,18 @@ Installation
     $ pip install python-jose
 
 
+Custom Backends
+---------------
+
+As of 2.0.0, python-jose uses pycryptodome by default for RSA signing and verification. If
+necessary, other RSA backends are supported. Both pycrpyto and crytography are options.
+
+In order to use a custom backend, install python-jose with the appropriate extra.
+
+::
+    $ pip install python-jose[pycrypto]
+    $ pip install python-jose[crytography]
+
 Usage
 -----
 
