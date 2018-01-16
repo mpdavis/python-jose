@@ -16,13 +16,6 @@ expected that most applications will only use a small set of algorithms
 to meet their needs.
 
 
-Principles
-----------
-
-This is a JOSE implementation that is fully compatible with Google App Engine
-which requires the use of the PyCrypto library.
-
-
 Installation
 ------------
 
