@@ -12,7 +12,7 @@ python:
   - "3.6"
   - "pypy-5.3.1"
 install:
-  - pip install -U tox codecov tox-travis
+  - pip install -U setuptools && pip install -U tox codecov tox-travis
 script:
   - tox
 after_success:
