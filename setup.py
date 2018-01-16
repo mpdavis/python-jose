@@ -56,5 +56,5 @@ setup(
         'Topic :: Utilities',
     ],
     extras_require=extras_require,
-    install_requires=['six <2.0', 'ecdsa <1.0', 'future <1.0']
+    install_requires=['six <2.0', 'ecdsa <1.0', 'future <1.0', 'pycryptodome >=3.3.1, <3.4.0']
 )
