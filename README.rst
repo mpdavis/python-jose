@@ -40,8 +40,10 @@ necessary, other RSA backends are supported. Both pycrpyto and crytography are o
 In order to use a custom backend, install python-jose with the appropriate extra.
 
 ::
+
     $ pip install python-jose[pycrypto]
     $ pip install python-jose[crytography]
+
 
 Usage
 -----
