@@ -1,19 +1,22 @@
-sudo: false
 # Travis infra requires pinning dist:precise, at least as of 2017-09-01
 # detail: https://blog.travis-ci.com/2017-06-21-trusty-updates-2017-Q2-launch
-dist: trusty
+dist: precise
 language: python
 python:
-  - "2.6"
   - "2.7"
-  - "3.3"
   - "3.4"
   - "3.5"
   - "3.6"
   - "pypy-5.3.1"
 install:
-  - pip install -U setuptools && pip install -U tox codecov tox-travis
+  - pip install -U tox codecov tox-travis
 script:
   - tox
 after_success:
-- codecov
+  - codecov
+matrix:
+  include:
+    - python: 3.6
+      env:
+        - TOX_ENV=flake8
+      script: tox -e $TOX_ENV
