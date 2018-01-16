@@ -4,8 +4,6 @@ import os
 
 import jose
 
-import platform
-
 from setuptools import setup
 
 
@@ -24,17 +22,11 @@ def get_packages(package):
     ]
 
 
-def get_install_requires():
-    if platform.python_implementation() == 'PyPy':
-        crypto_lib = 'pycryptodome >=3.3.1, <3.4.0'
-    else:
-        crypto_lib = 'pycrypto >=2.6.0, <2.7.0'
-    return [
-        crypto_lib,
-        'six <2.0',
-        'ecdsa <1.0',
-        'future <1.0',
-    ]
+extras_require = {
+    'cryptography': ['cryptography'],
+    'pycrypto': ['pycrypto >=2.6.0, <2.7.0'],
+    'pycryptodome': ['pycryptodome >=3.3.1, <3.4.0'],
+}
 
 
 setup(
@@ -63,5 +55,6 @@ setup(
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Utilities',
     ],
-    install_requires=get_install_requires()
+    extras_require=extras_require,
+    install_requires=['six <2.0', 'ecdsa <1.0', 'future <1.0']
 )
