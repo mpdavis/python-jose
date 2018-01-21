@@ -25,7 +25,7 @@ def get_packages(package):
 extras_require = {
     'cryptography': ['cryptography'],
     'pycrypto': ['pycrypto >=2.6.0, <2.7.0'],
-    'pycryptodome': ['pycryptodome >=3.3.1, <3.4.0'],
+    'pycryptodome': ['pycryptodome >=3.3.1, <4.0.0'],
 }
 
 
