@@ -102,6 +102,8 @@ def decode(token, key, algorithms=None, options=None, audience=None,
 
     Raises:
         JWTError: If the signature is invalid in any way.
+        ExpiredSignatureError: If the signature has expired.
+        JWTClaimsError: If any claim is invalid in any way.
 
     Examples:
 
