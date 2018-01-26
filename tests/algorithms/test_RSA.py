@@ -184,6 +184,22 @@ class TestRSAAlgorithm:
         newkey = Backend(pkcs8, ALGORITHMS.RS256)
         assert newkey.to_pem(pem_format='PKCS1').strip() == private_key.strip()
 
+    @pytest.mark.parametrize("BackendFrom", [RSAKey, CryptographyRSAKey, PurePythonRSAKey])
+    @pytest.mark.parametrize("BackendTo", [RSAKey, CryptographyRSAKey, PurePythonRSAKey])
+    def test_public_key_to_pem(self, BackendFrom, BackendTo):
+        key = BackendFrom(private_key, ALGORITHMS.RS256)
+        pubkey = key.public_key()
+
+        pkcs1_pub = pubkey.to_pem(pem_format='PKCS1').strip()
+        pkcs8_pub = pubkey.to_pem(pem_format='PKCS8').strip()
+        assert pkcs1_pub != pkcs8_pub, BackendFrom
+
+        pub1 = BackendTo(pkcs1_pub, ALGORITHMS.RS256)
+        pub8 = BackendTo(pkcs8_pub, ALGORITHMS.RS256)
+
+        assert pkcs8_pub == pub1.to_pem(pem_format='PKCS8').strip()
+        assert pkcs1_pub == pub8.to_pem(pem_format='PKCS1').strip()
+
     def assert_parameters(self, as_dict, private):
         assert isinstance(as_dict, dict)
 

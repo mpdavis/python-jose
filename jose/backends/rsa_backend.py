@@ -1,6 +1,10 @@
+import six
+from pyasn1.codec.der import encoder
+from pyasn1.type import univ
+
 import rsa as pyrsa
 import rsa.pem as pyrsa_pem
-import six
+from rsa.asn1 import OpenSSLPubKey, AsnPubKey, PubKeyHeader
 
 from jose.backends.base import Key
 from jose.constants import ALGORITHMS
@@ -71,6 +75,11 @@ def _rsa_recover_prime_factors(n, e, d):
     assert r == 0
     p, q = sorted((p, q), reverse=True)
     return (p, q)
+
+
+def pem_to_spki(pem, fmt='PKCS8'):
+    key = RSAKey(pem, ALGORITHMS.RS256)
+    return key.to_pem(fmt)
 
 
 class RSAKey(Key):
@@ -171,21 +180,35 @@ class RSAKey(Key):
         return self.__class__(pyrsa.PublicKey(n=self._prepared_key.n, e=self._prepared_key.e), self._algorithm)
 
     def to_pem(self, pem_format='PKCS8'):
-        import rsa.pem
 
         if isinstance(self._prepared_key, pyrsa.PrivateKey):
             der = self._prepared_key.save_pkcs1(format='DER')
             if pem_format == 'PKCS8':
-                pem = rsa.pem.save_pem(PKCS8_RSA_HEADER + der, pem_marker='PRIVATE KEY')
+                pem = pyrsa_pem.save_pem(PKCS8_RSA_HEADER + der, pem_marker='PRIVATE KEY')
             elif pem_format == 'PKCS1':
-                pem = rsa.pem.save_pem(der, pem_marker='RSA PRIVATE KEY')
+                pem = pyrsa_pem.save_pem(der, pem_marker='RSA PRIVATE KEY')
             else:
                 raise ValueError("Invalid pem format specified: %r" % (pem_format,))
         else:
-            # this is a PKCS#8 DER header to identify rsaEncryption
-            header = b'0\x82\x04\xbd\x02\x01\x000\r\x06\t*\x86H\x86\xf7\r\x01\x01\x01\x05\x00'
-            der = self._prepared_key.save_pkcs1(format='DER')
-            pem = rsa.pem.save_pem(header + der, pem_marker='PUBLIC KEY')
+            if pem_format == 'PKCS8':
+                asn_key = AsnPubKey()
+                asn_key.setComponentByName('modulus', self._prepared_key.n)
+                asn_key.setComponentByName('publicExponent', self._prepared_key.e)
+                der = encoder.encode(asn_key)
+
+                header = PubKeyHeader()
+                header['oid'] = univ.ObjectIdentifier('1.2.840.113549.1.1.1')
+                pub_key = OpenSSLPubKey()
+                pub_key['header'] = header
+                pub_key['key'] = univ.BitString.fromOctetString(der)
+
+                der = encoder.encode(pub_key)
+                pem = pyrsa_pem.save_pem(der, pem_marker='PUBLIC KEY')
+            elif pem_format == 'PKCS1':
+                der = self._prepared_key.save_pkcs1(format='DER')
+                pem = pyrsa_pem.save_pem(der, pem_marker='RSA PUBLIC KEY')
+            else:
+                raise ValueError("Invalid pem format specified: %r" % (pem_format,))
         return pem
 
     def to_dict(self):

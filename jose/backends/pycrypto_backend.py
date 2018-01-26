@@ -9,6 +9,7 @@ from Crypto.Signature import PKCS1_v1_5
 from Crypto.Util.asn1 import DerSequence
 
 from jose.backends.base import Key
+from jose.backends.rsa_backend import pem_to_spki
 from jose.utils import base64_to_long, long_to_base64
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWKError
@@ -148,7 +149,15 @@ class RSAKey(Key):
         else:
             raise ValueError("Invalid pem format specified: %r" % (pem_format,))
 
-        pem = self.prepared_key.exportKey('PEM', pkcs=pkcs)
+        if self.is_public():
+            pem = self.prepared_key.exportKey('PEM', pkcs=1)
+            if pkcs == 8:
+                pem = pem_to_spki(pem, fmt='PKCS8')
+            else:
+                pem = pem_to_spki(pem, fmt='PKCS1')
+            return pem
+        else:
+            pem = self.prepared_key.exportKey('PEM', pkcs=pkcs)
         return pem
 
     def to_dict(self):
