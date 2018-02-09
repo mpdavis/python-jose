@@ -60,7 +60,7 @@ class TestJWT:
             ('a', '123'),
         ))
         encoded = jwt.encode(claims, key, headers=headers)
-        assert encoded.split('.')[0] == b64encode(
+        assert encoded.split('.')[0].encode('iso8859') == b64encode(
             dumps(headers)
                 .replace(' ', '')
                 .encode('iso8859')).replace(b'==', b'')
