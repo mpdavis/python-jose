@@ -63,7 +63,7 @@ class TestJWT:
         assert encoded.split('.')[0] == b64encode(
             dumps(headers)
                 .replace(b' ', b'')
-                .encode('iso8859')).replace(b'==', b'')
+                .encode('iso8859')).replace('==', '')
 
     def test_encode(self, claims, key):
 
