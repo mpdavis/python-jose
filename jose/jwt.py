@@ -3,7 +3,7 @@ import binascii
 import json
 
 from calendar import timegm
-from collections import Mapping
+from collections import Mapping, OrderedDict
 from datetime import datetime
 from datetime import timedelta
 from six import string_types
@@ -112,18 +112,18 @@ def decode(token, key, algorithms=None, options=None, audience=None,
 
     """
 
-    defaults = {
-        'verify_signature': True,
-        'verify_aud': True,
-        'verify_iat': True,
-        'verify_exp': True,
-        'verify_nbf': True,
-        'verify_iss': True,
-        'verify_sub': True,
-        'verify_jti': True,
-        'verify_at_hash': True,
-        'leeway': 0,
-    }
+    defaults = OrderedDict((
+        ('verify_signature', True),
+        ('verify_aud', True),
+        ('verify_iat', True),
+        ('verify_exp', True),
+        ('verify_nbf', True),
+        ('verify_iss', True),
+        ('verify_sub', True),
+        ('verify_jti', True),
+        ('verify_at_hash', True),
+        ('leeway', 0),
+    ))
 
     if options:
         defaults.update(options)

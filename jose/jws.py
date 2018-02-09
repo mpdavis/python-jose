@@ -3,7 +3,7 @@ import binascii
 import json
 import six
 
-from collections import Mapping, Iterable
+from collections import Mapping, Iterable, OrderedDict
 
 from jose import jwk
 from jose.constants import ALGORITHMS
@@ -128,10 +128,10 @@ def get_unverified_claims(token):
 
 
 def _encode_header(algorithm, additional_headers=None):
-    header = {
-        "typ": "JWT",
-        "alg": algorithm
-    }
+    header = OrderedDict((
+        ("typ", "JWT"),
+        ("alg", algorithm)
+    ))
 
     if additional_headers:
         header.update(additional_headers)

@@ -2,6 +2,9 @@
 from jose import jwt
 from jose.exceptions import JWTError
 
+from base64 import b64decode, b64encode
+from json import dumps
+from collections import OrderedDict
 from datetime import datetime
 from datetime import timedelta
 
@@ -24,7 +27,7 @@ def key():
 @pytest.fixture
 def headers():
     headers = {
-        'kid': 'my-key-id',
+        'kid': 'my-key-id'
     }
     return headers
 
@@ -48,6 +51,17 @@ class TestJWT:
         all_headers = jwt.get_unverified_headers(encoded)
         for k, v in headers.items():
             assert all_headers[k] == v
+
+    def test_ordered_json(self, claims, key):
+        headers = OrderedDict((
+            ('typ', 'JWT'),
+            ('alg', 'HS256'),
+            ('kid', 'my-key-id'),
+            ('a', '123'),
+        ))
+        encoded = jwt.encode(claims, key, headers=headers)
+        assert encoded.split('.')[0] == b64encode(
+            dumps(headers).replace(' ', '')).replace('==', '')
 
     def test_encode(self, claims, key):
 

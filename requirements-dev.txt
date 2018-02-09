@@ -9,6 +9,8 @@ pytest==2.7.0
 pytest-cov==1.8.1
 ecdsa==0.13
 wsgiref==0.1.2
+cryptography==2.1.4
+
 
 -r requirements.txt
 -r requirements-rtd.txt
