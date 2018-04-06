@@ -101,10 +101,8 @@ class CryptographyECKey(Key):
     def verify(self, msg, sig):
         order = (2 ** self.prepared_key.curve.key_size) - 1
         signature = sigencode_der(*sigdecode_string(sig, order), order=order)
-        verifier = self.prepared_key.verifier(signature, ec.ECDSA(self.hash_alg()))
-        verifier.update(msg)
         try:
-            verifier.verify()
+            self.prepared_key.verify(signature, msg, ec.ECDSA(self.hash_alg()))
             return True
         except:
             return False
@@ -251,25 +249,23 @@ class CryptographyRSAKey(Key):
 
     def sign(self, msg):
         try:
-            signer = self.prepared_key.signer(
+            signature = self.prepared_key.sign(
+                msg,
                 padding.PKCS1v15(),
                 self.hash_alg()
             )
-            signer.update(msg)
-            signature = signer.finalize()
         except Exception as e:
             raise JWKError(e)
         return signature
 
     def verify(self, msg, sig):
-        verifier = self.prepared_key.verifier(
-            sig,
-            padding.PKCS1v15(),
-            self.hash_alg()
-        )
-        verifier.update(msg)
         try:
-            verifier.verify()
+            self.prepared_key.verify(
+                sig,
+                msg,
+                padding.PKCS1v15(),
+                self.hash_alg()
+            )
             return True
         except InvalidSignature:
             return False
