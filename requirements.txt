@@ -1,3 +1,5 @@
 pycryptodome
 six
 future
+rsa
+ecdsa

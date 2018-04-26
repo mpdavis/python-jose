@@ -3,6 +3,7 @@ import sys
 
 from jose.backends.pycrypto_backend import RSAKey
 from jose.backends.cryptography_backend import CryptographyRSAKey
+from jose.backends.rsa_backend import RSAKey as PurePythonRSAKey
 from jose.constants import ALGORITHMS
 from jose.exceptions import JOSEError, JWKError
 
@@ -70,7 +71,7 @@ mdUxHwi1ulkspAn/fmY7f0hZpskDwcHyZmbKZuk+NU/FJ8IAcmvk9y7m25nSSc8=
 
 class TestRSAAlgorithm:
 
-    @pytest.mark.parametrize("Backend", [RSAKey, CryptographyRSAKey])
+    @pytest.mark.parametrize("Backend", [RSAKey, CryptographyRSAKey, PurePythonRSAKey])
     def test_RSA_key(self, Backend):
         assert not Backend(private_key, ALGORITHMS.RS256).is_public()
 
@@ -93,25 +94,25 @@ class TestRSAAlgorithm:
         pem = pubkey.to_pem()
         assert pem.startswith(b'-----BEGIN PUBLIC KEY-----')
 
-    @pytest.mark.parametrize("Backend", [RSAKey, CryptographyRSAKey])
+    @pytest.mark.parametrize("Backend", [RSAKey, CryptographyRSAKey, PurePythonRSAKey])
     def test_string_secret(self, Backend):
         key = 'secret'
         with pytest.raises(JOSEError):
             Backend(key, ALGORITHMS.RS256)
 
-    @pytest.mark.parametrize("Backend", [RSAKey, CryptographyRSAKey])
+    @pytest.mark.parametrize("Backend", [RSAKey, CryptographyRSAKey, PurePythonRSAKey])
     def test_object(self, Backend):
         key = object()
         with pytest.raises(JOSEError):
             Backend(key, ALGORITHMS.RS256)
 
-    @pytest.mark.parametrize("Backend", [RSAKey, CryptographyRSAKey])
+    @pytest.mark.parametrize("Backend", [RSAKey, CryptographyRSAKey, PurePythonRSAKey])
     def test_bad_cert(self, Backend):
         key = '-----BEGIN CERTIFICATE-----'
         with pytest.raises(JOSEError):
             Backend(key, ALGORITHMS.RS256)
 
-    @pytest.mark.parametrize("Backend", [RSAKey, CryptographyRSAKey])
+    @pytest.mark.parametrize("Backend", [RSAKey, CryptographyRSAKey, PurePythonRSAKey])
     def test_invalid_algorithm(self, Backend):
         with pytest.raises(JWKError):
             Backend(private_key, ALGORITHMS.ES256)
@@ -119,7 +120,7 @@ class TestRSAAlgorithm:
         with pytest.raises(JWKError):
             Backend({'kty': 'bla'}, ALGORITHMS.RS256)
 
-    @pytest.mark.parametrize("Backend", [RSAKey, CryptographyRSAKey])
+    @pytest.mark.parametrize("Backend", [RSAKey, CryptographyRSAKey, PurePythonRSAKey])
     def test_RSA_jwk(self, Backend):
         key = {
             "kty": "RSA",
@@ -157,13 +158,13 @@ class TestRSAAlgorithm:
         # None of the extra parameters are present, but 'key' is still private.
         assert not Backend(key, ALGORITHMS.RS256).is_public()
 
-    @pytest.mark.parametrize("Backend", [RSAKey, CryptographyRSAKey])
+    @pytest.mark.parametrize("Backend", [RSAKey, CryptographyRSAKey, PurePythonRSAKey])
     def test_string_secret(self, Backend):
         key = 'secret'
         with pytest.raises(JOSEError):
             Backend(key, ALGORITHMS.RS256)
 
-    @pytest.mark.parametrize("Backend", [RSAKey, CryptographyRSAKey])
+    @pytest.mark.parametrize("Backend", [RSAKey, CryptographyRSAKey, PurePythonRSAKey])
     def test_get_public_key(self, Backend):
         key = Backend(private_key, ALGORITHMS.RS256)
         public_key = key.public_key()
@@ -172,10 +173,32 @@ class TestRSAAlgorithm:
         assert public_key2.is_public()
         assert public_key == public_key2
 
-    @pytest.mark.parametrize("Backend", [RSAKey, CryptographyRSAKey])
+    @pytest.mark.parametrize("Backend", [RSAKey, CryptographyRSAKey, PurePythonRSAKey])
     def test_to_pem(self, Backend):
         key = Backend(private_key, ALGORITHMS.RS256)
-        assert key.to_pem().strip() == private_key.strip()
+        assert key.to_pem(pem_format='PKCS1').strip() == private_key.strip()
+
+        pkcs8 = key.to_pem(pem_format='PKCS8').strip()
+        assert pkcs8 != private_key.strip()
+
+        newkey = Backend(pkcs8, ALGORITHMS.RS256)
+        assert newkey.to_pem(pem_format='PKCS1').strip() == private_key.strip()
+
+    @pytest.mark.parametrize("BackendFrom", [RSAKey, CryptographyRSAKey, PurePythonRSAKey])
+    @pytest.mark.parametrize("BackendTo", [RSAKey, CryptographyRSAKey, PurePythonRSAKey])
+    def test_public_key_to_pem(self, BackendFrom, BackendTo):
+        key = BackendFrom(private_key, ALGORITHMS.RS256)
+        pubkey = key.public_key()
+
+        pkcs1_pub = pubkey.to_pem(pem_format='PKCS1').strip()
+        pkcs8_pub = pubkey.to_pem(pem_format='PKCS8').strip()
+        assert pkcs1_pub != pkcs8_pub, BackendFrom
+
+        pub1 = BackendTo(pkcs1_pub, ALGORITHMS.RS256)
+        pub8 = BackendTo(pkcs8_pub, ALGORITHMS.RS256)
+
+        assert pkcs8_pub == pub1.to_pem(pem_format='PKCS8').strip()
+        assert pkcs1_pub == pub8.to_pem(pem_format='PKCS1').strip()
 
     def assert_parameters(self, as_dict, private):
         assert isinstance(as_dict, dict)
@@ -207,7 +230,7 @@ class TestRSAAlgorithm:
             ALGORITHMS.RS256
         ).to_dict() == key.to_dict()
 
-    @pytest.mark.parametrize("Backend", [RSAKey, CryptographyRSAKey])
+    @pytest.mark.parametrize("Backend", [RSAKey, CryptographyRSAKey, PurePythonRSAKey])
     def test_to_dict(self, Backend):
         key = Backend(private_key, ALGORITHMS.RS256)
         self.assert_parameters(key.to_dict(), private=True)
@@ -215,8 +238,8 @@ class TestRSAAlgorithm:
         self.assert_roundtrip(key, Backend)
         self.assert_roundtrip(key.public_key(), Backend)
 
-    @pytest.mark.parametrize("BackendSign", [RSAKey, CryptographyRSAKey])
-    @pytest.mark.parametrize("BackendVerify", [RSAKey, CryptographyRSAKey])
+    @pytest.mark.parametrize("BackendSign", [RSAKey, CryptographyRSAKey, PurePythonRSAKey])
+    @pytest.mark.parametrize("BackendVerify", [RSAKey, CryptographyRSAKey, PurePythonRSAKey])
     def test_signing_parity(self, BackendSign, BackendVerify):
         key_sign = BackendSign(private_key, ALGORITHMS.RS256)
         key_verify = BackendVerify(private_key, ALGORITHMS.RS256).public_key()
@@ -230,9 +253,15 @@ class TestRSAAlgorithm:
         # invalid signature
         assert not key_verify.verify(msg, b'n' * 64)
 
-    @pytest.mark.parametrize("Backend", [RSAKey, CryptographyRSAKey])
+    @pytest.mark.parametrize("Backend", [RSAKey, CryptographyRSAKey, PurePythonRSAKey])
     def test_pycrypto_unencoded_cleartext(self, Backend):
         key = Backend(private_key, ALGORITHMS.RS256)
 
-        with pytest.raises(JWKError):
-            key.sign(True)
+        key = RSAKey(private_key, ALGORITHMS.RS256)
+        msg = b'test'
+        signature = key.sign(msg)
+        public_key = key.public_key()
+
+        assert public_key.verify(msg, signature) == True
+        assert public_key.verify(msg, 1) == False
+

@@ -282,16 +282,30 @@ class CryptographyRSAKey(Key):
             return self
         return self.__class__(self.prepared_key.public_key(), self._algorithm)
 
-    def to_pem(self):
+    def to_pem(self, pem_format='PKCS8'):
         if self.is_public():
-            return self.prepared_key.public_bytes(
+            if pem_format == 'PKCS8':
+                fmt = serialization.PublicFormat.SubjectPublicKeyInfo
+            elif pem_format == 'PKCS1':
+                fmt = serialization.PublicFormat.PKCS1
+            else:
+                raise ValueError("Invalid format specified: %r" % pem_format)
+            pem = self.prepared_key.public_bytes(
                 encoding=serialization.Encoding.PEM,
-                format=serialization.PublicFormat.SubjectPublicKeyInfo
+                format=fmt
             )
+            return pem
+
+        if pem_format == 'PKCS8':
+            fmt = serialization.PrivateFormat.PKCS8
+        elif pem_format == 'PKCS1':
+            fmt = serialization.PrivateFormat.TraditionalOpenSSL
+        else:
+            raise ValueError("Invalid format specified: %r" % pem_format)
 
         return self.prepared_key.private_bytes(
             encoding=serialization.Encoding.PEM,
-            format=serialization.PrivateFormat.TraditionalOpenSSL,
+            format=fmt,
             encryption_algorithm=serialization.NoEncryption()
         )
 

@@ -9,6 +9,7 @@ from Crypto.Signature import PKCS1_v1_5
 from Crypto.Util.asn1 import DerSequence
 
 from jose.backends.base import Key
+from jose.backends.rsa_backend import pem_to_spki
 from jose.utils import base64_to_long, long_to_base64
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWKError
@@ -143,16 +144,23 @@ class RSAKey(Key):
             return self
         return self.__class__(self.prepared_key.publickey(), self._algorithm)
 
-    def to_pem(self):
-        pem = self.prepared_key.exportKey('PEM', pkcs=1)
+    def to_pem(self, pem_format='PKCS8'):
+        if pem_format == 'PKCS8':
+            pkcs = 8
+        elif pem_format == 'PKCS1':
+            pkcs = 1
+        else:
+            raise ValueError("Invalid pem format specified: %r" % (pem_format,))
 
-        # pycryptodome fix
-        begin = b'-----BEGIN RSA PUBLIC KEY-----'
-        end = b'-----END RSA PUBLIC KEY-----'
-        if pem.startswith(begin) and pem.strip().endswith(end):
-            pem = b'-----BEGIN PUBLIC KEY-----' + pem.strip()[len(begin):-len(end)] + b'-----END PUBLIC KEY-----'
-        if not pem.endswith(b'\n'):
-            pem = pem + b'\n'
+        if self.is_public():
+            pem = self.prepared_key.exportKey('PEM', pkcs=1)
+            if pkcs == 8:
+                pem = pem_to_spki(pem, fmt='PKCS8')
+            else:
+                pem = pem_to_spki(pem, fmt='PKCS1')
+            return pem
+        else:
+            pem = self.prepared_key.exportKey('PEM', pkcs=pkcs)
         return pem
 
     def to_dict(self):
