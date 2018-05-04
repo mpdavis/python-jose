@@ -32,7 +32,7 @@ necessary, other RSA backends are supported. Options include crytography, pycryp
 
 In order to use a custom backend, install python-jose with the appropriate extra.
 
-It is reccomended that a custom backend is used in production, as the pure-python rsa module is slow.
+It is recommended that a custom backend is used in production, as the pure-python rsa module is slow.
 
 The crytography option is a good default.
 
