@@ -78,8 +78,7 @@ def decode(token, key, algorithms=None, options=None, audience=None,
         subject (str): The subject of the token.  If the "sub" claim is
             included in the claim set, then the subject must be included and must equal
             the provided claim.
-        access_token (str): An access token returned alongside the id_token during
-            the authorization grant flow. If the "at_hash" claim is included in the
+        access_token (str): An access token string. If the "at_hash" claim is included in the
             claim set, then the access_token must be included, and it must match
             the "at_hash" claim.
         options (dict): A dictionary of options for skipping validation steps.
