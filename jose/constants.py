@@ -13,9 +13,9 @@ class Algorithms(object):
     ES384 = 'ES384'
     ES512 = 'ES512'
 
-    HMAC = set([HS256, HS384, HS512])
-    RSA = set([RS256, RS384, RS512])
-    EC = set([ES256, ES384, ES512])
+    HMAC = {HS256, HS384, HS512}
+    RSA = {RS256, RS384, RS512}
+    EC = {ES256, ES384, ES512}
 
     SUPPORTED = HMAC.union(RSA).union(EC)
 
