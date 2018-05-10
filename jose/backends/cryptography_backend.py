@@ -1,5 +1,6 @@
 import six
 import ecdsa
+from cryptography.x509 import load_pem_x509_certificate
 from ecdsa.util import sigdecode_string, sigencode_string, sigdecode_der, sigencode_der
 
 from jose.backends.base import Key
@@ -198,7 +199,11 @@ class CryptographyRSAKey(Key):
                 try:
                     key = load_pem_public_key(key, self.cryptography_backend())
                 except ValueError:
-                    key = load_pem_private_key(key, password=None, backend=self.cryptography_backend())
+                    try:
+                        cert = load_pem_x509_certificate(key, self.cryptography_backend())
+                        key = cert.public_key()
+                    except ValueError:
+                        key = load_pem_private_key(key, password=None, backend=self.cryptography_backend())
                 self.prepared_key = key
             except Exception as e:
                 raise JWKError(e)

@@ -240,7 +240,7 @@ def _get_keys(key):
 
     # Iterable but not text or mapping => list- or tuple-like
     elif (isinstance(key, Iterable) and
-          not (isinstance(key, six.string_types) or isinstance(key, Mapping))):
+          not isinstance(key, (six.string_types, six.binary_type, Mapping))):
         return key
 
     # Scalar value, wrap in tuple.
