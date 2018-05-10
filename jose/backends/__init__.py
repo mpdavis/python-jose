@@ -1,9 +1,9 @@
 
 try:
-    from jose.backends.pycrypto_backend import RSAKey
+    from jose.backends.cryptography_backend import CryptographyRSAKey as RSAKey
 except ImportError:
     try:
-        from jose.backends.cryptography_backend import CryptographyRSAKey as RSAKey
+        from jose.backends.pycrypto_backend import RSAKey
     except ImportError:
         from jose.backends.rsa_backend import RSAKey
 
