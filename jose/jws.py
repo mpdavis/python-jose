@@ -223,24 +223,23 @@ def _get_keys(key):
     except Exception:
         pass
 
-    # JWK Set per RFC 7517
-    if 'keys' in key:
-        return key['keys']
-
-    # Individual JWK per RFC 7517
-    elif 'kty' in key:
-        return (key,)
-
-    # Some other mapping. Firebase uses just dict of kid, cert pairs
-    elif isinstance(key, Mapping):
-        values = key.values()
-        if values:
-            return values
-        return (key,)
+    if isinstance(key, Mapping):
+        if 'keys' in key:
+            # JWK Set per RFC 7517
+            return key['keys']
+        elif 'kty' in key:
+            # Individual JWK per RFC 7517
+            return (key,)
+        else:
+            # Some other mapping. Firebase uses just dict of kid, cert pairs
+            values = key.values()
+            if values:
+                return values
+            return (key,)
 
     # Iterable but not text or mapping => list- or tuple-like
     elif (isinstance(key, Iterable) and
-          not (isinstance(key, six.string_types) or isinstance(key, Mapping))):
+          not (isinstance(key, six.string_types) or isinstance(key, six.binary_type))):
         return key
 
     # Scalar value, wrap in tuple.
