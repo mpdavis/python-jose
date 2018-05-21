@@ -38,7 +38,7 @@ The crytography option is a good default.
 
 ::
 
-    $ pip install python-jose[crytography]
+    $ pip install python-jose[cryptography]
     $ pip install python-jose[pycryptodome]
     $ pip install python-jose[pycrypto]
 
