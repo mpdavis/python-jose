@@ -8,6 +8,8 @@ Changelog
 Major
 """""
 
+* Require claim options added.
+  `#98 <https://github.com/mpdavis/python-jose/pull/98>`_
 * Isolate and flesh out cryptographic backends to enable independent operation.
   `#114 <https://github.com/mpdavis/python-jose/issues/114>`_
   `#129 <https://github.com/mpdavis/python-jose/pull/129>`_
