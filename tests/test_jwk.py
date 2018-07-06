@@ -30,6 +30,13 @@ ec_key = {
     "y": "AdymlHvOiLxXkEhayXQnNCvDX4h9htZaCJN34kfmC6pV5OhQHiraVySsUdaQkAgDPrwQrJmbnX9cwlGfP-HqHZR1"
 }
 
+ed25519_key = {
+    "kty": "OKP",
+    "crv": "Ed25519",
+    "d": "npAVhmIfq2byvIzcmgS5cguKCv2Nw8Seqa1Fku00LoE",
+    "x": "th-Fe1Whyvy0vdexhMwSybtIyMh-WiYgUTogOKXfVnI",
+}
+
 
 class TestJWK:
 
@@ -53,6 +60,9 @@ class TestJWK:
         with pytest.raises(JWKError):
             key = ECKey(ec_key, 'RS512')  # noqa: F841
 
+        with pytest.raises(JWKError):
+            key = Ed25519Key(ed25519_key, 'RS512')
+
     def test_invalid_jwk(self):
 
         with pytest.raises(JWKError):
@@ -63,6 +73,9 @@ class TestJWK:
 
         with pytest.raises(JWKError):
             key = ECKey(rsa_key, 'ES256')  # noqa: F841
+
+        with pytest.raises(JWKError):
+            key = Ed25519Key(rsa_key, 'EdDSA')
 
     def test_RSAKey_errors(self):
 
@@ -101,6 +114,9 @@ class TestJWK:
         key = jwk.construct(hmac_key)
         assert isinstance(key, jwk.Key)
 
+        key = jwk.construct(ed25519_key, algorithm='EdDSA', use='private')
+        assert isinstance(key, jwk.Key)
+
     def test_construct_EC_from_jwk(self):
         key = ECKey(ec_key, algorithm='ES512')
         assert isinstance(key, jwk.Key)
@@ -126,6 +142,7 @@ class TestJWK:
         assert issubclass(hs_key, Key)
         assert issubclass(jwk.get_key("RS256"), Key)
         assert issubclass(jwk.get_key("ES256"), Key)
+        assert issubclass(jwk.get_key("EdDSA"), Key)
 
         assert jwk.get_key("NONEXISTENT") is None
 

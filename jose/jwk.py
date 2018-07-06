@@ -20,6 +20,9 @@ except ImportError:
     pass
 
 
+from jose.backends import Ed25519Key
+
+
 def get_key(algorithm):
     if algorithm in ALGORITHMS.KEYS:
         return ALGORITHMS.KEYS[algorithm]
@@ -31,6 +34,9 @@ def get_key(algorithm):
     elif algorithm in ALGORITHMS.EC:
         from jose.backends import ECKey  # noqa: F811
         return ECKey
+    elif algorithm in ALGORITHMS.ED:
+        from jose.backends import Ed25519Key
+        return Ed25519Key
     return None
 
 
@@ -42,7 +48,7 @@ def register_key(algorithm, key_class):
     return True
 
 
-def construct(key_data, algorithm=None):
+def construct(key_data, algorithm=None, use=None):
     """
     Construct a Key object for the given algorithm with the given
     key_data.
@@ -58,7 +64,10 @@ def construct(key_data, algorithm=None):
     key_class = get_key(algorithm)
     if not key_class:
         raise JWKError('Unable to find a algorithm for key: %s' % key_data)
-    return key_class(key_data, algorithm)
+    if use is None:
+        return key_class(key_data, algorithm)
+    else:
+        return key_class(key_data, algorithm, use)
 
 
 def get_algorithm_object(algorithm):
