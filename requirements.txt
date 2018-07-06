@@ -3,3 +3,4 @@ six
 rsa
 ecdsa
 pyasn1
+pynacl

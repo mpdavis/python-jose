@@ -12,12 +12,15 @@ class Algorithms(object):
     ES256 = 'ES256'
     ES384 = 'ES384'
     ES512 = 'ES512'
+    # RFC8037 - https://tools.ietf.org/html/rfc8037
+    EdDSA = 'EdDSA'
 
     HMAC = {HS256, HS384, HS512}
     RSA = {RS256, RS384, RS512}
     EC = {ES256, ES384, ES512}
+    ED = {EdDSA}
 
-    SUPPORTED = HMAC.union(RSA).union(EC)
+    SUPPORTED = HMAC.union(RSA).union(EC).union(ED)
 
     ALL = SUPPORTED.union([NONE])
 
@@ -37,3 +40,15 @@ class Algorithms(object):
 
 
 ALGORITHMS = Algorithms()
+
+
+class Usages(object):
+    PUBLIC = 'public'
+    PRIVATE = 'private'
+
+    SUPPORTED = {PUBLIC, PRIVATE}
+
+    ALL = SUPPORTED
+
+
+USAGES = Usages()
