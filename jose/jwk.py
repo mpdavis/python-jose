@@ -10,12 +10,12 @@ from jose.utils import constant_time_string_compare
 from jose.backends.base import Key
 
 try:
-    from jose.backends import RSAKey
+    from jose.backends import RSAKey  # noqa: F401
 except ImportError:
     pass
 
 try:
-    from jose.backends import ECKey
+    from jose.backends import ECKey  # noqa: F401
 except ImportError:
     pass
 
@@ -26,10 +26,10 @@ def get_key(algorithm):
     elif algorithm in ALGORITHMS.HMAC:
         return HMACKey
     elif algorithm in ALGORITHMS.RSA:
-        from jose.backends import RSAKey
+        from jose.backends import RSAKey  # noqa: F811
         return RSAKey
     elif algorithm in ALGORITHMS.EC:
-        from jose.backends import ECKey
+        from jose.backends import ECKey  # noqa: F811
         return ECKey
     return None
 

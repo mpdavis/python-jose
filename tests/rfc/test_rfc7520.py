@@ -1,8 +1,8 @@
 
+# Disable flake8 reporting
+# flake8: noqa
+
 from jose.jws import verify
-
-import pytest
-
 
 expected_payload = b"It\xe2\x80\x99s a dangerous business, Frodo, going out your door. You step onto the road, and if you don't keep your feet, there\xe2\x80\x99s no knowing where you might be swept off to."
 

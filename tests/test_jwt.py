@@ -1,4 +1,8 @@
 
+import base64
+import json
+
+from jose import jws
 from jose import jwt
 from jose.exceptions import JWTError
 
@@ -31,6 +35,53 @@ def headers():
 
 class TestJWT:
 
+    def test_no_alg(self, claims, key):
+        token = jwt.encode(claims, key, algorithm='HS384')
+        b64header, b64payload, b64signature = token.split('.')
+        header_json = base64.urlsafe_b64decode(b64header.encode('utf-8'))
+        header = json.loads(header_json.decode('utf-8'))
+        del header['alg']
+        bad_header_json_bytes = json.dumps(header).encode('utf-8')
+        bad_b64header_bytes = base64.urlsafe_b64encode(bad_header_json_bytes)
+        bad_b64header_bytes_short = bad_b64header_bytes.replace(b'=', b'')
+        bad_b64header = bad_b64header_bytes.decode('utf-8')
+        bad_token = '.'.join([bad_b64header, b64payload, b64signature])
+        with pytest.raises(JWTError):
+            jwt.decode(
+                token=bad_token,
+                key=key,
+                algorithms=[])
+
+    def test_invalid_claims_json(self):
+        old_jws_verify = jws.verify
+        try:
+            token = u'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+
+            def return_invalid_json(token, key, algorithms, verify=True):
+                return b'["a", "b"}'
+
+            jws.verify = return_invalid_json
+
+            with pytest.raises(JWTError, message='Invalid payload string: ["a", "b"}'):
+                jwt.decode(token, 'secret', ['HS256'])
+        finally:
+            jws.verify = old_jws_verify
+
+    def test_invalid_claims(self):
+        old_jws_verify = jws.verify
+        try:
+            token = u'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+
+            def return_encoded_array(token, key, algorithms, verify=True):
+                return b'["a","b"]'
+
+            jws.verify = return_encoded_array
+
+            with pytest.raises(JWTError, message='Invalid payload string: must be a json object'):
+                jwt.decode(token, 'secret', ['HS256'])
+        finally:
+            jws.verify = old_jws_verify
+
     def test_non_default_alg(self, claims, key):
         encoded = jwt.encode(claims, key, algorithm='HS384')
         decoded = jwt.decode(encoded, key, algorithms='HS384')
@@ -40,6 +91,13 @@ class TestJWT:
         encoded = jwt.encode(claims, key, 'HS384')
         decoded = jwt.decode(encoded, key, 'HS384')
         assert claims == decoded
+
+    def test_no_alg_default_headers(self, claims, key, headers):
+        token = jwt.encode(claims, key, algorithm='HS384')
+        b64header, b64payload, b64signature = token.split('.')
+        bad_token = b64header + '.' + b64payload
+        with pytest.raises(JWTError):
+            jwt.get_unverified_headers(bad_token)
 
     def test_non_default_headers(self, claims, key, headers):
         encoded = jwt.encode(claims, key, headers=headers)
@@ -475,6 +533,11 @@ class TestJWT:
         token = jwt.encode(claims, key, access_token='<ACCESS_TOKEN>')
         with pytest.raises(JWTError):
             jwt.decode(token, key, access_token='\xe2')
+
+    def test_bad_claims(self):
+        bad_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.iOJ5SiNfaNO_pa2J4Umtb3b3zmk5C18-mhTCVNsjnck'
+        with pytest.raises(JWTError):
+            jwt.get_unverified_claims(bad_token)
 
     def test_unverified_claims_string(self):
         token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.aW52YWxpZCBjbGFpbQ.iOJ5SiNfaNO_pa2J4Umtb3b3zmk5C18-mhTCVNsjnck'

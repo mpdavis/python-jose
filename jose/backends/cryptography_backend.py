@@ -93,7 +93,7 @@ class CryptographyECKey(Key):
         if self.hash_alg.digest_size * 8 > self.prepared_key.curve.key_size:
             raise TypeError("this curve (%s) is too short "
                             "for your digest (%d)" % (self.prepared_key.curve.name,
-                                                      8*self.hash_alg.digest_size))
+                                                      8 * self.hash_alg.digest_size))
         signature = self.prepared_key.sign(msg, ec.ECDSA(self.hash_alg()))
         order = (2 ** self.prepared_key.curve.key_size) - 1
         return sigencode_string(*sigdecode_der(signature, order), order=order)
@@ -104,7 +104,7 @@ class CryptographyECKey(Key):
         try:
             self.prepared_key.verify(signature, msg, ec.ECDSA(self.hash_alg()))
             return True
-        except:
+        except Exception:
             return False
 
     def is_public(self):

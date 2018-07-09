@@ -2,7 +2,7 @@ from jose import jwk
 from jose.exceptions import JWKError
 from jose.backends.base import Key
 from jose.backends.pycrypto_backend import RSAKey
-from jose.backends.cryptography_backend import CryptographyECKey, CryptographyRSAKey
+from jose.backends.cryptography_backend import CryptographyECKey
 from jose.backends.ecdsa_backend import ECDSAECKey
 
 import pytest
@@ -53,7 +53,7 @@ class TestJWK:
             key = RSAKey(rsa_key, 'HS512')
 
         with pytest.raises(JWKError):
-            key = ECDSAECKey(ec_key, 'RS512')
+            key = ECDSAECKey(ec_key, 'RS512')  # noqa: F841
 
     def test_invalid_jwk(self):
 
@@ -64,7 +64,7 @@ class TestJWK:
             key = RSAKey(hmac_key, 'RS256')
 
         with pytest.raises(JWKError):
-            key = ECDSAECKey(rsa_key, 'ES256')
+            key = ECDSAECKey(rsa_key, 'ES256')  # noqa: F841
 
     def test_RSAKey_errors(self):
 
@@ -88,7 +88,7 @@ class TestJWK:
         }
 
         with pytest.raises(JWKError):
-            key = RSAKey(rsa_key, 'RS256')
+            key = RSAKey(rsa_key, 'RS256')  # noqa: F841
 
     def test_construct_from_jwk(self):
 
@@ -122,7 +122,7 @@ class TestJWK:
             key = jwk.construct(hmac_key)
 
         with pytest.raises(JWKError):
-            key = jwk.construct("key", algorithm="NONEXISTENT")
+            key = jwk.construct("key", algorithm="NONEXISTENT")  # noqa: F841
 
     def test_get_key(self):
         hs_key = jwk.get_key("HS256")
@@ -131,7 +131,7 @@ class TestJWK:
         assert issubclass(jwk.get_key("RS256"), Key)
         assert issubclass(jwk.get_key("ES256"), Key)
 
-        assert jwk.get_key("NONEXISTENT") == None
+        assert jwk.get_key("NONEXISTENT") is None
 
     def test_register_key(self):
         assert jwk.register_key("ALG", jwk.Key)

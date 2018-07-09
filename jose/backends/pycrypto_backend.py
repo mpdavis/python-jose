@@ -23,7 +23,6 @@ if hasattr(RSA, 'RsaKey'):
     _RSAKey = RSA.RsaKey
 else:
     _RSAKey = RSA._RSAobj
-    
 
 
 class RSAKey(Key):

@@ -86,7 +86,7 @@ class TestRSAAlgorithm:
         key = rsa.RSAPublicNumbers(
             long(65537),
             long(26057131595212989515105618545799160306093557851986992545257129318694524535510983041068168825614868056510242030438003863929818932202262132630250203397069801217463517914103389095129323580576852108653940669240896817348477800490303630912852266209307160550655497615975529276169196271699168537716821419779900117025818140018436554173242441334827711966499484119233207097432165756707507563413323850255548329534279691658369466534587631102538061857114141268972476680597988266772849780811214198186940677291891818952682545840788356616771009013059992237747149380197028452160324144544057074406611859615973035412993832273216732343819),
-            ).public_key(default_backend())
+        ).public_key(default_backend())
 
         pubkey = CryptographyRSAKey(key, ALGORITHMS.RS256)
         assert pubkey.is_public()
@@ -157,12 +157,6 @@ class TestRSAAlgorithm:
 
         # None of the extra parameters are present, but 'key' is still private.
         assert not Backend(key, ALGORITHMS.RS256).is_public()
-
-    @pytest.mark.parametrize("Backend", [RSAKey, CryptographyRSAKey, PurePythonRSAKey])
-    def test_string_secret(self, Backend):
-        key = 'secret'
-        with pytest.raises(JOSEError):
-            Backend(key, ALGORITHMS.RS256)
 
     @pytest.mark.parametrize("Backend", [RSAKey, CryptographyRSAKey, PurePythonRSAKey])
     def test_get_public_key(self, Backend):
@@ -262,6 +256,5 @@ class TestRSAAlgorithm:
         signature = key.sign(msg)
         public_key = key.public_key()
 
-        assert public_key.verify(msg, signature) == True
-        assert public_key.verify(msg, 1) == False
-
+        assert bool(public_key.verify(msg, signature))
+        assert not bool(public_key.verify(msg, 1))
