@@ -18,7 +18,8 @@ def sign(payload, key, headers=None, algorithm=ALGORITHMS.HS256):
 
     Args:
         payload (str): A string to sign
-        key (str): The key to use for signing the claim set
+        key (str or dict): The key to use for signing the claim set. Can be
+            individual JWK or JWK set.
         headers (dict, optional): A set of headers that will be added to
             the default headers.  Any headers that are added as additional
             headers will override the default headers.
@@ -53,7 +54,8 @@ def verify(token, key, algorithms, verify=True):
 
     Args:
         token (str): A signed JWS to be verified.
-        key (str): A key to attempt to verify the payload with.
+        key (str or dict): A key to attempt to verify the payload with. Can be
+            individual JWK or JWK set.
         algorithms (str or list): Valid algorithms that should be used to verify the JWS.
 
     Returns:

@@ -25,7 +25,8 @@ def encode(claims, key, algorithm=ALGORITHMS.HS256, headers=None, access_token=N
 
     Args:
         claims (dict): A claims set to sign
-        key (str): The key to use for signing the claim set
+        key (str or dict): The key to use for signing the claim set. Can be
+            individual JWK or JWK set.
         algorithm (str, optional): The algorithm to use for signing the
             the claims.  Defaults to HS256.
         headers (dict, optional): A set of headers that will be added to
@@ -67,7 +68,8 @@ def decode(token, key, algorithms=None, options=None, audience=None,
 
     Args:
         token (str): A signed JWS to be verified.
-        key (str): A key to attempt to verify the payload with.
+        key (str or dict): A key to attempt to verify the payload with. Can be
+            individual JWK or JWK set.
         algorithms (str or list): Valid algorithms that should be used to verify the JWS.
         audience (str): The intended audience of the token.  If the "aud" claim is
             included in the claim set, then the audience must be included and must equal
