@@ -1,5 +1,4 @@
 
-import binascii
 import json
 
 from calendar import timegm
@@ -170,7 +169,7 @@ def get_unverified_header(token):
     """
     try:
         headers = jws.get_unverified_headers(token)
-    except:
+    except Exception:
         raise JWTError('Error decoding token headers.')
 
     return headers
@@ -208,7 +207,7 @@ def get_unverified_claims(token):
     """
     try:
         claims = jws.get_unverified_claims(token)
-    except:
+    except Exception:
         raise JWTError('Error decoding token claims.')
 
     try:
@@ -386,6 +385,7 @@ def _validate_sub(claims, subject=None):
         if claims.get('sub') != subject:
             raise JWTClaimsError('Invalid subject')
 
+
 def _validate_jti(claims):
     """Validates that the 'jti' claim is valid.
 
@@ -435,7 +435,7 @@ def _validate_at_hash(claims, access_token, algorithm):
     except (TypeError, ValueError):
         msg = 'Unable to calculate at_hash to verify against token claims.'
         raise JWTClaimsError(msg)
-        
+
     if claims['at_hash'] != expected_hash:
         raise JWTClaimsError('at_hash claim does not match access_token.')
 

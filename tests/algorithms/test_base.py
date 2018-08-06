@@ -17,4 +17,3 @@ class TestBaseAlgorithm:
     def test_verify_is_interface(self, alg):
         with pytest.raises(NotImplementedError):
             alg.verify('msg', 'sig')
-

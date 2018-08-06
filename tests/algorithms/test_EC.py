@@ -107,8 +107,8 @@ class TestECAlgorithm:
         signature = key.sign(msg)
         public_key = key.public_key()
 
-        assert public_key.verify(msg, signature) == True
-        assert public_key.verify(msg, b'not a signature') == False
+        assert bool(public_key.verify(msg, signature))
+        assert not bool(public_key.verify(msg, b'not a signature'))
 
     def assert_parameters(self, as_dict, private):
         assert isinstance(as_dict, dict)

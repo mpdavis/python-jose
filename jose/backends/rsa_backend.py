@@ -17,6 +17,7 @@ PKCS8_RSA_HEADER = b'0\x82\x04\xbd\x02\x01\x000\r\x06\t*\x86H\x86\xf7\r\x01\x01\
 # to enable pure python rsa module to be in compliance with section 6.3.1 of RFC7518
 # which requires only private exponent (d) for private key.
 
+
 def _gcd(a, b):
     """Calculate the Greatest Common Divisor of a and b.
 
@@ -24,7 +25,7 @@ def _gcd(a, b):
     b is divided by it, the result comes out positive).
     """
     while b:
-        a, b = b, a%b
+        a, b = b, (a % b)
     return a
 
 
@@ -138,7 +139,7 @@ class RSAKey(Key):
         e = base64_to_long(jwk_dict.get('e'))
         n = base64_to_long(jwk_dict.get('n'))
 
-        if not 'd' in jwk_dict:
+        if 'd' not in jwk_dict:
             return pyrsa.PublicKey(e=e, n=n)
         else:
             d = base64_to_long(jwk_dict.get('d'))
@@ -158,8 +159,6 @@ class RSAKey(Key):
             else:
                 p, q = _rsa_recover_prime_factors(n, e, d)
                 return pyrsa.PrivateKey(n=n, e=e, d=d, p=p, q=q)
-
-
 
     def sign(self, msg):
         return pyrsa.sign(msg, self._prepared_key, self.hash_alg)

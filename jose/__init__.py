@@ -5,7 +5,7 @@ __license__ = 'MIT'
 __copyright__ = 'Copyright 2016 Michael Davis'
 
 
-from .exceptions import JOSEError
-from .exceptions import JWSError
-from .exceptions import ExpiredSignatureError
-from .exceptions import JWTError
+from .exceptions import JOSEError  # noqa: F401
+from .exceptions import JWSError  # noqa: F401
+from .exceptions import ExpiredSignatureError  # noqa: F401
+from .exceptions import JWTError  # noqa: F401

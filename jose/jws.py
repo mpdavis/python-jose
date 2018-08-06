@@ -213,7 +213,7 @@ def _sig_matches_keys(keys, signing_input, signature, alg):
         try:
             if key.verify(signing_input, signature):
                 return True
-        except:
+        except Exception:
             pass
     return False
 
@@ -252,18 +252,18 @@ def _get_keys(key):
 
 def _verify_signature(signing_input, header, signature, key='', algorithms=None):
 
-        alg = header.get('alg')
-        if not alg:
-            raise JWSError('No algorithm was specified in the JWS header.')
+    alg = header.get('alg')
+    if not alg:
+        raise JWSError('No algorithm was specified in the JWS header.')
 
-        if algorithms is not None and alg not in algorithms:
-            raise JWSError('The specified alg value is not allowed')
+    if algorithms is not None and alg not in algorithms:
+        raise JWSError('The specified alg value is not allowed')
 
-        keys = _get_keys(key)
-        try:
-            if not _sig_matches_keys(keys, signing_input, signature, alg):
-                raise JWSSignatureError()
-        except JWSSignatureError:
-            raise JWSError('Signature verification failed.')
-        except JWSError:
-            raise JWSError('Invalid or unsupported algorithm: %s' % alg)
+    keys = _get_keys(key)
+    try:
+        if not _sig_matches_keys(keys, signing_input, signature, alg):
+            raise JWSSignatureError()
+    except JWSSignatureError:
+        raise JWSError('Signature verification failed.')
+    except JWSError:
+        raise JWSError('Invalid or unsupported algorithm: %s' % alg)
