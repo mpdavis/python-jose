@@ -12,6 +12,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import ec, rsa, padding
 from cryptography.hazmat.primitives.serialization import load_pem_private_key, load_pem_public_key
+from cryptography.x509 import load_pem_x509_certificate
 
 
 class CryptographyECKey(Key):
@@ -195,11 +196,14 @@ class CryptographyRSAKey(Key):
 
         if isinstance(key, six.binary_type):
             try:
+                if key.startswith(b'-----BEGIN CERTIFICATE-----'):
+                    self._process_cert(key)
+                    return
+
                 try:
-                    key = load_pem_public_key(key, self.cryptography_backend())
+                    self.prepared_key = load_pem_public_key(key, self.cryptography_backend())
                 except ValueError:
-                    key = load_pem_private_key(key, password=None, backend=self.cryptography_backend())
-                self.prepared_key = key
+                    self.prepared_key = load_pem_private_key(key, password=None, backend=self.cryptography_backend())
             except Exception as e:
                 raise JWKError(e)
             return
@@ -246,6 +250,10 @@ class CryptographyRSAKey(Key):
             private = rsa.RSAPrivateNumbers(p, q, d, dp, dq, qi, public)
 
             return private.private_key(self.cryptography_backend())
+
+    def _process_cert(self, key):
+        key = load_pem_x509_certificate(key, self.cryptography_backend())
+        self.prepared_key = key.public_key()
 
     def sign(self, msg):
         try:
