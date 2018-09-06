@@ -13,7 +13,7 @@ from jose.utils import base64url_encode
 from jose.utils import base64url_decode
 
 
-def sign(payload, key, headers=None, algorithm=ALGORITHMS.HS256):
+def sign(payload, key, headers=None, algorithm=ALGORITHMS.HS256, typ="JWT"):
     """Signs a claims set and returns a JWS string.
 
     Args:
@@ -42,7 +42,7 @@ def sign(payload, key, headers=None, algorithm=ALGORITHMS.HS256):
     if algorithm not in ALGORITHMS.SUPPORTED:
         raise JWSError('Algorithm %s not supported.' % algorithm)
 
-    encoded_header = _encode_header(algorithm, additional_headers=headers)
+    encoded_header = _encode_header(algorithm, additional_headers=headers, typ=typ)
     encoded_payload = _encode_payload(payload)
     signed_output = _sign_header_and_claims(encoded_header, encoded_payload, algorithm, key)
 
@@ -129,9 +129,9 @@ def get_unverified_claims(token):
     return claims
 
 
-def _encode_header(algorithm, additional_headers=None):
+def _encode_header(algorithm, additional_headers=None, typ="JWT"):
     header = {
-        "typ": "JWT",
+        "typ": typ,
         "alg": algorithm
     }
 
