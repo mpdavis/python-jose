@@ -67,7 +67,7 @@ class CryptographyECKey(Key):
 
     def _process_jwk(self, jwk_dict):
         if not jwk_dict.get('kty') == 'EC':
-            raise JWKError("Incorrect key type.  Expected: 'EC', Recieved: %s" % jwk_dict.get('kty'))
+            raise JWKError("Incorrect key type.  Expected: 'EC', Received: %s" % jwk_dict.get('kty'))
 
         if not all(k in jwk_dict for k in ['x', 'y', 'crv']):
             raise JWKError('Mandatory parameters are missing')
@@ -212,7 +212,7 @@ class CryptographyRSAKey(Key):
 
     def _process_jwk(self, jwk_dict):
         if not jwk_dict.get('kty') == 'RSA':
-            raise JWKError("Incorrect key type.  Expected: 'RSA', Recieved: %s" % jwk_dict.get('kty'))
+            raise JWKError("Incorrect key type.  Expected: 'RSA', Received: %s" % jwk_dict.get('kty'))
 
         e = base64_to_long(jwk_dict.get('e', 256))
         n = base64_to_long(jwk_dict.get('n'))

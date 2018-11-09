@@ -63,7 +63,6 @@ setup(
         'pytest',
         'pytest-cov',
         'pytest-runner',
-        'cryptography',
     ],
     install_requires=['six <2.0', 'ecdsa <1.0', 'rsa', 'future <1.0']
 )

@@ -2,21 +2,70 @@
 # detail: https://blog.travis-ci.com/2017-06-21-trusty-updates-2017-Q2-launch
 dist: precise
 language: python
-python:
-  - "2.7"
-  - "3.4"
-  - "3.5"
-  - "3.6"
-  - "pypy-5.3.1"
 install:
   - pip install -U setuptools && pip install -U tox codecov tox-travis
 script:
   - tox
 after_success:
   - codecov
+matrix:
+  include:
+    # CPython 2.7
+    - python: 2.7
+      env: TOXENV=py27-base
+    - python: 2.7
+      env: TOXENV=py27-cryptography
+    - python: 2.7
+      env: TOXENV=py27-pycryptodome
+    - python: 2.7
+      env: TOXENV=py27-pycrypto
+    - python: 2.7
+      env: TOXENV=py27-compatibility
+    # CPython 3.4
+    - python: 3.4
+      env: TOXENV=py34-base
+    - python: 3.4
+      env: TOXENV=py34-cryptography
+    - python: 3.4
+      env: TOXENV=py34-pycryptodome
+    - python: 3.4
+      env: TOXENV=py34-pycrypto
+    - python: 3.4
+      env: TOXENV=py34-compatibility
+    # CPython 3.5
+    - python: 3.5
+      env: TOXENV=py35-base
+    - python: 3.5
+      env: TOXENV=py35-cryptography
+    - python: 3.5
+      env: TOXENV=py35-pycryptodome
+    - python: 3.5
+      env: TOXENV=py35-pycrypto
+    - python: 3.5
+      env: TOXENV=py35-compatibility
+    # CPython 3.5
+    - python: 3.5
+      env: TOXENV=py35-base
+    - python: 3.5
+      env: TOXENV=py35-cryptography
+    - python: 3.5
+      env: TOXENV=py35-pycryptodome
+    - python: 3.5
+      env: TOXENV=py35-pycrypto
+    - python: 3.5
+      env: TOXENV=py35-compatibility
+    # PyPy 5.3.1
+    - python: pypy-5.3.1
+      env: TOXENV=pypy-base
+    - python: pypy-5.3.1
+      env: TOXENV=pypy-cryptography
+    - python: pypy-5.3.1
+      env: TOXENV=pypy-pycryptodome
+    - python: pypy-5.3.1
+      env: TOXENV=pypy-pycrypto
+    - python: pypy-5.3.1
+      env: TOXENV=pypy-compatibility
 # matrix:
 #   include:
 #     - python: 3.6
-#       env:
-#         - TOX_ENV=flake8
-#       script: tox -e $TOX_ENV
+#       env: TOX_ENV=flake8
