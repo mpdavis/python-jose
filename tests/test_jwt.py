@@ -526,8 +526,8 @@ class TestJWT:
 
     def test_at_hash_missing_claim(self, claims, key):
         token = jwt.encode(claims, key)
-        with pytest.raises(JWTError):
-            jwt.decode(token, key, access_token='<ACCESS_TOKEN>')
+        payload = jwt.decode(token, key, access_token='<ACCESS_TOKEN>')
+        assert 'at_hash' not in payload
 
     def test_at_hash_unable_to_calculate(self, claims, key):
         token = jwt.encode(claims, key, access_token='<ACCESS_TOKEN>')
