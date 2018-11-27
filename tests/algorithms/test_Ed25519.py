@@ -126,11 +126,30 @@ class TestEd25519Algorithm:
         with pytest.raises(JWKError):
             Ed25519Key(bad_key_dict, algorithm=ALGORITHMS.EdDSA)
 
-    def test_signing_parity(self):
+    def test_signing_bytes_parity(self):
         signing_key = Ed25519Key(SIGNING_KEY, algorithm=ALGORITHMS.EdDSA, use=USAGES.PRIVATE)
         verify_key = signing_key.public_key()
 
         msg = b'test'
+        smsg = signing_key.sign(msg)  # -> signature + cleartext message
+        bad_smsg_message = bytes([(b + 1) if b < 255 else 0 for b in bytearray(smsg.message)])
+        bad_smsg_signature = bytes([(b + 1) if b < 255 else 0 for b in bytearray(smsg.signature)])
+        bad_smsg = bad_smsg_signature + bad_smsg_message
+
+        assert verify_key.verify(smsg)
+        assert verify_key.verify(smsg.signature + smsg.message)
+        assert verify_key.verify(smsg.message, smsg.signature)
+
+        assert not verify_key.verify(smsg.message, bad_smsg_signature)
+        assert not verify_key.verify(bad_smsg_message, smsg.signature)
+        assert not verify_key.verify(bad_smsg_message, bad_smsg_signature)
+        assert not verify_key.verify(bad_smsg)
+
+    def test_signing_string_parity(self):
+        signing_key = Ed25519Key(SIGNING_KEY, algorithm=ALGORITHMS.EdDSA, use=USAGES.PRIVATE)
+        verify_key = signing_key.public_key()
+
+        msg = 'test'
         smsg = signing_key.sign(msg)  # -> signature + cleartext message
         bad_smsg_message = bytes([(b + 1) if b < 255 else 0 for b in bytearray(smsg.message)])
         bad_smsg_signature = bytes([(b + 1) if b < 255 else 0 for b in bytearray(smsg.signature)])
