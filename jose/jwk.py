@@ -19,8 +19,10 @@ try:
 except ImportError:
     pass
 
-
-from jose.backends import Ed25519Key
+try:
+    from jose.backends import Ed25519Key  # noqa: F401
+except ImportError:
+    pass
 
 
 def get_key(algorithm):
@@ -35,7 +37,7 @@ def get_key(algorithm):
         from jose.backends import ECKey  # noqa: F811
         return ECKey
     elif algorithm in ALGORITHMS.ED:
-        from jose.backends import Ed25519Key
+        from jose.backends import Ed25519Key  # noqa: F811
         return Ed25519Key
     return None
 

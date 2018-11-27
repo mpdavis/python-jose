@@ -37,6 +37,7 @@ extras_require = {
     'cryptography': [_cryptography_version()],
     'pycrypto': ['pycrypto >=2.6.0, <2.7.0'] + pyasn1,
     'pycryptodome': ['pycryptodome >=3.3.1, <4.0.0'] + pyasn1,
+    'ed25519': ['pynacl'],
 }
 legacy_backend_requires = ['ecdsa <1.0', 'rsa'] + pyasn1
 install_requires = ['six <2.0', 'pynacl']

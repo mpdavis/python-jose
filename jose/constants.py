@@ -20,7 +20,8 @@ class Algorithms(object):
     EC = {ES256, ES384, ES512}
     ED = {EdDSA}
 
-    SUPPORTED = HMAC.union(RSA).union(EC).union(ED)
+    # This is modified in jose.backends.nacl_backend to register EdDSA
+    SUPPORTED = HMAC.union(RSA).union(EC)
 
     ALL = SUPPORTED.union([NONE])
 
