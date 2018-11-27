@@ -26,6 +26,7 @@ class ECDSAECKey(Key):
         SHA256: ecdsa.curves.NIST256p,
         SHA384: ecdsa.curves.NIST384p,
         SHA512: ecdsa.curves.NIST521p,
+        SHA256: ecdsa.curves.SECP256k1,
     }
 
     def __init__(self, key, algorithm):
@@ -35,7 +36,8 @@ class ECDSAECKey(Key):
         self.hash_alg = {
             ALGORITHMS.ES256: self.SHA256,
             ALGORITHMS.ES384: self.SHA384,
-            ALGORITHMS.ES512: self.SHA512
+            ALGORITHMS.ES512: self.SHA512,
+            ALGORITHMS.ES256K: self.SHA256
         }.get(algorithm)
         self._algorithm = algorithm
 

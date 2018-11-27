@@ -27,7 +27,8 @@ class CryptographyECKey(Key):
         self.hash_alg = {
             ALGORITHMS.ES256: self.SHA256,
             ALGORITHMS.ES384: self.SHA384,
-            ALGORITHMS.ES512: self.SHA512
+            ALGORITHMS.ES512: self.SHA512,
+            ALGORITHMS.ES256K: self.SHA256
         }.get(algorithm)
         self._algorithm = algorithm
 

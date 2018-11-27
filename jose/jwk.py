@@ -72,6 +72,7 @@ def get_algorithm_object(algorithm):
         ALGORITHMS.ES256: 'SHA256',
         ALGORITHMS.ES384: 'SHA384',
         ALGORITHMS.ES512: 'SHA512',
+        ALGORITHMS.ES256K: 'SHA256',
     }
     key = get_key(algorithm)
     attr = algorithms.get(algorithm, None)

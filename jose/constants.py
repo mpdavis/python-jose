@@ -12,10 +12,11 @@ class Algorithms(object):
     ES256 = 'ES256'
     ES384 = 'ES384'
     ES512 = 'ES512'
+    ES256K = 'ES256K'
 
     HMAC = {HS256, HS384, HS512}
     RSA = {RS256, RS384, RS512}
-    EC = {ES256, ES384, ES512}
+    EC = {ES256, ES384, ES512, ES256K}
 
     SUPPORTED = HMAC.union(RSA).union(EC)
 
@@ -31,6 +32,7 @@ class Algorithms(object):
         ES256: hashlib.sha256,
         ES384: hashlib.sha384,
         ES512: hashlib.sha512,
+        ES256K: hashlib.sha256,
     }
 
     KEYS = {}
