@@ -122,6 +122,7 @@ class ECDSAECKey(Key):
             ecdsa.curves.NIST256p: 'P-256',
             ecdsa.curves.NIST384p: 'P-384',
             ecdsa.curves.NIST521p: 'P-521',
+            ecdsa.curves.SECP256k1: 'P-256K',
         }[self.prepared_key.curve]
 
         # Calculate the key size in bytes. Section 6.2.1.2 and 6.2.1.3 of

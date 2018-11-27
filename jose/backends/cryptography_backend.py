@@ -79,6 +79,7 @@ class CryptographyECKey(Key):
             'P-256': ec.SECP256R1,
             'P-384': ec.SECP384R1,
             'P-521': ec.SECP521R1,
+            'P-256K': ec.SECP256k1,
         }[jwk_dict['crv']]
 
         public = ec.EllipticCurvePublicNumbers(x, y, curve())
@@ -141,6 +142,7 @@ class CryptographyECKey(Key):
             'secp256r1': 'P-256',
             'secp384r1': 'P-384',
             'secp521r1': 'P-521',
+            'secp256k1': 'P-256K',
         }[self.prepared_key.curve.name]
 
         # Calculate the key size in bytes. Section 6.2.1.2 and 6.2.1.3 of
