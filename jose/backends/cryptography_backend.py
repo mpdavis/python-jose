@@ -79,7 +79,7 @@ class CryptographyECKey(Key):
             'P-256': ec.SECP256R1,
             'P-384': ec.SECP384R1,
             'P-521': ec.SECP521R1,
-            'P-256K': ec.SECP256k1,
+            'P-256K': ec.SECP256K1,
         }[jwk_dict['crv']]
 
         public = ec.EllipticCurvePublicNumbers(x, y, curve())
