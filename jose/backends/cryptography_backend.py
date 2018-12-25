@@ -101,8 +101,8 @@ class CryptographyECKey(Key):
 
     def verify(self, msg, sig):
         order = (2 ** self.prepared_key.curve.key_size) - 1
-        signature = sigencode_der(*sigdecode_string(sig, order), order=order)
         try:
+            signature = sigencode_der(*sigdecode_string(sig, order), order=order)
             self.prepared_key.verify(signature, msg, ec.ECDSA(self.hash_alg()))
             return True
         except Exception:
