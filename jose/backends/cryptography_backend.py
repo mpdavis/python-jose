@@ -106,20 +106,20 @@ class CryptographyECKey(Key):
         """
         return math.ceil(self.prepared_key.key_size / 8.0)
 
-    def _der_to_asn1(self, der_signature):
-        """Convert signature from DER encoding to ASN1 encoding."""
+    def _der_to_raw(self, der_signature):
+        """Convert signature from DER encoding to RAW encoding."""
         r, s = decode_dss_signature(der_signature)
         component_length = self._sig_component_length()
         return int_to_bytes(r, component_length) + int_to_bytes(s, component_length)
 
-    def _asn1_to_der(self, asn1_signature):
-        """Convert signature from ASN1 encoding to DER encoding."""
+    def _raw_to_der(self, raw_signature):
+        """Convert signature from RAW encoding to DER encoding."""
         component_length = self._sig_component_length()
-        if len(asn1_signature) != int(2 * component_length):
+        if len(raw_signature) != int(2 * component_length):
             raise ValueError("Invalid signature")
 
-        r_bytes = asn1_signature[:component_length]
-        s_bytes = asn1_signature[component_length:]
+        r_bytes = raw_signature[:component_length]
+        s_bytes = raw_signature[component_length:]
         r = int_from_bytes(r_bytes, "big")
         s = int_from_bytes(s_bytes, "big")
         return encode_dss_signature(r, s)
@@ -130,11 +130,11 @@ class CryptographyECKey(Key):
                             "for your digest (%d)" % (self.prepared_key.curve.name,
                                                       8 * self.hash_alg.digest_size))
         signature = self.prepared_key.sign(msg, ec.ECDSA(self.hash_alg()))
-        return self._der_to_asn1(signature)
+        return self._der_to_raw(signature)
 
     def verify(self, msg, sig):
         try:
-            signature = self._asn1_to_der(sig)
+            signature = self._raw_to_der(sig)
             self.prepared_key.verify(signature, msg, ec.ECDSA(self.hash_alg()))
             return True
         except Exception:

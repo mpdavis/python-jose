@@ -39,7 +39,7 @@ DER_SIGNATURE = (
     b"\x9d\xdf \xd1\xbc\xedK\x01\x87:}\xf2\x02!\x00\xb2shTA\x00\x1a\x13~\xba"
     b"J\xdb\xeem\x12\x1e\xfeMO\x04\xb2[\x86A\xbd\xc6hu\x953X\x1e"
 )
-ASN1_SIGNATURE = (
+RAW_SIGNATURE = (
     b"\x89yG\x81W\x01\x11\x9b0\x08\xa4\xd0\xe3g([\x07\xb5\x01\xb3\x9d\xdf "
     b"\xd1\xbc\xedK\x01\x87:}\xf2\xb2shTA\x00\x1a\x13~\xbaJ\xdb\xeem\x12\x1e"
     b"\xfeMO\x04\xb2[\x86A\xbd\xc6hu\x953X\x1e"
@@ -88,16 +88,16 @@ def test_cryptography_sig_component_length(algorithm, expected_length):
 
 @pytest.mark.cryptography
 @pytest.mark.skipif(CryptographyECKey is None, reason="pyca/cryptography backend not available")
-def test_cryptograhy_der_to_asn1():
+def test_cryptograhy_der_to_raw():
     key = CryptographyECKey(private_key, ALGORITHMS.ES256)
-    assert key._der_to_asn1(DER_SIGNATURE) == ASN1_SIGNATURE
+    assert key._der_to_raw(DER_SIGNATURE) == RAW_SIGNATURE
 
 
 @pytest.mark.cryptography
 @pytest.mark.skipif(CryptographyECKey is None, reason="pyca/cryptography backend not available")
-def test_cryptograhy_asn1_to_der():
+def test_cryptograhy_raw_to_der():
     key = CryptographyECKey(private_key, ALGORITHMS.ES256)
-    assert key._asn1_to_der(ASN1_SIGNATURE) == DER_SIGNATURE
+    assert key._raw_to_der(RAW_SIGNATURE) == DER_SIGNATURE
 
 
 class TestECAlgorithm:
