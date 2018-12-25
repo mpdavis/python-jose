@@ -1,5 +1,9 @@
 import six
-import ecdsa
+
+try:
+    from ecdsa import SigningKey as EcdsaSigningKey, VerifyingKey as EcdsaVerifyingKey
+except ImportError:
+    SigningKey = VerifyingKey = None
 from ecdsa.util import sigdecode_string, sigencode_string, sigdecode_der, sigencode_der
 
 from jose.backends.base import Key
@@ -37,7 +41,7 @@ class CryptographyECKey(Key):
             self.prepared_key = key
             return
 
-        if isinstance(key, (ecdsa.SigningKey, ecdsa.VerifyingKey)):
+        if None not in (EcdsaSigningKey, EcdsaVerifyingKey) and isinstance(key, (EcdsaSigningKey, EcdsaVerifyingKey)):
             # convert to PEM and let cryptography below load it as PEM
             key = key.to_pem().decode('utf-8')
 
