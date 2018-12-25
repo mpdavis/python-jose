@@ -104,7 +104,7 @@ class CryptographyECKey(Key):
 
         This is the number of bytes required to encode the maximum key value.
         """
-        return math.ceil(self.prepared_key.key_size / 8.0)
+        return int(math.ceil(self.prepared_key.key_size / 8.0))
 
     def _der_to_raw(self, der_signature):
         """Convert signature from DER encoding to RAW encoding."""
