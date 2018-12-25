@@ -11,8 +11,10 @@ except ImportError:
 
 try:
     from jose.backends.cryptography_backend import CryptographyECKey
+    from cryptography.hazmat.primitives.asymmetric import ec as CryptographyEc
+    from cryptography.hazmat.backends import default_backend as CryptographyBackend
 except ImportError:
-    CryptographyECKey = None
+    CryptographyECKey = CryptographyEc = CryptographyBackend = None
 
 import pytest
 
@@ -61,6 +63,27 @@ def _backend_exception_types():
 def test_key_from_ecdsa():
     key = ecdsa.SigningKey.from_pem(private_key)
     assert not ECKey(key, ALGORITHMS.ES256).is_public()
+
+
+@pytest.mark.cryptography
+@pytest.mark.skipif(CryptographyECKey is None, reason="pyca/cryptography backend not available")
+@pytest.mark.parametrize("algorithm, expected_length", (
+        (ALGORITHMS.ES256, 32),
+        (ALGORITHMS.ES384, 48),
+        (ALGORITHMS.ES512, 66)
+))
+def test_cryptography_sig_component_length(algorithm, expected_length):
+    # Put mapping inside here to avoid more complex handling for test runs that do not have pyca/cryptography
+    mapping = {
+        ALGORITHMS.ES256: CryptographyEc.SECP256R1,
+        ALGORITHMS.ES384: CryptographyEc.SECP384R1,
+        ALGORITHMS.ES512: CryptographyEc.SECP521R1,
+    }
+    key = CryptographyECKey(
+        CryptographyEc.generate_private_key(mapping[algorithm](), backend=CryptographyBackend()),
+        algorithm
+    )
+    assert key._sig_component_length() == expected_length
 
 
 @pytest.mark.cryptography
