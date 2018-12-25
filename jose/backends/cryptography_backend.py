@@ -94,19 +94,27 @@ class CryptographyECKey(Key):
         else:
             return public.public_key(self.cryptography_backend())
 
+    def _der_to_asn1(self, der_signature):
+        """Convert signature from DER encoding to ASN1 encoding."""
+        order = (2 ** self.prepared_key.curve.key_size) - 1
+        return sigencode_string(*sigdecode_der(der_signature, order), order=order)
+
+    def _asn1_to_der(self, asn1_signature):
+        """Convert signature from ASN1 encoding to DER encoding."""
+        order = (2 ** self.prepared_key.curve.key_size) - 1
+        return sigencode_der(*sigdecode_string(asn1_signature, order), order=order)
+
     def sign(self, msg):
         if self.hash_alg.digest_size * 8 > self.prepared_key.curve.key_size:
             raise TypeError("this curve (%s) is too short "
                             "for your digest (%d)" % (self.prepared_key.curve.name,
                                                       8 * self.hash_alg.digest_size))
         signature = self.prepared_key.sign(msg, ec.ECDSA(self.hash_alg()))
-        order = (2 ** self.prepared_key.curve.key_size) - 1
-        return sigencode_string(*sigdecode_der(signature, order), order=order)
+        return self._der_to_asn1(signature)
 
     def verify(self, msg, sig):
-        order = (2 ** self.prepared_key.curve.key_size) - 1
-        signature = sigencode_der(*sigdecode_string(sig, order), order=order)
         try:
+            signature = self._asn1_to_der(sig)
             self.prepared_key.verify(signature, msg, ec.ECDSA(self.hash_alg()))
             return True
         except Exception:
