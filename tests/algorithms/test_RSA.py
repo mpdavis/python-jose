@@ -22,7 +22,7 @@ import pytest
 if sys.version_info > (3,):
     long = int
 
-private_key = b"""-----BEGIN RSA PRIVATE KEY-----
+private_key_4096 = b"""-----BEGIN RSA PRIVATE KEY-----
 MIIJKwIBAAKCAgEAtSKfSeI0fukRIX38AHlKB1YPpX8PUYN2JdvfM+XjNmLfU1M7
 4N0VmdzIX95sneQGO9kC2xMIE+AIlt52Yf/KgBZggAlS9Y0Vx8DsSL2HvOjguAdX
 ir3vYLvAyyHin/mUisJOqccFKChHKjnk0uXy/38+1r17/cYTp76brKpU1I4kM20M
@@ -100,8 +100,10 @@ t73xGjGsKnsmrXoOCxSqV3LtRrfcxSLDTHOejbNKLpeIkOb8CvOzem/OvyC5K0DP
 dXI4NN9leDeIpNaGU6ozr+At3f50GtCWxdUppy9FDh5qDamBV8K4/+uNqFPiKFQ9
 uwNcJ8daMgVZ0QBrD3CBcSZQrfC484BlV6spJ3C16qDVSQPt7sAI
 -----END RSA PRIVATE KEY-----"""
-private_key_4096 = private_key
-PRIVATE_KEYS = (private_key_2048, private_key_4096)
+PRIVATE_KEYS = (
+    pytest.param(private_key_2048, id="RSA-2048"),
+    pytest.param(private_key_4096, id="RSA-4096")
+)
 
 
 @pytest.mark.pycrypto
@@ -113,10 +115,12 @@ def test_pycrypto_RSA_key_instance():
                          long(65537)))
     RSAKey(key, ALGORITHMS.RS256)
 
+
 # TODO: Unclear why this test was marked as only for pycrypto
 @pytest.mark.pycrypto
 @pytest.mark.pycryptodome
-def test_pycrypto_unencoded_cleartext():
+@pytest.mark.parametrize("private_key", PRIVATE_KEYS)
+def test_pycrypto_unencoded_cleartext(private_key):
     key = RSAKey(private_key, ALGORITHMS.RS256)
     msg = b'test'
     signature = key.sign(msg)
@@ -147,7 +151,7 @@ def test_cryptography_RSA_key_instance():
 
 class TestRSAAlgorithm:
     def test_RSA_key(self):
-        assert not RSAKey(private_key, ALGORITHMS.RS256).is_public()
+        assert not RSAKey(private_key_4096, ALGORITHMS.RS256).is_public()
 
     def test_string_secret(self):
         key = 'secret'
@@ -166,7 +170,7 @@ class TestRSAAlgorithm:
 
     def test_invalid_algorithm(self):
         with pytest.raises(JWKError):
-            RSAKey(private_key, ALGORITHMS.ES256)
+            RSAKey(private_key_4096, ALGORITHMS.ES256)
 
         with pytest.raises(JWKError):
             RSAKey({'kty': 'bla'}, ALGORITHMS.RS256)
@@ -208,7 +212,8 @@ class TestRSAAlgorithm:
         # None of the extra parameters are present, but 'key' is still private.
         assert not RSAKey(key, ALGORITHMS.RS256).is_public()
 
-    def test_get_public_key(self):
+    @pytest.mark.parametrize("private_key", PRIVATE_KEYS)
+    def test_get_public_key(self, private_key):
         key = RSAKey(private_key, ALGORITHMS.RS256)
         public_key = key.public_key()
         public_key2 = public_key.public_key()
@@ -216,15 +221,16 @@ class TestRSAAlgorithm:
         assert public_key2.is_public()
         assert public_key == public_key2
 
-    def test_to_pem(self):
-        key = RSAKey(private_key, ALGORITHMS.RS256)
-        assert key.to_pem(pem_format='PKCS1').strip() == private_key.strip()
+    @pytest.mark.parametrize("pkey", PRIVATE_KEYS)
+    def test_to_pem(self, pkey):
+        key = RSAKey(pkey, ALGORITHMS.RS256)
+        assert key.to_pem(pem_format='PKCS1').strip() == pkey.strip()
 
         pkcs8 = key.to_pem(pem_format='PKCS8').strip()
-        assert pkcs8 != private_key.strip()
+        assert pkcs8 != pkey.strip()
 
         newkey = RSAKey(pkcs8, ALGORITHMS.RS256)
-        assert newkey.to_pem(pem_format='PKCS1').strip() == private_key.strip()
+        assert newkey.to_pem(pem_format='PKCS1').strip() == pkey.strip()
 
     def assert_parameters(self, as_dict, private):
         assert isinstance(as_dict, dict)
@@ -256,7 +262,8 @@ class TestRSAAlgorithm:
             ALGORITHMS.RS256
         ).to_dict() == key.to_dict()
 
-    def test_to_dict(self):
+    @pytest.mark.parametrize("private_key", PRIVATE_KEYS)
+    def test_to_dict(self, private_key):
         key = RSAKey(private_key, ALGORITHMS.RS256)
         self.assert_parameters(key.to_dict(), private=True)
         self.assert_parameters(key.public_key().to_dict(), private=False)

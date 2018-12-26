@@ -8,7 +8,7 @@ except ImportError:
     PurePythonRSAKey = CryptographyRSAKey = PyCryptoRSAKey = None
 from jose.constants import ALGORITHMS
 
-from .test_RSA import private_key
+from .test_RSA import PRIVATE_KEYS
 
 CRYPTO_BACKENDS = (
     pytest.param(PurePythonRSAKey, id="python_rsa"),
@@ -27,7 +27,8 @@ class TestBackendRsaCompatibility(object):
 
     @pytest.mark.parametrize("BackendSign", CRYPTO_BACKENDS)
     @pytest.mark.parametrize("BackendVerify", CRYPTO_BACKENDS)
-    def test_signing_parity(self, BackendSign, BackendVerify):
+    @pytest.mark.parametrize("private_key", PRIVATE_KEYS)
+    def test_signing_parity(self, BackendSign, BackendVerify, private_key):
         key_sign = BackendSign(private_key, ALGORITHMS.RS256)
         key_verify = BackendVerify(private_key, ALGORITHMS.RS256).public_key()
 
@@ -43,7 +44,8 @@ class TestBackendRsaCompatibility(object):
     @pytest.mark.parametrize("encoding", ENCODINGS)
     @pytest.mark.parametrize("BackendFrom", CRYPTO_BACKENDS)
     @pytest.mark.parametrize("BackendTo", CRYPTO_BACKENDS)
-    def test_public_key_to_pem(self, BackendFrom, BackendTo, encoding):
+    @pytest.mark.parametrize("private_key", PRIVATE_KEYS)
+    def test_public_key_to_pem(self, BackendFrom, BackendTo, encoding, private_key):
         key = BackendFrom(private_key, ALGORITHMS.RS256)
         key2 = BackendTo(private_key, ALGORITHMS.RS256)
 
@@ -54,7 +56,8 @@ class TestBackendRsaCompatibility(object):
     @pytest.mark.parametrize("encoding", ENCODINGS)
     @pytest.mark.parametrize("BackendFrom", CRYPTO_BACKENDS)
     @pytest.mark.parametrize("BackendTo", CRYPTO_BACKENDS)
-    def test_private_key_to_pem(self, BackendFrom, BackendTo, encoding):
+    @pytest.mark.parametrize("private_key", PRIVATE_KEYS)
+    def test_private_key_to_pem(self, BackendFrom, BackendTo, encoding, private_key):
         key = BackendFrom(private_key, ALGORITHMS.RS256)
         key2 = BackendTo(private_key, ALGORITHMS.RS256)
 
@@ -72,7 +75,8 @@ class TestBackendRsaCompatibility(object):
     @pytest.mark.parametrize("encoding_load", ENCODINGS)
     @pytest.mark.parametrize("BackendFrom", CRYPTO_BACKENDS)
     @pytest.mark.parametrize("BackendTo", CRYPTO_BACKENDS)
-    def test_public_key_load_cycle(self, BackendFrom, BackendTo, encoding_save, encoding_load):
+    @pytest.mark.parametrize("private_key", PRIVATE_KEYS)
+    def test_public_key_load_cycle(self, BackendFrom, BackendTo, encoding_save, encoding_load, private_key):
         key = BackendFrom(private_key, ALGORITHMS.RS256)
 
         pem_pub_reference = key.public_key().to_pem(pem_format=encoding_save).strip()
@@ -86,7 +90,8 @@ class TestBackendRsaCompatibility(object):
     @pytest.mark.parametrize("encoding_load", ENCODINGS)
     @pytest.mark.parametrize("BackendFrom", CRYPTO_BACKENDS)
     @pytest.mark.parametrize("BackendTo", CRYPTO_BACKENDS)
-    def test_private_key_load_cycle(self, BackendFrom, BackendTo, encoding_save, encoding_load):
+    @pytest.mark.parametrize("private_key", PRIVATE_KEYS)
+    def test_private_key_load_cycle(self, BackendFrom, BackendTo, encoding_save, encoding_load, private_key):
         key = BackendFrom(private_key, ALGORITHMS.RS256)
 
         pem_reference = key.to_pem(pem_format=encoding_save).strip()
