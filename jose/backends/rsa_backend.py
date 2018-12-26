@@ -1,6 +1,7 @@
 import six
-from pyasn1.codec.der import encoder
-from pyasn1.type import univ
+from pyasn1.codec.der import decoder, encoder
+from pyasn1.error import PyAsn1Error
+from pyasn1.type import namedtype, univ
 
 import rsa as pyrsa
 import rsa.pem as pyrsa_pem
@@ -12,7 +13,9 @@ from jose.exceptions import JWKError
 from jose.utils import base64_to_long, long_to_base64
 
 
-PKCS8_RSA_HEADER = b'0\x82\x04\xbd\x02\x01\x000\r\x06\t*\x86H\x86\xf7\r\x01\x01\x01\x05\x00'
+LEGACY_INVALID_PKCS8_RSA_HEADER = b'0\x82\x04\xbd\x02\x01\x000\r\x06\t*\x86H\x86\xf7\r\x01\x01\x01\x05\x00'
+RSA_ENCRYPTION_ASN1_OID = "1.2.840.113549.1.1.1"
+
 # Functions gcd and rsa_recover_prime_factors were copied from cryptography 1.9
 # to enable pure python rsa module to be in compliance with section 6.3.1 of RFC7518
 # which requires only private exponent (d) for private key.
@@ -83,6 +86,59 @@ def pem_to_spki(pem, fmt='PKCS8'):
     return key.to_pem(fmt)
 
 
+def _legacy_private_key_pkcs8_to_pkcs1(der_key):
+    """Legacy RSA private key PKCS8-to-PKCS1 conversion.
+
+    .. warning::
+
+        This is incorrect parsing and only works because the legacy PKCS1-to-PKCS8
+        encoding was also incorrect.
+    """
+    return der_key[len(LEGACY_INVALID_PKCS8_RSA_HEADER):]
+
+
+class PKCS8RsaPrivateKeyAlgorithm(univ.Sequence):
+    """ASN1 structure for recording RSA PrivateKeyAlgorithm identifiers."""
+    componentType = namedtype.NamedTypes(
+        namedtype.NamedType("rsaEncryption", univ.ObjectIdentifier()),
+        namedtype.NamedType("parameters", univ.Null())
+    )
+
+
+class PKCS8PrivateKey(univ.Sequence):
+    """ASN1 structure for recording PKCS8 private keys."""
+    componentType = namedtype.NamedTypes(
+        namedtype.NamedType("version", univ.Integer()),
+        namedtype.NamedType("privateKeyAlgorithm", PKCS8RsaPrivateKeyAlgorithm()),
+        namedtype.NamedType("privateKey", univ.OctetString())
+    )
+
+
+def _private_key_pkcs8_to_pkcs1(pkcs8_key):
+    """Convert a PKCS8-encoded RSA private key to PKCS1."""
+    decoded_values = decoder.decode(pkcs8_key, asn1Spec=PKCS8PrivateKey())
+
+    try:
+        decoded_key = decoded_values[0]
+    except IndexError:
+        raise ValueError("Invalid private key encoding")
+
+    return decoded_key["privateKey"]
+
+
+def _private_key_pkcs1_to_pkcs8(pkcs1_key):
+    """Convert a PKCS1-encoded RSA private key to PKCS8."""
+    algorithm = PKCS8RsaPrivateKeyAlgorithm()
+    algorithm["rsaEncryption"] = RSA_ENCRYPTION_ASN1_OID
+
+    pkcs8_key = PKCS8PrivateKey()
+    pkcs8_key["version"] = 0
+    pkcs8_key["privateKeyAlgorithm"] = algorithm
+    pkcs8_key["privateKey"] = pkcs1_key
+
+    return encoder.encode(pkcs8_key)
+
+
 class RSAKey(Key):
     SHA256 = 'SHA-256'
     SHA384 = 'SHA-384'
@@ -121,12 +177,15 @@ class RSAKey(Key):
                         self._prepared_key = pyrsa.PrivateKey.load_pkcs1(key)
                     except ValueError:
                         try:
-                            # python-rsa does not support PKCS8 yet so we have to manually remove OID
                             der = pyrsa_pem.load_pem(key, b'PRIVATE KEY')
-                            header, der = der[:22], der[22:]
-                            if header != PKCS8_RSA_HEADER:
-                                raise ValueError("Invalid PKCS8 header")
-                            self._prepared_key = pyrsa.PrivateKey._load_pkcs1_der(der)
+                            try:
+                                pkcs1_key = _private_key_pkcs8_to_pkcs1(der)
+                            except PyAsn1Error:
+                                # If the key was encoded using the old, invalid,
+                                # encoding then pyasn1 will throw an error attempting
+                                # to parse the key.
+                                pkcs1_key = _legacy_private_key_pkcs8_to_pkcs1(der)
+                            self._prepared_key = pyrsa.PrivateKey.load_pkcs1(pkcs1_key, format="DER")
                         except ValueError as e:
                             raise JWKError(e)
             return
@@ -183,7 +242,8 @@ class RSAKey(Key):
         if isinstance(self._prepared_key, pyrsa.PrivateKey):
             der = self._prepared_key.save_pkcs1(format='DER')
             if pem_format == 'PKCS8':
-                pem = pyrsa_pem.save_pem(PKCS8_RSA_HEADER + der, pem_marker='PRIVATE KEY')
+                pkcs8_der = _private_key_pkcs1_to_pkcs8(der)
+                pem = pyrsa_pem.save_pem(pkcs8_der, pem_marker='PRIVATE KEY')
             elif pem_format == 'PKCS1':
                 pem = pyrsa_pem.save_pem(der, pem_marker='RSA PRIVATE KEY')
             else:
@@ -196,7 +256,7 @@ class RSAKey(Key):
                 der = encoder.encode(asn_key)
 
                 header = PubKeyHeader()
-                header['oid'] = univ.ObjectIdentifier('1.2.840.113549.1.1.1')
+                header['oid'] = univ.ObjectIdentifier(RSA_ENCRYPTION_ASN1_OID)
                 pub_key = OpenSSLPubKey()
                 pub_key['header'] = header
                 pub_key['key'] = univ.BitString.fromOctetString(der)
