@@ -1,9 +1,15 @@
 import sys
 
 try:
-    from Crypto.PublicKey import RSA
+    from jose.backends.rsa_backend import RSAKey as PurePythonRSAKey
 except ImportError:
-    RSA = None
+    PurePythonRSAKey = None
+
+try:
+    from Crypto.PublicKey import RSA as PyCryptoRSA
+    from jose.backends.pycrypto_backend import RSAKey as PyCryptoRSAKey
+except ImportError:
+    PyCryptoRSA = None
 
 try:
     from cryptography.hazmat.backends import default_backend
@@ -22,7 +28,7 @@ import pytest
 if sys.version_info > (3,):
     long = int
 
-private_key_4096 = b"""-----BEGIN RSA PRIVATE KEY-----
+private_key_4096_pkcs1 = b"""-----BEGIN RSA PRIVATE KEY-----
 MIIJKwIBAAKCAgEAtSKfSeI0fukRIX38AHlKB1YPpX8PUYN2JdvfM+XjNmLfU1M7
 4N0VmdzIX95sneQGO9kC2xMIE+AIlt52Yf/KgBZggAlS9Y0Vx8DsSL2HvOjguAdX
 ir3vYLvAyyHin/mUisJOqccFKChHKjnk0uXy/38+1r17/cYTp76brKpU1I4kM20M
@@ -73,7 +79,7 @@ nKyI8B5gw4C0G0iL1dSsz2bR1O4GNOVfT3R6joZEXATFo/Kc2L0YAvApBNUYvY0k
 bjJ/JfTO5060SsWftf4iw3jrhSn9RwTTYdq/kErGFWvDGJn2MiuhMe2onNfVzIGR
 mdUxHwi1ulkspAn/fmY7f0hZpskDwcHyZmbKZuk+NU/FJ8IAcmvk9y7m25nSSc8=
 -----END RSA PRIVATE KEY-----"""
-private_key_2048 = b"""-----BEGIN RSA PRIVATE KEY-----
+private_key_2048_pkcs1 = b"""-----BEGIN RSA PRIVATE KEY-----
 MIIEowIBAAKCAQEAom6GcUPchmHxBuV3zJ60EPC7y30WiiVxn1WXSPHmfqaj0q2U
 xS03YugkYmX9lB/EQ6Z5bOY9VuL1oMudL6Dkb9aYYEBZHVgejV7vtYuYT19QMesn
 AsmGq8etie7XyWHzfWTxljbF53yvxXJMixcFzebAov9pUiV9Hmy3hYVLw3J1NXVg
@@ -101,16 +107,77 @@ dXI4NN9leDeIpNaGU6ozr+At3f50GtCWxdUppy9FDh5qDamBV8K4/+uNqFPiKFQ9
 uwNcJ8daMgVZ0QBrD3CBcSZQrfC484BlV6spJ3C16qDVSQPt7sAI
 -----END RSA PRIVATE KEY-----"""
 PRIVATE_KEYS = (
-    pytest.param(private_key_2048, id="RSA-2048"),
-    pytest.param(private_key_4096, id="RSA-4096")
+    pytest.param(private_key_2048_pkcs1, id="RSA_2048_PKCS1"),
+    pytest.param(private_key_4096_pkcs1, id="RSA_4096_PKCS1")
 )
+
+LEGACY_INVALID_PRIVATE_KEY_PKCS8_PEM = b"""-----BEGIN PRIVATE KEY-----
+MIIEvQIBADANBgkqhkiG9w0BAQEFADCCCSsCAQACggIBALUin0niNH7pESF9/AB5
+SgdWD6V/D1GDdiXb3zPl4zZi31NTO+DdFZncyF/ebJ3kBjvZAtsTCBPgCJbedmH/
+yoAWYIAJUvWNFcfA7Ei9h7zo4LgHV4q972C7wMsh4p/5lIrCTqnHBSgoRyo55NLl
+8v9/Pta9e/3GE6e+m6yqVNSOJDNtDP/3W7ywVo388sPXobn6++GlcK/tMSX7AVa9
+qGkBcMP1xxs+vUO8hyug28WDuMOKtrCH3AuKU/F0zx6OCWdjO99xGvGux8bWUuet
+/5oYUWS1OWsp0KcGlb9lPvgi+hLxrfE5TWTpHkb/MM/kbfAe9I86EaVSt+q0fqRy
+pV4TBk+tfb/Ni53k3bKgNuVoti3f3NJ4rrpduAOvmmo9rvUlm8QPS5lbRZ7bzW0W
+h1xNUi6Sz6CKfLqaRhdNjc9r95XfIAp001n6vwUPNEMvHtHKEUQARAma4yDMxxIO
+jJaEQ8uJ2tKUUL+tVaIKkSg1Nq9/1XsxT0A293ImLGY1ga9x6TTpFI067y5hcjhP
+UOUf6kBpnOgWLX5Oa5+4iH15ZCQGR14QcvhJQbogTPmEpBTO3R/drEiKGdOVeDD9
+PV3Kace5HcLCcu9krrLfR53fQe1d+WJ1Relu/dZVR53p4QiTs4kZpB+MSy2z5Gkk
+9irNyBx+7VZbTOjbEZN4zXVTAgMBAAECggIBAK8ftCV4oAx7RWa+KWBD48DIAgSd
+na/Pi/D6bQf+IPi6CvTCqkezOGkzvj6CCz1z8lr2av5nng2pMmS63HXPGndQKyhe
+22gwaXhhG5EQPSX1eR4zav3muIMrwzAhqLvGT0kAp5EZq/CxUGyQ4JzOWWuQGK8B
+L9mhIeuyK0x6ud1vN6zIqCLpgjYhvu00O3oBBomLEO+ORi6xAi2YSikU4Lf0/pNX
+EpNSyyWsJnuV4CVMPtw/RnXSRHqb2KC/sGf4JztgA8j5z3UO6HNjT3BTF6ZiEH9v
+fv4OxX5WrX0IZCL/ngumwedQ4XTItc8qdoTocyoOo5++IsVV/h7bNv3DIgD7tDWl
+plPZ/IOx5l1nOPrkjv37LBoyNwy2CnecZ4a6uGt2TuaCS3jDvVO9fmJHLYNtz0x8
+DQBq7D2HYxnAZyRHbW12t9WoCOTwBuq4BlGN4kqFqhy4AU8a19OE1lby0IvMG8Ye
+wRBdMmrDnmSsXRNiFmIO+cxrI5bsh5Tp6UWuZUn+imerYYfXnMxR2LUuA72AXGfY
+WVv4PO4ntvEpARccZdG62LfbijWCb7mo1RvJE/NAAu1s4Nqu1pp6MMNyTSVGzbYb
+OXaislEpTBTCAf7znjxRy6wOqg3wJ7EB4FG/Vh4VK2LB9tFyqakdjo5llNOW1eKU
+jFvycBt+6PqcdcihAoIBAQDZ8MdHe5LBDLyY3jeaZQ8t3jC4nwSPuki/6OU1w6BT
+OqycRftFD+9LqLmCatnSPgwkgOnPxLJ+1gDoq2Ne+2nSnAVfG4sALZih5xZwrP5M
+AGavJTL0D7TTyf76tp+NJDuPIfH8W3hnJsgKhT2eGCksazwOHHWxyLhUrfVsmlHF
+RZs3UxR1ZUT+9BF3Zlx7fOG8ljQeAh3qvM5qzcTzQIuuZxJFJLO4gUDLbr8ldvml
+4wzkwTAneuiISIdomatTu5F1MIIdTh/YQmu6K4h8gHYJCnSglqHJmzzxDThE4I62
+gPcESF8DmEw29V+YTL4tZgh6PMYzI7uLMw9N8SVYu1q7AoIBAQDUxG5QpMRMoSam
+jGRd1N3X9mK/2bR6rK06+JcAfzDipM5rkq0TsYXhJCiLMW4lfgMU77T0dRUK5am4
+UyUcMvqcOCjyez+H6tkf2Aar10jQQmpk7epdl3V6pwJNwPvnDhGdpVPbm34HXjdi
+IfK4HZ9S1njkowlnxMZpKFOtf13usQDHlykEpRykp1/b6MbhNsSDR3lOmQCstZBp
+qybRIlpyPG/AuLPH08g7VydS2rMrNIhztk89o1IX+CCcG/Oy5OyM3tjKyPqD81Q1
+5ZpG45AeLWMqIkU4/K5PKcAVvx1b9NNqYzi02uJM9ZEN5bGf9wLOM3zYu5lhIWnZ
+hLACH2JJAoIBAQDTt/a/2Ko+ZFMq5mV51ccjNgB6ufBCeCOIW4Wf70Vm1U8uGUX6
+V3qOM4DT0117ws8k/x8kud71HIyRez3z3aV19h+5vxYPvDvUvJuuJkB8ML+QUkDn
+nAJ85HSRtqvU/2fkqoNcNrgG7UPUBJBRbwNApYQX6UnkxitcCAqt0FSzoeUhn9H2
+IcUfMJdvOL+LL0xUWk6TAFdz3KtiUjeMYB3R9UtoZDk7ekUp25JRoPzxTFsQNyTC
+lcIj8uGomfA4TbUG9XLRaT3CZvQkTXowCNOiAMg/4VWWdvqC6ebJ8qRxY2OUg4Ha
+Ci+wDDsrxxHRJJgDt9qLf6EHnzi07Rjs1EVVAoIBAQC0seYmIuh7U9kpVM3gSmnl
+gWA4IsH99SxhisFjMKHpuaF9BmJq+TcED9tG60HqIWyomTMK8WxfhtButF4t5rWj
+eqZ72GQKIE8pliOESR+TjvQgp1WFCp5A/hkcw6qrfe1D/yaKuTF9PGy4sLAb4Txv
+86lUM4pHUHxYzmDSVfsGPdi1qRCy2y7KP0NP1g8hMYwPGeJR9+r0wnXU5//dWNmL
+bvxRpgs4yAmjK88/tHC5XrIL42bEqDGOHbJEIhEDexvSP2fKQIlRCpQX+djeH2FD
+37P6EoTLcvzuSjzRuy9J61CpZ36/Sa0rQtpf/RSvD+6YBG4g+qG2NdRZYTDBfLnR
+AoIBAQCCobzhbYqQ9Y6gzqYzqEfbCv5UUeW1VVkH2pjAzdQMJoyW1R0vIYbWFDP+
+LIdqddj+kYKDvHzg39bxHFhYd8cTWRNaTwj2iAg/YuVPjUbz89rwvdNB3K2i0a1B
+Wkc8IajjpJ2CUgaxs1vgsd2EnmjgoJysiPAeYMOAtBtIi9XUrM9m0dTuBjTlX090
+eo6GRFwExaPynNi9GALwKQTVGL2NJG4yfyX0zudOtErFn7X+IsN464Up/UcE02Ha
+v5BKxhVrwxiZ9jIroTHtqJzX1cyBkZnVMR8ItbpZLKQJ/35mO39IWabJA8HB8mZm
+ymbpPjVPxSfCAHJr5Pcu5tuZ0knP
+-----END PRIVATE KEY-----
+"""
+
+
+@pytest.mark.skipif(PurePythonRSAKey is None, reason="python-rsa backend not available")
+def test_python_rsa_legacy_pem_read():
+    key = PurePythonRSAKey(LEGACY_INVALID_PRIVATE_KEY_PKCS8_PEM, ALGORITHMS.RS256)
+    new_pem = key.to_pem(pem_format="PKCS8")
+    assert new_pem != LEGACY_INVALID_PRIVATE_KEY_PKCS8_PEM
 
 
 @pytest.mark.pycrypto
 @pytest.mark.pycryptodome
-@pytest.mark.skipif(RSA is None, reason="Pycrypto/dome backend not available")
+@pytest.mark.skipif(PyCryptoRSA is None, reason="Pycrypto/dome backend not available")
 def test_pycrypto_RSA_key_instance():
-    key = RSA.construct((long(
+    key = PyCryptoRSA.construct((long(
         26057131595212989515105618545799160306093557851986992545257129318694524535510983041068168825614868056510242030438003863929818932202262132630250203397069801217463517914103389095129323580576852108653940669240896817348477800490303630912852266209307160550655497615975529276169196271699168537716821419779900117025818140018436554173242441334827711966499484119233207097432165756707507563413323850255548329534279691658369466534587631102538061857114141268972476680597988266772849780811214198186940677291891818952682545840788356616771009013059992237747149380197028452160324144544057074406611859615973035412993832273216732343819),
                          long(65537)))
     RSAKey(key, ALGORITHMS.RS256)
@@ -151,7 +218,7 @@ def test_cryptography_RSA_key_instance():
 
 class TestRSAAlgorithm:
     def test_RSA_key(self):
-        assert not RSAKey(private_key_4096, ALGORITHMS.RS256).is_public()
+        assert not RSAKey(private_key_4096_pkcs1, ALGORITHMS.RS256).is_public()
 
     def test_string_secret(self):
         key = 'secret'
@@ -170,7 +237,7 @@ class TestRSAAlgorithm:
 
     def test_invalid_algorithm(self):
         with pytest.raises(JWKError):
-            RSAKey(private_key_4096, ALGORITHMS.ES256)
+            RSAKey(private_key_4096_pkcs1, ALGORITHMS.ES256)
 
         with pytest.raises(JWKError):
             RSAKey({'kty': 'bla'}, ALGORITHMS.RS256)
