@@ -16,9 +16,9 @@ matrix:
     - python: 2.7
       env: TOXENV=py27-cryptography-only
     - python: 2.7
-      env: TOXENV=py27-pycryptodome
+      env: TOXENV=py27-pycryptodome-norsa
     - python: 2.7
-      env: TOXENV=py27-pycrypto
+      env: TOXENV=py27-pycrypto-norsa
     - python: 2.7
       env: TOXENV=py27-compatibility
     # CPython 3.4
@@ -27,9 +27,9 @@ matrix:
     - python: 3.4
       env: TOXENV=py34-cryptography-only
     - python: 3.4
-      env: TOXENV=py34-pycryptodome
+      env: TOXENV=py34-pycryptodome-norsa
     - python: 3.4
-      env: TOXENV=py34-pycrypto
+      env: TOXENV=py34-pycrypto-norsa
     - python: 3.4
       env: TOXENV=py34-compatibility
     # CPython 3.5
@@ -38,9 +38,9 @@ matrix:
     - python: 3.5
       env: TOXENV=py35-cryptography-only
     - python: 3.5
-      env: TOXENV=py35-pycryptodome
+      env: TOXENV=py35-pycryptodome-norsa
     - python: 3.5
-      env: TOXENV=py35-pycrypto
+      env: TOXENV=py35-pycrypto-norsa
     - python: 3.5
       env: TOXENV=py35-compatibility
     # CPython 3.5
@@ -49,9 +49,9 @@ matrix:
     - python: 3.5
       env: TOXENV=py35-cryptography-only
     - python: 3.5
-      env: TOXENV=py35-pycryptodome
+      env: TOXENV=py35-pycryptodome-norsa
     - python: 3.5
-      env: TOXENV=py35-pycrypto
+      env: TOXENV=py35-pycrypto-norsa
     - python: 3.5
       env: TOXENV=py35-compatibility
     # PyPy 5.3.1
@@ -60,9 +60,9 @@ matrix:
     - python: pypy-5.3.1
       env: TOXENV=pypy-cryptography-only
     - python: pypy-5.3.1
-      env: TOXENV=pypy-pycryptodome
+      env: TOXENV=pypy-pycryptodome-norsa
     - python: pypy-5.3.1
-      env: TOXENV=pypy-pycrypto
+      env: TOXENV=pypy-pycrypto-norsa
     - python: pypy-5.3.1
       env: TOXENV=pypy-compatibility
 # matrix:
