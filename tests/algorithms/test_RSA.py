@@ -1,15 +1,17 @@
 import sys
 
 try:
-    from Crypto.PublicKey import RSA
+    from Crypto.PublicKey import RSA as PyCryptoRSA
+    from jose.backends.pycrypto_backend import RSAKey as PyCryptoRSAKey
 except ImportError:
-    RSA = None
+    PyCryptoRSA = PyCryptoRSAKey = None
 
 try:
     from cryptography.hazmat.backends import default_backend
-    from cryptography.hazmat.primitives.asymmetric import rsa
+    from cryptography.hazmat.primitives.asymmetric import rsa as pyca_rsa
+    from jose.backends.cryptography_backend import CryptographyRSAKey
 except ImportError:
-    default_backend = rsa = None
+    default_backend = pyca_rsa = CryptographyRSAKey = None
 
 from jose.backends import RSAKey
 from jose.constants import ALGORITHMS
@@ -77,12 +79,12 @@ mdUxHwi1ulkspAn/fmY7f0hZpskDwcHyZmbKZuk+NU/FJ8IAcmvk9y7m25nSSc8=
 
 @pytest.mark.pycrypto
 @pytest.mark.pycryptodome
-@pytest.mark.skipif(RSA is None, reason="Pycrypto/dome backend not available")
+@pytest.mark.skipif(None in (PyCryptoRSA, PyCryptoRSAKey), reason="Pycrypto/dome backend not available")
 def test_pycrypto_RSA_key_instance():
-    key = RSA.construct((long(
+    key = PyCryptoRSA.construct((long(
         26057131595212989515105618545799160306093557851986992545257129318694524535510983041068168825614868056510242030438003863929818932202262132630250203397069801217463517914103389095129323580576852108653940669240896817348477800490303630912852266209307160550655497615975529276169196271699168537716821419779900117025818140018436554173242441334827711966499484119233207097432165756707507563413323850255548329534279691658369466534587631102538061857114141268972476680597988266772849780811214198186940677291891818952682545840788356616771009013059992237747149380197028452160324144544057074406611859615973035412993832273216732343819),
                          long(65537)))
-    RSAKey(key, ALGORITHMS.RS256)
+    PyCryptoRSAKey(key, ALGORITHMS.RS256)
 
 # TODO: Unclear why this test was marked as only for pycrypto
 @pytest.mark.pycrypto
@@ -99,17 +101,17 @@ def test_pycrypto_unencoded_cleartext():
 
 @pytest.mark.cryptography
 @pytest.mark.skipif(
-    None in (default_backend, rsa),
+    None in (default_backend, pyca_rsa, CryptographyRSAKey),
     reason="Cryptography backend not available"
 )
 def test_cryptography_RSA_key_instance():
 
-    key = rsa.RSAPublicNumbers(
+    key = pyca_rsa.RSAPublicNumbers(
         long(65537),
         long(26057131595212989515105618545799160306093557851986992545257129318694524535510983041068168825614868056510242030438003863929818932202262132630250203397069801217463517914103389095129323580576852108653940669240896817348477800490303630912852266209307160550655497615975529276169196271699168537716821419779900117025818140018436554173242441334827711966499484119233207097432165756707507563413323850255548329534279691658369466534587631102538061857114141268972476680597988266772849780811214198186940677291891818952682545840788356616771009013059992237747149380197028452160324144544057074406611859615973035412993832273216732343819),
     ).public_key(default_backend())
 
-    pubkey = RSAKey(key, ALGORITHMS.RS256)
+    pubkey = CryptographyRSAKey(key, ALGORITHMS.RS256)
     assert pubkey.is_public()
 
     pem = pubkey.to_pem()
