@@ -21,12 +21,13 @@ def get_packages(package):
     ]
 
 
+pyasn1 = ['pyasn1']
 extras_require = {
     'cryptography': ['cryptography'],
-    'pycrypto': ['pycrypto >=2.6.0, <2.7.0'],
-    'pycryptodome': ['pycryptodome >=3.3.1, <4.0.0'],
+    'pycrypto': ['pycrypto >=2.6.0, <2.7.0'] + pyasn1,
+    'pycryptodome': ['pycryptodome >=3.3.1, <4.0.0'] + pyasn1,
 }
-legacy_backend_requires = ['ecdsa <1.0', 'rsa', 'pyasn1']
+legacy_backend_requires = ['ecdsa <1.0', 'rsa'] + pyasn1
 install_requires = ['six <2.0', 'future <1.0']
 
 # TODO: work this into the extras selection instead.

@@ -152,7 +152,8 @@ class RSAKey(Key):
             raise ValueError("Invalid pem format specified: %r" % (pem_format,))
 
         if self.is_public():
-            pem = self.prepared_key.exportKey('PEM', pkcs=1)
+            # PyCrypto/dome always export public keys as PKCS8
+            pem = self.prepared_key.exportKey('PEM')
             if pkcs == 8:
                 pem = pem_to_spki(pem, fmt='PKCS8')
             else:

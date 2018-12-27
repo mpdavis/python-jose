@@ -318,18 +318,6 @@ class TestPurePythonRsa(object):
 
         excinfo.match("Invalid private key encoding")
 
-    def test_python_rsa_private_key_pkcs1_to_pkcs8(self):
-        pkcs1 = base64.b64decode(PKCS1_PRIVATE_KEY)
-        pkcs8 = base64.b64decode(PKCS8_PRIVATE_KEY)
-
-        assert rsa_backend._private_key_pkcs1_to_pkcs8(pkcs1) == pkcs8
-
-    def test_python_rsa_private_key_pkcs8_to_pkcs1(self):
-        pkcs1 = base64.b64decode(PKCS1_PRIVATE_KEY)
-        pkcs8 = base64.b64decode(PKCS8_PRIVATE_KEY)
-
-        assert rsa_backend._private_key_pkcs8_to_pkcs1(pkcs8) == pkcs1
-
 
 @pytest.mark.pycrypto
 @pytest.mark.pycryptodome
