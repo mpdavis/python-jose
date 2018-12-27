@@ -14,7 +14,7 @@ matrix:
     - python: 2.7
       env: TOXENV=py27-base
     - python: 2.7
-      env: TOXENV=py27-cryptography
+      env: TOXENV=py27-cryptography-only
     - python: 2.7
       env: TOXENV=py27-pycryptodome
     - python: 2.7
@@ -25,7 +25,7 @@ matrix:
     - python: 3.4
       env: TOXENV=py34-base
     - python: 3.4
-      env: TOXENV=py34-cryptography
+      env: TOXENV=py34-cryptography-only
     - python: 3.4
       env: TOXENV=py34-pycryptodome
     - python: 3.4
@@ -36,7 +36,7 @@ matrix:
     - python: 3.5
       env: TOXENV=py35-base
     - python: 3.5
-      env: TOXENV=py35-cryptography
+      env: TOXENV=py35-cryptography-only
     - python: 3.5
       env: TOXENV=py35-pycryptodome
     - python: 3.5
@@ -47,7 +47,7 @@ matrix:
     - python: 3.5
       env: TOXENV=py35-base
     - python: 3.5
-      env: TOXENV=py35-cryptography
+      env: TOXENV=py35-cryptography-only
     - python: 3.5
       env: TOXENV=py35-pycryptodome
     - python: 3.5
@@ -58,7 +58,7 @@ matrix:
     - python: pypy-5.3.1
       env: TOXENV=pypy-base
     - python: pypy-5.3.1
-      env: TOXENV=pypy-cryptography
+      env: TOXENV=pypy-cryptography-only
     - python: pypy-5.3.1
       env: TOXENV=pypy-pycryptodome
     - python: pypy-5.3.1
