@@ -3,3 +3,4 @@ six
 future
 rsa
 ecdsa
+pyasn1
