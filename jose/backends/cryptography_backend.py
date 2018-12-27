@@ -1,6 +1,13 @@
+from __future__ import division
+
+import math
+
 import six
-import ecdsa
-from ecdsa.util import sigdecode_string, sigencode_string, sigdecode_der, sigencode_der
+
+try:
+    from ecdsa import SigningKey as EcdsaSigningKey, VerifyingKey as EcdsaVerifyingKey
+except ImportError:
+    EcdsaSigningKey = EcdsaVerifyingKey = None
 
 from jose.backends.base import Key
 from jose.utils import base64_to_long, long_to_base64
@@ -11,7 +18,9 @@ from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import ec, rsa, padding
+from cryptography.hazmat.primitives.asymmetric.utils import decode_dss_signature, encode_dss_signature
 from cryptography.hazmat.primitives.serialization import load_pem_private_key, load_pem_public_key
+from cryptography.utils import int_from_bytes, int_to_bytes
 from cryptography.x509 import load_pem_x509_certificate
 
 
@@ -37,7 +46,7 @@ class CryptographyECKey(Key):
             self.prepared_key = key
             return
 
-        if isinstance(key, (ecdsa.SigningKey, ecdsa.VerifyingKey)):
+        if None not in (EcdsaSigningKey, EcdsaVerifyingKey) and isinstance(key, (EcdsaSigningKey, EcdsaVerifyingKey)):
             # convert to PEM and let cryptography below load it as PEM
             key = key.to_pem().decode('utf-8')
 
@@ -90,19 +99,42 @@ class CryptographyECKey(Key):
         else:
             return public.public_key(self.cryptography_backend())
 
+    def _sig_component_length(self):
+        """Determine the correct serialization length for an encoded signature component.
+
+        This is the number of bytes required to encode the maximum key value.
+        """
+        return int(math.ceil(self.prepared_key.key_size / 8.0))
+
+    def _der_to_raw(self, der_signature):
+        """Convert signature from DER encoding to RAW encoding."""
+        r, s = decode_dss_signature(der_signature)
+        component_length = self._sig_component_length()
+        return int_to_bytes(r, component_length) + int_to_bytes(s, component_length)
+
+    def _raw_to_der(self, raw_signature):
+        """Convert signature from RAW encoding to DER encoding."""
+        component_length = self._sig_component_length()
+        if len(raw_signature) != int(2 * component_length):
+            raise ValueError("Invalid signature")
+
+        r_bytes = raw_signature[:component_length]
+        s_bytes = raw_signature[component_length:]
+        r = int_from_bytes(r_bytes, "big")
+        s = int_from_bytes(s_bytes, "big")
+        return encode_dss_signature(r, s)
+
     def sign(self, msg):
         if self.hash_alg.digest_size * 8 > self.prepared_key.curve.key_size:
             raise TypeError("this curve (%s) is too short "
                             "for your digest (%d)" % (self.prepared_key.curve.name,
                                                       8 * self.hash_alg.digest_size))
         signature = self.prepared_key.sign(msg, ec.ECDSA(self.hash_alg()))
-        order = (2 ** self.prepared_key.curve.key_size) - 1
-        return sigencode_string(*sigdecode_der(signature, order), order=order)
+        return self._der_to_raw(signature)
 
     def verify(self, msg, sig):
-        order = (2 ** self.prepared_key.curve.key_size) - 1
-        signature = sigencode_der(*sigdecode_string(sig, order), order=order)
         try:
+            signature = self._raw_to_der(sig)
             self.prepared_key.verify(signature, msg, ec.ECDSA(self.hash_alg()))
             return True
         except Exception:
