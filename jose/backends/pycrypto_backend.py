@@ -4,12 +4,13 @@ import Crypto.Hash.SHA256
 import Crypto.Hash.SHA384
 import Crypto.Hash.SHA512
 
+from Crypto.IO import PEM
 from Crypto.PublicKey import RSA
 from Crypto.Signature import PKCS1_v1_5
 from Crypto.Util.asn1 import DerSequence
 
 from jose.backends.base import Key
-from jose.backends.rsa_backend import pem_to_spki
+from jose.backends._asn1 import rsa_public_key_pkcs8_to_pkcs1
 from jose.utils import base64_to_long, long_to_base64
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWKError
@@ -153,11 +154,12 @@ class RSAKey(Key):
 
         if self.is_public():
             # PyCrypto/dome always export public keys as PKCS8
-            pem = self.prepared_key.exportKey('PEM')
             if pkcs == 8:
-                pem = pem_to_spki(pem, fmt='PKCS8')
+                pem = self.prepared_key.exportKey('PEM')
             else:
-                pem = pem_to_spki(pem, fmt='PKCS1')
+                pkcs8_der = self.prepared_key.exportKey('DER')
+                pkcs1_der = rsa_public_key_pkcs8_to_pkcs1(pkcs8_der)
+                pem = PEM.encode(pkcs1_der, 'RSA PUBLIC KEY').encode('utf-8')
             return pem
         else:
             pem = self.prepared_key.exportKey('PEM', pkcs=pkcs)
