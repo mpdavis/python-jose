@@ -1,3 +1,5 @@
+import binascii
+
 import six
 from pyasn1.codec.der import decoder, encoder
 from pyasn1.error import PyAsn1Error
@@ -13,7 +15,16 @@ from jose.exceptions import JWKError
 from jose.utils import base64_to_long, long_to_base64
 
 
-LEGACY_INVALID_PKCS8_RSA_HEADER = b'0\x82\x04\xbd\x02\x01\x000\r\x06\t*\x86H\x86\xf7\r\x01\x01\x01\x05\x00'
+LEGACY_INVALID_PKCS8_RSA_HEADER = binascii.unhexlify(
+    "30"  # sequence
+    "8204BD"  # DER-encoded sequence contents length of 1213 bytes -- INCORRECT STATIC LENGTH
+    "020100"  # integer: 0 -- Version
+    "30"  # sequence
+    "0D"  # DER-encoded sequence contents length of 13 bytes -- PrivateKeyAlgorithmIdentifier
+    "06092A864886F70D010101"  # OID -- rsaEncryption
+    "0500"  # NULL -- parameters
+)
+ASN1_SEQUENCE_ID = binascii.unhexlify("30")
 RSA_ENCRYPTION_ASN1_OID = "1.2.840.113549.1.1.1"
 
 # Functions gcd and rsa_recover_prime_factors were copied from cryptography 1.9
@@ -86,7 +97,7 @@ def pem_to_spki(pem, fmt='PKCS8'):
     return key.to_pem(fmt)
 
 
-def _legacy_private_key_pkcs8_to_pkcs1(der_key):
+def _legacy_private_key_pkcs8_to_pkcs1(pkcs8_key):
     """Legacy RSA private key PKCS8-to-PKCS1 conversion.
 
     .. warning::
@@ -94,7 +105,13 @@ def _legacy_private_key_pkcs8_to_pkcs1(der_key):
         This is incorrect parsing and only works because the legacy PKCS1-to-PKCS8
         encoding was also incorrect.
     """
-    return der_key[len(LEGACY_INVALID_PKCS8_RSA_HEADER):]
+    # Only allow this processing if the prefix matches
+    # AND the following byte indicates an ASN1 sequence,
+    # as we would expect with the legacy encoding.
+    if not pkcs8_key.startswith(LEGACY_INVALID_PKCS8_RSA_HEADER + ASN1_SEQUENCE_ID):
+        raise ValueError("Invalid private key encoding")
+
+    return pkcs8_key[len(LEGACY_INVALID_PKCS8_RSA_HEADER):]
 
 
 class PKCS8RsaPrivateKeyAlgorithm(univ.Sequence):

@@ -268,12 +268,54 @@ rhSn9RwTTYdq/kErGFWvDGJn2MiuhMe2onNfVzIGRmdUxHwi1ulkspAn/fmY7f0hZ
 pskDwcHyZmbKZuk+NU/FJ8IAcmvk9y7m25nSSc8="""
 
 
+def _legacy_invalid_private_key_pkcs8_der():
+    legacy_key = LEGACY_INVALID_PRIVATE_KEY_PKCS8_PEM.strip()
+    legacy_key = legacy_key[legacy_key.index(b"\n"):legacy_key.rindex(b"\n")]
+    return base64.b64decode(legacy_key)
+
+
+def _actually_invalid_private_key_pkcs8_der():
+    legacy_key = _legacy_invalid_private_key_pkcs8_der()
+    invalid_key = legacy_key[:len(rsa_backend.LEGACY_INVALID_PKCS8_RSA_HEADER)]
+    invalid_key += b"\x00"
+    invalid_key += legacy_key[len(rsa_backend.LEGACY_INVALID_PKCS8_RSA_HEADER):]
+    return invalid_key
+
+
+def _actually_invalid_private_key_pkcs8_pem():
+    invalid_key = b"-----BEGIN PRIVATE KEY-----\n"
+    invalid_key += base64.b64encode(_actually_invalid_private_key_pkcs8_der())
+    invalid_key += b"\n-----END PRIVATE KEY-----\n"
+    return invalid_key
+
+
 @pytest.mark.skipif(PurePythonRSAKey is None, reason="python-rsa backend not available")
 class TestPurePythonRsa(object):
+
     def test_python_rsa_legacy_pem_read(self):
         key = PurePythonRSAKey(LEGACY_INVALID_PRIVATE_KEY_PKCS8_PEM, ALGORITHMS.RS256)
         new_pem = key.to_pem(pem_format="PKCS8")
         assert new_pem != LEGACY_INVALID_PRIVATE_KEY_PKCS8_PEM
+
+    def test_python_rsa_legacy_pem_invalid(self):
+        with pytest.raises(JWKError) as excinfo:
+            PurePythonRSAKey(_actually_invalid_private_key_pkcs8_pem(), ALGORITHMS.RS256)
+
+        excinfo.match("Invalid private key encoding")
+
+    def test_python_rsa_legacy_private_key_pkcs8_to_pkcs1(self):
+        legacy_key = _legacy_invalid_private_key_pkcs8_der()
+        legacy_pkcs1 = legacy_key[len(rsa_backend.LEGACY_INVALID_PKCS8_RSA_HEADER):]
+
+        assert rsa_backend._legacy_private_key_pkcs8_to_pkcs1(legacy_key) == legacy_pkcs1
+
+    def test_python_rsa_legacy_private_key_pkcs8_to_pkcs1_invalid(self):
+        invalid_key = _actually_invalid_private_key_pkcs8_der()
+
+        with pytest.raises(ValueError) as excinfo:
+            rsa_backend._legacy_private_key_pkcs8_to_pkcs1(invalid_key)
+
+        excinfo.match("Invalid private key encoding")
 
     def test_python_rsa_private_key_pkcs1_to_pkcs8(self):
         pkcs1 = base64.b64decode(PKCS1_PRIVATE_KEY)
