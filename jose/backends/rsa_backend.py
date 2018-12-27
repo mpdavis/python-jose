@@ -1,16 +1,17 @@
 import binascii
 
 import six
-from pyasn1.codec.der import encoder
 from pyasn1.error import PyAsn1Error
-from pyasn1.type import univ
 
 import rsa as pyrsa
 import rsa.pem as pyrsa_pem
-from rsa.asn1 import OpenSSLPubKey, AsnPubKey, PubKeyHeader
 
 from jose.backends.base import Key
-from jose.backends._asn1 import rsa_private_key_pkcs1_to_pkcs8, rsa_private_key_pkcs8_to_pkcs1
+from jose.backends._asn1 import (
+    rsa_private_key_pkcs1_to_pkcs8,
+    rsa_private_key_pkcs8_to_pkcs1,
+    rsa_public_key_pkcs1_to_pkcs8,
+)
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWKError
 from jose.utils import base64_to_long, long_to_base64
@@ -226,19 +227,9 @@ class RSAKey(Key):
                 raise ValueError("Invalid pem format specified: %r" % (pem_format,))
         else:
             if pem_format == 'PKCS8':
-                asn_key = AsnPubKey()
-                asn_key.setComponentByName('modulus', self._prepared_key.n)
-                asn_key.setComponentByName('publicExponent', self._prepared_key.e)
-                der = encoder.encode(asn_key)
-
-                header = PubKeyHeader()
-                header['oid'] = univ.ObjectIdentifier(RSA_ENCRYPTION_ASN1_OID)
-                pub_key = OpenSSLPubKey()
-                pub_key['header'] = header
-                pub_key['key'] = univ.BitString.fromOctetString(der)
-
-                der = encoder.encode(pub_key)
-                pem = pyrsa_pem.save_pem(der, pem_marker='PUBLIC KEY')
+                pkcs1_der = self._prepared_key.save_pkcs1(format="DER")
+                pkcs8_der = rsa_public_key_pkcs1_to_pkcs8(pkcs1_der)
+                pem = pyrsa_pem.save_pem(pkcs8_der, pem_marker='PUBLIC KEY')
             elif pem_format == 'PKCS1':
                 der = self._prepared_key.save_pkcs1(format='DER')
                 pem = pyrsa_pem.save_pem(der, pem_marker='RSA PUBLIC KEY')
