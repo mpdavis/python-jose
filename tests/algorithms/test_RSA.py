@@ -345,8 +345,9 @@ def test_pycrypto_RSA_key_instance():
 @pytest.mark.pycrypto
 @pytest.mark.pycryptodome
 @pytest.mark.parametrize("private_key", PRIVATE_KEYS)
+@pytest.mark.skipif(None in (PyCryptoRSA, PyCryptoRSAKey), reason="Pycrypto/dome backend not available")
 def test_pycrypto_unencoded_cleartext(private_key):
-    key = RSAKey(private_key, ALGORITHMS.RS256)
+    key = PyCryptoRSAKey(private_key, ALGORITHMS.RS256)
     msg = b'test'
     signature = key.sign(msg)
     public_key = key.public_key()
