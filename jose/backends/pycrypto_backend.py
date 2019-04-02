@@ -1,10 +1,11 @@
+from base64 import b64encode
+
 import six
 
 import Crypto.Hash.SHA256
 import Crypto.Hash.SHA384
 import Crypto.Hash.SHA512
 
-from Crypto.IO import PEM
 from Crypto.PublicKey import RSA
 from Crypto.Signature import PKCS1_v1_5
 from Crypto.Util.asn1 import DerSequence
@@ -24,6 +25,21 @@ if hasattr(RSA, 'RsaKey'):
     _RSAKey = RSA.RsaKey
 else:
     _RSAKey = RSA._RSAobj
+
+
+def _der_to_pem(der_key, marker):
+    """
+    Perform a simple DER to PEM conversion.
+    """
+    pem_key_chunks = [('-----BEGIN %s-----' % marker).encode('utf-8')]
+
+    # Limit base64 output lines to 64 characters by limiting input lines to 48 characters.
+    for chunk_start in range(0, len(der_key), 48):
+        pem_key_chunks.append(b64encode(der_key[chunk_start:chunk_start + 48]))
+
+    pem_key_chunks.append(('-----END %s-----' % marker).encode('utf-8'))
+
+    return b'\n'.join(pem_key_chunks)
 
 
 class RSAKey(Key):
@@ -159,7 +175,7 @@ class RSAKey(Key):
             else:
                 pkcs8_der = self.prepared_key.exportKey('DER')
                 pkcs1_der = rsa_public_key_pkcs8_to_pkcs1(pkcs8_der)
-                pem = PEM.encode(pkcs1_der, 'RSA PUBLIC KEY').encode('utf-8')
+                pem = _der_to_pem(pkcs1_der, 'RSA PUBLIC KEY')
             return pem
         else:
             pem = self.prepared_key.exportKey('PEM', pkcs=pkcs)
