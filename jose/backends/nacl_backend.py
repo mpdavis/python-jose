@@ -6,7 +6,6 @@ from jose.backends.base import Key
 from jose.constants import ALGORITHMS, USAGES
 from jose.exceptions import JWKError
 
-from nacl.encoding import RawEncoder, URLSafeBase64Encoder
 from nacl.exceptions import BadSignatureError
 from nacl.signing import SigningKey, VerifyKey
 
@@ -36,9 +35,11 @@ class Ed25519Key(Key):
                                "from a string or bytes")
 
             if use == USAGES.PUBLIC:
-                self._prepared_key = VerifyKey(key, encoder=URLSafeBase64Encoder)
+                decoded_key_bytes = base64.urlsafe_b64decode(key)
+                self._prepared_key = VerifyKey(decoded_key_bytes)
             elif use == USAGES.PRIVATE:
-                self._prepared_key = SigningKey(key, encoder=URLSafeBase64Encoder)
+                decoded_key_bytes = base64.urlsafe_b64decode(key)
+                self._prepared_key = SigningKey(decoded_key_bytes)
             else:
                 raise JWKError("The 'use' parameter must either be 'public' or 'private', not %s" % use)
             return
@@ -55,20 +56,22 @@ class Ed25519Key(Key):
         if 'd' in jwk_dict:
             # d indicates private key
             d = jwk_dict.get('d').encode('utf-8') + b'=='
-            return SigningKey(d, encoder=URLSafeBase64Encoder)
+            decoded_d_bytes = base64.urlsafe_b64decode(d)
+            return SigningKey(decoded_d_bytes)
         else:
             # no d indicates public key
             x = jwk_dict.get('x').encode('utf-8') + b'=='
-            return VerifyKey(x, encoder=URLSafeBase64Encoder)
+            decoded_x_bytes = base64.urlsafe_b64decode(x)
+            return VerifyKey(decoded_x_bytes)
 
     def sign(self, msg):
         if isinstance(msg, six.string_types):
             msg = msg.encode('utf-8')
-        return self._prepared_key.sign(msg, encoder=RawEncoder)
+        return self._prepared_key.sign(msg)
 
     def verify(self, msg, sig=None):
         try:
-            self._prepared_key.verify(msg, sig, encoder=RawEncoder)
+            self._prepared_key.verify(msg, sig)
             return True
         except BadSignatureError:
             return False

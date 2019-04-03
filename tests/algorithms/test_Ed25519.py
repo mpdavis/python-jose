@@ -5,14 +5,14 @@ from jose.backends.nacl_backend import Ed25519Key
 from jose.constants import ALGORITHMS, USAGES
 from jose.exceptions import JWKError
 
-from nacl.encoding import URLSafeBase64Encoder
 from nacl.signing import SigningKey, VerifyKey
 
 import pytest
 
 
 SIGNING_KEY = "npAVhmIfq2byvIzcmgS5cguKCv2Nw8Seqa1Fku00LoE="
-nacl_signing_key = SigningKey(SIGNING_KEY.encode('utf-8'), encoder=URLSafeBase64Encoder)
+signing_key_bytes = base64.urlsafe_b64decode(SIGNING_KEY.encode('utf-8'))
+nacl_signing_key = SigningKey(signing_key_bytes)
 nacl_verify_key = nacl_signing_key.verify_key
 VERIFY_KEY = base64.urlsafe_b64encode(bytes(nacl_verify_key))
 
