@@ -110,7 +110,6 @@ matrix:
       env: TOXENV=pypy-pycrypto-norsa
     - python: pypy3.5
       env: TOXENV=pypy-compatibility
-# matrix:
-#   include:
-#     - python: 3.6
-#       env: TOX_ENV=flake8
+    # Linting
+    - python: 3.6
+      env: TOX_ENV=flake8
