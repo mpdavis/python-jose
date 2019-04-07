@@ -1,3 +1,5 @@
+from base64 import b64encode
+
 import six
 
 import Crypto.Hash.SHA256
@@ -9,7 +11,7 @@ from Crypto.Signature import PKCS1_v1_5
 from Crypto.Util.asn1 import DerSequence
 
 from jose.backends.base import Key
-from jose.backends.rsa_backend import pem_to_spki
+from jose.backends._asn1 import rsa_public_key_pkcs8_to_pkcs1
 from jose.utils import base64_to_long, long_to_base64
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWKError
@@ -23,6 +25,21 @@ if hasattr(RSA, 'RsaKey'):
     _RSAKey = RSA.RsaKey
 else:
     _RSAKey = RSA._RSAobj
+
+
+def _der_to_pem(der_key, marker):
+    """
+    Perform a simple DER to PEM conversion.
+    """
+    pem_key_chunks = [('-----BEGIN %s-----' % marker).encode('utf-8')]
+
+    # Limit base64 output lines to 64 characters by limiting input lines to 48 characters.
+    for chunk_start in range(0, len(der_key), 48):
+        pem_key_chunks.append(b64encode(der_key[chunk_start:chunk_start + 48]))
+
+    pem_key_chunks.append(('-----END %s-----' % marker).encode('utf-8'))
+
+    return b'\n'.join(pem_key_chunks)
 
 
 class RSAKey(Key):
@@ -132,7 +149,7 @@ class RSAKey(Key):
     def verify(self, msg, sig):
         try:
             return PKCS1_v1_5.new(self.prepared_key).verify(self.hash_alg.new(msg), sig)
-        except Exception as e:
+        except Exception:
             return False
 
     def is_public(self):
@@ -152,11 +169,13 @@ class RSAKey(Key):
             raise ValueError("Invalid pem format specified: %r" % (pem_format,))
 
         if self.is_public():
-            pem = self.prepared_key.exportKey('PEM', pkcs=1)
+            # PyCrypto/dome always export public keys as PKCS8
             if pkcs == 8:
-                pem = pem_to_spki(pem, fmt='PKCS8')
+                pem = self.prepared_key.exportKey('PEM')
             else:
-                pem = pem_to_spki(pem, fmt='PKCS1')
+                pkcs8_der = self.prepared_key.exportKey('DER')
+                pkcs1_der = rsa_public_key_pkcs8_to_pkcs1(pkcs8_der)
+                pem = _der_to_pem(pkcs1_der, 'RSA PUBLIC KEY')
             return pem
         else:
             pem = self.prepared_key.exportKey('PEM', pkcs=pkcs)

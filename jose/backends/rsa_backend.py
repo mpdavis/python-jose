@@ -1,15 +1,17 @@
 import binascii
 
 import six
-from pyasn1.codec.der import decoder, encoder
 from pyasn1.error import PyAsn1Error
-from pyasn1.type import namedtype, univ
 
 import rsa as pyrsa
 import rsa.pem as pyrsa_pem
-from rsa.asn1 import OpenSSLPubKey, AsnPubKey, PubKeyHeader
 
 from jose.backends.base import Key
+from jose.backends._asn1 import (
+    rsa_private_key_pkcs1_to_pkcs8,
+    rsa_private_key_pkcs8_to_pkcs1,
+    rsa_public_key_pkcs1_to_pkcs8,
+)
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWKError
 from jose.utils import base64_to_long, long_to_base64
@@ -114,48 +116,6 @@ def _legacy_private_key_pkcs8_to_pkcs1(pkcs8_key):
     return pkcs8_key[len(LEGACY_INVALID_PKCS8_RSA_HEADER):]
 
 
-class PKCS8RsaPrivateKeyAlgorithm(univ.Sequence):
-    """ASN1 structure for recording RSA PrivateKeyAlgorithm identifiers."""
-    componentType = namedtype.NamedTypes(
-        namedtype.NamedType("rsaEncryption", univ.ObjectIdentifier()),
-        namedtype.NamedType("parameters", univ.Null())
-    )
-
-
-class PKCS8PrivateKey(univ.Sequence):
-    """ASN1 structure for recording PKCS8 private keys."""
-    componentType = namedtype.NamedTypes(
-        namedtype.NamedType("version", univ.Integer()),
-        namedtype.NamedType("privateKeyAlgorithm", PKCS8RsaPrivateKeyAlgorithm()),
-        namedtype.NamedType("privateKey", univ.OctetString())
-    )
-
-
-def _private_key_pkcs8_to_pkcs1(pkcs8_key):
-    """Convert a PKCS8-encoded RSA private key to PKCS1."""
-    decoded_values = decoder.decode(pkcs8_key, asn1Spec=PKCS8PrivateKey())
-
-    try:
-        decoded_key = decoded_values[0]
-    except IndexError:
-        raise ValueError("Invalid private key encoding")
-
-    return decoded_key["privateKey"]
-
-
-def _private_key_pkcs1_to_pkcs8(pkcs1_key):
-    """Convert a PKCS1-encoded RSA private key to PKCS8."""
-    algorithm = PKCS8RsaPrivateKeyAlgorithm()
-    algorithm["rsaEncryption"] = RSA_ENCRYPTION_ASN1_OID
-
-    pkcs8_key = PKCS8PrivateKey()
-    pkcs8_key["version"] = 0
-    pkcs8_key["privateKeyAlgorithm"] = algorithm
-    pkcs8_key["privateKey"] = pkcs1_key
-
-    return encoder.encode(pkcs8_key)
-
-
 class RSAKey(Key):
     SHA256 = 'SHA-256'
     SHA384 = 'SHA-384'
@@ -196,7 +156,7 @@ class RSAKey(Key):
                         try:
                             der = pyrsa_pem.load_pem(key, b'PRIVATE KEY')
                             try:
-                                pkcs1_key = _private_key_pkcs8_to_pkcs1(der)
+                                pkcs1_key = rsa_private_key_pkcs8_to_pkcs1(der)
                             except PyAsn1Error:
                                 # If the key was encoded using the old, invalid,
                                 # encoding then pyasn1 will throw an error attempting
@@ -259,7 +219,7 @@ class RSAKey(Key):
         if isinstance(self._prepared_key, pyrsa.PrivateKey):
             der = self._prepared_key.save_pkcs1(format='DER')
             if pem_format == 'PKCS8':
-                pkcs8_der = _private_key_pkcs1_to_pkcs8(der)
+                pkcs8_der = rsa_private_key_pkcs1_to_pkcs8(der)
                 pem = pyrsa_pem.save_pem(pkcs8_der, pem_marker='PRIVATE KEY')
             elif pem_format == 'PKCS1':
                 pem = pyrsa_pem.save_pem(der, pem_marker='RSA PRIVATE KEY')
@@ -267,19 +227,9 @@ class RSAKey(Key):
                 raise ValueError("Invalid pem format specified: %r" % (pem_format,))
         else:
             if pem_format == 'PKCS8':
-                asn_key = AsnPubKey()
-                asn_key.setComponentByName('modulus', self._prepared_key.n)
-                asn_key.setComponentByName('publicExponent', self._prepared_key.e)
-                der = encoder.encode(asn_key)
-
-                header = PubKeyHeader()
-                header['oid'] = univ.ObjectIdentifier(RSA_ENCRYPTION_ASN1_OID)
-                pub_key = OpenSSLPubKey()
-                pub_key['header'] = header
-                pub_key['key'] = univ.BitString.fromOctetString(der)
-
-                der = encoder.encode(pub_key)
-                pem = pyrsa_pem.save_pem(der, pem_marker='PUBLIC KEY')
+                pkcs1_der = self._prepared_key.save_pkcs1(format="DER")
+                pkcs8_der = rsa_public_key_pkcs1_to_pkcs8(pkcs1_der)
+                pem = pyrsa_pem.save_pem(pkcs8_der, pem_marker='PUBLIC KEY')
             elif pem_format == 'PKCS1':
                 der = self._prepared_key.save_pkcs1(format='DER')
                 pem = pyrsa_pem.save_pem(der, pem_marker='RSA PUBLIC KEY')

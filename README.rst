@@ -42,6 +42,23 @@ The crytography option is a good default.
     $ pip install python-jose[pycryptodome]
     $ pip install python-jose[pycrypto]
 
+Due to complexities with setuptools, the ``python-rsa`` and ``python-ecdsa`` libraries are always installed.
+If you use one of the custom backends and would like to clean up unneeded dependencies,
+you can remove the following dependencies for each backend:
+
+* ``cryptography``
+
+  * ``pip uninstall rsa ecdsa pyasn1``
+
+* ``pycrypto`` or ``pycryptodome``
+
+  * ``pip uninstall rsa``
+
+.. warning::
+
+    Uninstall carefully. Make sure that nothing else in your environment needs these
+    libraries before uninstalling them.
+
 
 Usage
 -----
