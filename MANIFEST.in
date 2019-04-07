@@ -1,2 +1,7 @@
 include README.rst
 include LICENSE
+include requirements.txt
+include requirements-*.txt
+include tox.ini
+graft docs
+graft tests
