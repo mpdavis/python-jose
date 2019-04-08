@@ -40,7 +40,7 @@ We recommend that you remove unnecessary dependencies in production.
 #. cryptography
 
    * This backend uses `pyca/cryptography`_ for all cryptographic operations.
-     This is the recommended backend and will be used as the default if multiple backends are installed.
+     This is the recommended backend and is selected over all other backends if any others are present.
    * Installation: ``pip install python-jose[cryptography]``
    * Unused dependencies:
 
