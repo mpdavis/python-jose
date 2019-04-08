@@ -1,9 +1,7 @@
 from jose import jwk
 from jose.exceptions import JWKError
 from jose.backends.base import Key
-from jose.backends.pycrypto_backend import RSAKey
-from jose.backends.cryptography_backend import CryptographyECKey
-from jose.backends.ecdsa_backend import ECDSAECKey
+from jose.backends import ECKey, RSAKey
 
 import pytest
 
@@ -53,7 +51,7 @@ class TestJWK:
             key = RSAKey(rsa_key, 'HS512')
 
         with pytest.raises(JWKError):
-            key = ECDSAECKey(ec_key, 'RS512')  # noqa: F841
+            key = ECKey(ec_key, 'RS512')  # noqa: F841
 
     def test_invalid_jwk(self):
 
@@ -64,7 +62,7 @@ class TestJWK:
             key = RSAKey(hmac_key, 'RS256')
 
         with pytest.raises(JWKError):
-            key = ECDSAECKey(rsa_key, 'ES256')  # noqa: F841
+            key = ECKey(rsa_key, 'ES256')  # noqa: F841
 
     def test_RSAKey_errors(self):
 
@@ -104,9 +102,7 @@ class TestJWK:
         assert isinstance(key, jwk.Key)
 
     def test_construct_EC_from_jwk(self):
-        key = CryptographyECKey(ec_key, algorithm='ES512')
-        assert isinstance(key, jwk.Key)
-        key = ECDSAECKey(ec_key, algorithm='ES512')
+        key = ECKey(ec_key, algorithm='ES512')
         assert isinstance(key, jwk.Key)
 
     def test_construct_from_jwk_missing_alg(self):
