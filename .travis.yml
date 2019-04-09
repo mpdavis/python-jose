@@ -45,36 +45,36 @@ matrix:
       env: TOXENV=py35-compatibility
     # CPython 3.6
     - python: 3.6
-      env: TOXENV=py35-base
+      env: TOXENV=py36-base
     - python: 3.6
-      env: TOXENV=py35-cryptography-only
+      env: TOXENV=py36-cryptography-only
     - python: 3.6
-      env: TOXENV=py35-pycryptodome-norsa
+      env: TOXENV=py36-pycryptodome-norsa
     - python: 3.6
-      env: TOXENV=py35-pycrypto-norsa
+      env: TOXENV=py36-pycrypto-norsa
     - python: 3.6
-      env: TOXENV=py35-compatibility
+      env: TOXENV=py36-compatibility
     # CPython 3.7
     # xenial + sudo are currently needed to get 3.7
     # https://github.com/travis-ci/travis-ci/issues/9815
     - python: 3.7
-      env: TOXENV=py35-base
+      env: TOXENV=py37-base
       dist: xenial
       sudo: true
     - python: 3.7
-      env: TOXENV=py35-cryptography-only
+      env: TOXENV=py37-cryptography-only
       dist: xenial
       sudo: true
     - python: 3.7
-      env: TOXENV=py35-pycryptodome-norsa
+      env: TOXENV=py37-pycryptodome-norsa
       dist: xenial
       sudo: true
     - python: 3.7
-      env: TOXENV=py35-pycrypto-norsa
+      env: TOXENV=py37-pycrypto-norsa
       dist: xenial
       sudo: true
     - python: 3.7
-      env: TOXENV=py35-compatibility
+      env: TOXENV=py37-compatibility
       dist: xenial
       sudo: true
     # PyPy 5.3.1
