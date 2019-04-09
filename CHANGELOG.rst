@@ -30,5 +30,6 @@ Housekeeping
 * Test each cryptographic backend independently in CI.
   `#114 <https://github.com/mpdavis/python-jose/issues/114>`_
   `#129 <https://github.com/mpdavis/python-jose/pull/129>`_
+  `#135 <https://github.com/mpdavis/python-jose/pull/135>`_
 * Add flake8 checks in CI.
 * Add CPython 3.7 and PyPy 3.5 testing in CI.
