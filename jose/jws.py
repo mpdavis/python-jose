@@ -144,6 +144,7 @@ def _encode_header(algorithm, additional_headers=None):
     json_header = json.dumps(
         header,
         separators=(',', ':'),
+        sort_keys=True,
     ).encode('utf-8')
 
     return base64url_encode(json_header)

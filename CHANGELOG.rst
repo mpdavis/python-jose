@@ -17,6 +17,8 @@ Major
   `#121 <https://github.com/mpdavis/python-jose/pull/121>`_
 * Make pyca/cryptography backend the preferred backend if multiple backends are present.
   `#122 <https://github.com/mpdavis/python-jose/pull/122>`_
+* Allow for headless JWT by sorting headers when serializing.
+  `#136 <https://github.com/mpdavis/python-jose/pull/136>`_
 
 Bugfixes
 """"""""

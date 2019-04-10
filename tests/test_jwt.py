@@ -107,6 +107,33 @@ class TestJWT:
         for k, v in headers.items():
             assert all_headers[k] == v
 
+    def test_deterministic_headers(self):
+        from collections import OrderedDict
+        from jose.utils import base64url_decode
+
+        claims = {"a": "b"}
+        key = "secret"
+
+        headers1 = OrderedDict((
+            ('kid', 'my-key-id'),
+            ('another_key', 'another_value'),
+        ))
+        encoded1 = jwt.encode(claims, key, algorithm='HS256', headers=headers1)
+        encoded_headers1 = encoded1.split('.', 1)[0]
+
+        headers2 = OrderedDict((
+            ('another_key', 'another_value'),
+            ('kid', 'my-key-id'),
+        ))
+        encoded2 = jwt.encode(claims, key, algorithm='HS256', headers=headers2)
+        encoded_headers2 = encoded2.split('.', 1)[0]
+
+        assert encoded_headers1 == encoded_headers2
+
+        # manually decode header to compare it to known good
+        decoded_headers1 = base64url_decode(encoded_headers1.encode('utf-8'))
+        assert decoded_headers1 == b"""{"alg":"HS256","another_key":"another_value","kid":"my-key-id","typ":"JWT"}"""
+
     def test_encode(self, claims, key):
 
         expected = (
