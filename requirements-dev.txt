@@ -1,14 +1,14 @@
 PyYAML==3.11
 cov-core==1.15.0
-coverage==3.7.1
-coveralls==0.5
+coverage==4.4
+coveralls==1.5.1
+cryptography==2.4.2
 docopt==0.6.2
 nose==1.3.6
-py==1.4.26
-pytest==2.7.0
-pytest-cov==1.8.1
-ecdsa==0.13
-wsgiref==0.1.2
-
+py==1.5.4
+pytest==4.1.1
+pytest-cov==2.6.1
+# wsgiref is included in python standard library in Python 3, and will fail to install.
+wsgiref==0.1.2; python_version < "3.0"
 -r requirements.txt
 -r requirements-rtd.txt
