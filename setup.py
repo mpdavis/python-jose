@@ -39,7 +39,7 @@ extras_require = {
     'pycryptodome': ['pycryptodome >=3.3.1, <4.0.0'] + pyasn1,
 }
 legacy_backend_requires = ['ecdsa <1.0', 'rsa'] + pyasn1
-install_requires = ['six <2.0', 'future <1.0']
+install_requires = ['six <2.0']
 
 # TODO: work this into the extras selection instead.
 install_requires += legacy_backend_requires
@@ -75,7 +75,6 @@ setup(
     setup_requires=['pytest-runner'],
     tests_require=[
         'six',
-        'future',
         'ecdsa',
         'pytest',
         'pytest-cov',

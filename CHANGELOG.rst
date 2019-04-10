@@ -35,3 +35,4 @@ Housekeeping
   `#135 <https://github.com/mpdavis/python-jose/pull/135>`_
 * Add flake8 checks in CI.
 * Add CPython 3.7 and PyPy 3.5 testing in CI.
+* Remove package future as a dependency, not needed anymore.
