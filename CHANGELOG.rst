@@ -36,3 +36,4 @@ Housekeeping
 * Add flake8 checks in CI.
 * Add CPython 3.7 and PyPy 3.5 testing in CI.
 * Remove package future as a dependency, not needed anymore.
+* Fix warnings from py.test.
