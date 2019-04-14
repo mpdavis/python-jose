@@ -194,6 +194,10 @@ class TestECAlgorithm:
             # Private parameters should be absent
             assert 'd' not in as_dict
 
+        # as_dict should be serializable to JSON
+        import json
+        json.dumps(as_dict)
+
     def test_to_dict(self):
         key = ECKey(private_key, ALGORITHMS.ES256)
         self.assert_parameters(key.to_dict(), private=True)

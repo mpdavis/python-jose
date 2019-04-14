@@ -183,15 +183,15 @@ class CryptographyECKey(Key):
             'alg': self._algorithm,
             'kty': 'EC',
             'crv': crv,
-            'x': long_to_base64(public_key.public_numbers().x, size=key_size),
-            'y': long_to_base64(public_key.public_numbers().y, size=key_size),
+            'x': long_to_base64(public_key.public_numbers().x, size=key_size).decode('ASCII'),
+            'y': long_to_base64(public_key.public_numbers().y, size=key_size).decode('ASCII'),
         }
 
         if not self.is_public():
             data['d'] = long_to_base64(
                 self.prepared_key.private_numbers().private_value,
                 size=key_size
-            )
+            ).decode('ASCII')
 
         return data
 
@@ -354,18 +354,18 @@ class CryptographyRSAKey(Key):
         data = {
             'alg': self._algorithm,
             'kty': 'RSA',
-            'n': long_to_base64(public_key.public_numbers().n),
-            'e': long_to_base64(public_key.public_numbers().e),
+            'n': long_to_base64(public_key.public_numbers().n).decode('ASCII'),
+            'e': long_to_base64(public_key.public_numbers().e).decode('ASCII'),
         }
 
         if not self.is_public():
             data.update({
-                'd': long_to_base64(self.prepared_key.private_numbers().d),
-                'p': long_to_base64(self.prepared_key.private_numbers().p),
-                'q': long_to_base64(self.prepared_key.private_numbers().q),
-                'dp': long_to_base64(self.prepared_key.private_numbers().dmp1),
-                'dq': long_to_base64(self.prepared_key.private_numbers().dmq1),
-                'qi': long_to_base64(self.prepared_key.private_numbers().iqmp),
+                'd': long_to_base64(self.prepared_key.private_numbers().d).decode('ASCII'),
+                'p': long_to_base64(self.prepared_key.private_numbers().p).decode('ASCII'),
+                'q': long_to_base64(self.prepared_key.private_numbers().q).decode('ASCII'),
+                'dp': long_to_base64(self.prepared_key.private_numbers().dmp1).decode('ASCII'),
+                'dq': long_to_base64(self.prepared_key.private_numbers().dmq1).decode('ASCII'),
+                'qi': long_to_base64(self.prepared_key.private_numbers().iqmp).decode('ASCII'),
             })
 
         return data

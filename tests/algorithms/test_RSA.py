@@ -370,6 +370,10 @@ class TestRSAAlgorithm:
             assert 'dq' not in as_dict
             assert 'qi' not in as_dict
 
+        # as_dict should be serializable to JSON
+        import json
+        json.dumps(as_dict)
+
     def assert_roundtrip(self, key):
         assert RSAKey(
             key.to_dict(),

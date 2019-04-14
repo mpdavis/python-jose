@@ -25,6 +25,8 @@ Bugfixes
 
 * Fix invalid RSA private key PKCS8 encoding by python-rsa backend.
   `#120 <https://github.com/mpdavis/python-jose/pull/120>`_
+* Fix to_dict output, which should always be JSON encodeable.
+  `#139 <https://github.com/mpdavis/python-jose/pull/139>`_
 
 Housekeeping
 """"""""""""
