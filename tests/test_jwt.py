@@ -579,3 +579,26 @@ class TestJWT:
     def test_unverified_claims_object(self, claims, key):
         token = jwt.encode(claims, key)
         assert jwt.get_unverified_claims(token) == claims
+
+    @pytest.mark.parametrize(
+        "claim,value", [
+            ("aud", "aud"),
+            ("ait", "ait"),
+            ("exp", datetime.utcnow() + timedelta(seconds=5)),
+            ("nbf", datetime.utcnow() - timedelta(seconds=5)),
+            ("iss", "iss"),
+            ("sub", "sub"),
+            ("jti", "jti"),
+        ]
+    )
+    def test_require(self, claims, key, claim, value):
+        options = {"require_" + claim: True, "verify_" + claim: False}
+
+        token = jwt.encode(claims, key)
+        with pytest.raises(JWTError):
+            jwt.decode(token, key, options=options, audience=str(value))
+
+        new_claims = dict(claims)
+        new_claims[claim] = value
+        token = jwt.encode(new_claims, key)
+        jwt.decode(token, key, options=options, audience=str(value))
