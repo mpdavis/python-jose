@@ -62,7 +62,7 @@ class TestJWT:
 
             jws.verify = return_invalid_json
 
-            with pytest.raises(JWTError, message='Invalid payload string: ["a", "b"}'):
+            with pytest.raises(JWTError, match='Invalid payload string: '):
                 jwt.decode(token, 'secret', ['HS256'])
         finally:
             jws.verify = old_jws_verify
@@ -77,7 +77,7 @@ class TestJWT:
 
             jws.verify = return_encoded_array
 
-            with pytest.raises(JWTError, message='Invalid payload string: must be a json object'):
+            with pytest.raises(JWTError, match='Invalid payload string: must be a json object'):
                 jwt.decode(token, 'secret', ['HS256'])
         finally:
             jws.verify = old_jws_verify
