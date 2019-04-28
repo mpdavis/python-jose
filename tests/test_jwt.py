@@ -584,7 +584,7 @@ class TestJWT:
         "claim,value", [
             ("aud", "aud"),
             ("ait", "ait"),
-            ("exp", datetime.utcnow() + timedelta(seconds=5)),
+            ("exp", datetime.utcnow() + timedelta(seconds=3600)),
             ("nbf", datetime.utcnow() - timedelta(seconds=5)),
             ("iss", "iss"),
             ("sub", "sub"),
