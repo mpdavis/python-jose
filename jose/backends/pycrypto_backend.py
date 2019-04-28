@@ -147,6 +147,8 @@ class RSAKey(Key):
             raise JWKError(e)
 
     def verify(self, msg, sig):
+        if not self.is_public():
+            return False
         try:
             return PKCS1_v1_5.new(self.prepared_key).verify(self.hash_alg.new(msg), sig)
         except Exception:

@@ -200,6 +200,8 @@ class RSAKey(Key):
         return pyrsa.sign(msg, self._prepared_key, self.hash_alg)
 
     def verify(self, msg, sig):
+        if not self.is_public():
+            return False
         try:
             pyrsa.verify(msg, sig, self._prepared_key)
             return True

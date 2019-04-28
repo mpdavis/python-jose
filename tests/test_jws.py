@@ -291,6 +291,16 @@ class TestRSA(object):
         with pytest.raises(JWSError):
             jws.verify(token, rsa_public_key, ALGORITHMS.HS256)
 
+    def test_private_verify(self, payload):
+        token = jws.sign(payload, rsa_private_key, algorithm='RS256')
+
+        # verify with public
+        dec = jws.verify(token, rsa_public_key, algorithms='RS256')
+
+        with pytest.raises(JWSError):
+            # verify with private does not work
+            dec = jws.verify(token, rsa_private_key, algorithms='RS256')
+
 
 ec_private_key = """-----BEGIN EC PRIVATE KEY-----
 MIHcAgEBBEIBzs13YUnYbLfYXTz4SG4DE4rPmsL3wBTdy34JcO+BDpI+NDZ0pqam
