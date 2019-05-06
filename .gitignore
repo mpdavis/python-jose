@@ -55,3 +55,12 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# PyCharm
+.idea/
+
+# PyEnv
+.python-version
+
+# PyTest
+.pytest_cache/

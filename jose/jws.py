@@ -3,7 +3,10 @@ import binascii
 import json
 import six
 
-from collections import Mapping, Iterable
+try:
+    from collections.abc import Mapping, Iterable  # Python 3
+except ImportError:
+    from collections import Mapping, Iterable  # Python 2, will be deprecated in Python 3.8
 
 from jose import jwk
 from jose.constants import ALGORITHMS
@@ -141,6 +144,7 @@ def _encode_header(algorithm, additional_headers=None):
     json_header = json.dumps(
         header,
         separators=(',', ':'),
+        sort_keys=True,
     ).encode('utf-8')
 
     return base64url_encode(json_header)

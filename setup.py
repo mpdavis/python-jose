@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
+import platform
+
 import jose
 
 from setuptools import setup
@@ -21,11 +23,26 @@ def get_packages(package):
     ]
 
 
+def _cryptography_version():
+    # pyca/cryptography dropped support for PyPy < 5.4 in 2.5
+    # https://cryptography.io/en/latest/changelog/#v2-5
+    if platform.python_implementation() == 'PyPy' and platform.python_version() < '5.4':
+        return 'cryptography < 2.5'
+
+    return 'cryptography'
+
+
+pyasn1 = ['pyasn1']
 extras_require = {
-    'cryptography': ['cryptography'],
-    'pycrypto': ['pycrypto >=2.6.0, <2.7.0'],
-    'pycryptodome': ['pycryptodome >=3.3.1, <4.0.0'],
+    'cryptography': [_cryptography_version()],
+    'pycrypto': ['pycrypto >=2.6.0, <2.7.0'] + pyasn1,
+    'pycryptodome': ['pycryptodome >=3.3.1, <4.0.0'] + pyasn1,
 }
+legacy_backend_requires = ['ecdsa <1.0', 'rsa'] + pyasn1
+install_requires = ['six <2.0']
+
+# TODO: work this into the extras selection instead.
+install_requires += legacy_backend_requires
 
 
 setup(
@@ -58,12 +75,10 @@ setup(
     setup_requires=['pytest-runner'],
     tests_require=[
         'six',
-        'future',
         'ecdsa',
         'pytest',
         'pytest-cov',
         'pytest-runner',
-        'cryptography',
     ],
-    install_requires=['six <2.0', 'ecdsa <1.0', 'rsa', 'future <1.0']
+    install_requires=install_requires
 )

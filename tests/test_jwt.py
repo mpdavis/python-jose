@@ -62,7 +62,7 @@ class TestJWT:
 
             jws.verify = return_invalid_json
 
-            with pytest.raises(JWTError, message='Invalid payload string: ["a", "b"}'):
+            with pytest.raises(JWTError, match='Invalid payload string: '):
                 jwt.decode(token, 'secret', ['HS256'])
         finally:
             jws.verify = old_jws_verify
@@ -77,7 +77,7 @@ class TestJWT:
 
             jws.verify = return_encoded_array
 
-            with pytest.raises(JWTError, message='Invalid payload string: must be a json object'):
+            with pytest.raises(JWTError, match='Invalid payload string: must be a json object'):
                 jwt.decode(token, 'secret', ['HS256'])
         finally:
             jws.verify = old_jws_verify
@@ -106,6 +106,33 @@ class TestJWT:
         all_headers = jwt.get_unverified_headers(encoded)
         for k, v in headers.items():
             assert all_headers[k] == v
+
+    def test_deterministic_headers(self):
+        from collections import OrderedDict
+        from jose.utils import base64url_decode
+
+        claims = {"a": "b"}
+        key = "secret"
+
+        headers1 = OrderedDict((
+            ('kid', 'my-key-id'),
+            ('another_key', 'another_value'),
+        ))
+        encoded1 = jwt.encode(claims, key, algorithm='HS256', headers=headers1)
+        encoded_headers1 = encoded1.split('.', 1)[0]
+
+        headers2 = OrderedDict((
+            ('another_key', 'another_value'),
+            ('kid', 'my-key-id'),
+        ))
+        encoded2 = jwt.encode(claims, key, algorithm='HS256', headers=headers2)
+        encoded_headers2 = encoded2.split('.', 1)[0]
+
+        assert encoded_headers1 == encoded_headers2
+
+        # manually decode header to compare it to known good
+        decoded_headers1 = base64url_decode(encoded_headers1.encode('utf-8'))
+        assert decoded_headers1 == b"""{"alg":"HS256","another_key":"another_value","kid":"my-key-id","typ":"JWT"}"""
 
     def test_encode(self, claims, key):
 
@@ -552,3 +579,26 @@ class TestJWT:
     def test_unverified_claims_object(self, claims, key):
         token = jwt.encode(claims, key)
         assert jwt.get_unverified_claims(token) == claims
+
+    @pytest.mark.parametrize(
+        "claim,value", [
+            ("aud", "aud"),
+            ("ait", "ait"),
+            ("exp", datetime.utcnow() + timedelta(seconds=3600)),
+            ("nbf", datetime.utcnow() - timedelta(seconds=5)),
+            ("iss", "iss"),
+            ("sub", "sub"),
+            ("jti", "jti"),
+        ]
+    )
+    def test_require(self, claims, key, claim, value):
+        options = {"require_" + claim: True, "verify_" + claim: False}
+
+        token = jwt.encode(claims, key)
+        with pytest.raises(JWTError):
+            jwt.decode(token, key, options=options, audience=str(value))
+
+        new_claims = dict(claims)
+        new_claims[claim] = value
+        token = jwt.encode(new_claims, key)
+        jwt.decode(token, key, options=options, audience=str(value))

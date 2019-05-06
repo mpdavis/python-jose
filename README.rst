@@ -21,27 +21,64 @@ Installation
 
 ::
 
-    $ pip install python-jose
-
-
-Custom Backends
----------------
-
-As of 3.0.0, python-jose uses the pure-python rsa module by default for RSA signing and verification. If
-necessary, other RSA backends are supported. Options include crytography, pycryptodome, and pycrypto.
-
-In order to use a custom backend, install python-jose with the appropriate extra.
-
-It is recommended that a custom backend is used in production, as the pure-python rsa module is slow.
-
-The crytography option is a good default.
-
-::
-
     $ pip install python-jose[cryptography]
-    $ pip install python-jose[pycryptodome]
-    $ pip install python-jose[pycrypto]
 
+
+Cryptographic Backends
+----------------------
+
+As of 3.1.0, python-jose implements four different cryptographic backends.
+The backend must be selected as an extra when installing python-jose.
+If you do not select a backend, the native-python backend will be installed.
+
+Unless otherwise noted, all backends support all operations.
+
+Due to complexities with setuptools, the native-python backend is always installed,
+even if you select a different backend on install.
+We recommend that you remove unnecessary dependencies in production.
+
+#. cryptography
+
+   * This backend uses `pyca/cryptography`_ for all cryptographic operations.
+     This is the recommended backend and is selected over all other backends if any others are present.
+   * Installation: ``pip install python-jose[cryptography]``
+   * Unused dependencies:
+
+     * ``rsa``
+     * ``ecdsa``
+     * ``pyasn1``
+
+#. pycryptodome
+
+   * This backend uses `pycryptodome`_ for all cryptographic operations.
+   * Installation: ``pip install python-jose[pycryptodome]``
+   * Unused dependencies:
+
+     * ``rsa``
+
+#. native-python
+
+   * This backend uses `python-rsa`_ and `python-ecdsa`_ for all cryptographic operations.
+     This backend is always installed but any other backend will take precedence if one is installed.
+   * Installation: ``pip install python-jose``
+
+   .. note::
+
+       The native-python backend cannot process certificates.
+
+#. pycrypto
+
+   * This backend uses `pycrypto`_ for all cryptographic operations.
+   * Installation: ``pip install python-jose[pycrypto]``
+   * Unused dependencies:
+
+     * ``rsa``
+
+   .. warning::
+
+       The `pycrypto`_ project has not been maintained since 2013.
+       This backend is maintained for legacy compatibility purposes only.
+       Do not use this backend unless you cannot use any of the others.
 
 Usage
 -----
@@ -69,3 +106,8 @@ This library was originally based heavily on the work of the folks over at PyJWT
    :target: https://python-jose.readthedocs.org/en/latest/
 .. _ReadTheDocs: https://python-jose.readthedocs.org/en/latest/
 .. _PyJWT: https://github.com/jpadilla/pyjwt
+.. _pyca/cryptography: http://cryptography.io/
+.. _pycryptodome: https://pycryptodome.readthedocs.io/en/latest/
+.. _pycrypto: https://www.dlitz.net/software/pycrypto/
+.. _python-ecdsa: https://github.com/warner/python-ecdsa
+.. _python-rsa: https://stuvel.eu/rsa

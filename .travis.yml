@@ -2,21 +2,103 @@
 # detail: https://blog.travis-ci.com/2017-06-21-trusty-updates-2017-Q2-launch
 dist: precise
 language: python
-python:
-  - "2.7"
-  - "3.4"
-  - "3.5"
-  - "3.6"
-  - "pypy-5.3.1"
 install:
   - pip install -U setuptools && pip install -U tox codecov tox-travis
 script:
   - tox
 after_success:
   - codecov
-# matrix:
-#   include:
-#     - python: 3.6
-#       env:
-#         - TOX_ENV=flake8
-#       script: tox -e $TOX_ENV
+matrix:
+  include:
+    # CPython 2.7
+    - python: 2.7
+      env: TOXENV=py27-base
+    - python: 2.7
+      env: TOXENV=py27-cryptography-only
+    - python: 2.7
+      env: TOXENV=py27-pycryptodome-norsa
+    - python: 2.7
+      env: TOXENV=py27-pycrypto-norsa
+    - python: 2.7
+      env: TOXENV=py27-compatibility
+    # CPython 3.4
+    - python: 3.4
+      env: TOXENV=py34-base
+    - python: 3.4
+      env: TOXENV=py34-cryptography-only
+    - python: 3.4
+      env: TOXENV=py34-pycryptodome-norsa
+    - python: 3.4
+      env: TOXENV=py34-pycrypto-norsa
+    - python: 3.4
+      env: TOXENV=py34-compatibility
+    # CPython 3.5
+    - python: 3.5
+      env: TOXENV=py35-base
+    - python: 3.5
+      env: TOXENV=py35-cryptography-only
+    - python: 3.5
+      env: TOXENV=py35-pycryptodome-norsa
+    - python: 3.5
+      env: TOXENV=py35-pycrypto-norsa
+    - python: 3.5
+      env: TOXENV=py35-compatibility
+    # CPython 3.6
+    - python: 3.6
+      env: TOXENV=py36-base
+    - python: 3.6
+      env: TOXENV=py36-cryptography-only
+    - python: 3.6
+      env: TOXENV=py36-pycryptodome-norsa
+    - python: 3.6
+      env: TOXENV=py36-pycrypto-norsa
+    - python: 3.6
+      env: TOXENV=py36-compatibility
+    # CPython 3.7
+    # xenial + sudo are currently needed to get 3.7
+    # https://github.com/travis-ci/travis-ci/issues/9815
+    - python: 3.7
+      env: TOXENV=py37-base
+      dist: xenial
+      sudo: true
+    - python: 3.7
+      env: TOXENV=py37-cryptography-only
+      dist: xenial
+      sudo: true
+    - python: 3.7
+      env: TOXENV=py37-pycryptodome-norsa
+      dist: xenial
+      sudo: true
+    - python: 3.7
+      env: TOXENV=py37-pycrypto-norsa
+      dist: xenial
+      sudo: true
+    - python: 3.7
+      env: TOXENV=py37-compatibility
+      dist: xenial
+      sudo: true
+    # PyPy 5.3.1
+    - python: pypy-5.3.1
+      env: TOXENV=pypy-base
+    - python: pypy-5.3.1
+      env: TOXENV=pypy-cryptography-only
+    - python: pypy-5.3.1
+      env: TOXENV=pypy-pycryptodome-norsa
+    - python: pypy-5.3.1
+      env: TOXENV=pypy-pycrypto-norsa
+    - python: pypy-5.3.1
+      env: TOXENV=pypy-compatibility
+    # PyPy 3.5 (5.10.1?)
+    - python: pypy3.5
+      env: TOXENV=pypy-base
+    - python: pypy3.5
+      env: TOXENV=pypy-cryptography-only
+    - python: pypy3.5
+      env: TOXENV=pypy-pycryptodome-norsa
+    - python: pypy3.5
+      env: TOXENV=pypy-pycrypto-norsa
+    - python: pypy3.5
+      env: TOXENV=pypy-compatibility
+    # Linting
+    - python: 3.6
+      env: TOX_ENV=flake8
