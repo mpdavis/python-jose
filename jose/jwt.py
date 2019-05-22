@@ -338,7 +338,7 @@ def _validate_aud(claims, audience=None):
 
     Args:
         claims (dict): The claims dictionary to validate.
-        audience (str): The audience that is verifying the token.
+        audience (str or list): The audience that is verifying the token.
     """
 
     if 'aud' not in claims:
