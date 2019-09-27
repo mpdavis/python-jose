@@ -317,7 +317,7 @@ def _validate_exp(claims, leeway=0):
 
     now = timegm(datetime.utcnow().utctimetuple())
 
-    if exp < (now - leeway):
+    if exp < (now + leeway):
         raise ExpiredSignatureError('Signature has expired.')
 
 
