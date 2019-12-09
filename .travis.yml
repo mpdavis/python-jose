@@ -66,17 +66,6 @@ matrix:
       env: TOXENV=py37-compatibility
       dist: xenial
       sudo: true
-    # PyPy 5.3.1
-    - python: pypy-5.3.1
-      env: TOXENV=pypy-base
-    - python: pypy-5.3.1
-      env: TOXENV=pypy-cryptography-only
-    - python: pypy-5.3.1
-      env: TOXENV=pypy-pycryptodome-norsa
-    - python: pypy-5.3.1
-      env: TOXENV=pypy-pycrypto-norsa
-    - python: pypy-5.3.1
-      env: TOXENV=pypy-compatibility
     # PyPy 3.5 (5.10.1?)
     - python: pypy3.5
       env: TOXENV=pypy-base
