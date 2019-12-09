@@ -21,17 +21,6 @@ matrix:
       env: TOXENV=py27-pycrypto-norsa
     - python: 2.7
       env: TOXENV=py27-compatibility
-    # CPython 3.4
-    - python: 3.4
-      env: TOXENV=py34-base
-    - python: 3.4
-      env: TOXENV=py34-cryptography-only
-    - python: 3.4
-      env: TOXENV=py34-pycryptodome-norsa
-    - python: 3.4
-      env: TOXENV=py34-pycrypto-norsa
-    - python: 3.4
-      env: TOXENV=py34-compatibility
     # CPython 3.5
     - python: 3.5
       env: TOXENV=py35-base
