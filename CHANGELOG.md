@@ -42,4 +42,4 @@ This is a greatly overdue release.
 * Document versioning policy #131
 * Add `CHANGELOG.rst` #132 (fixes #99)
 * Simplify and extend `.travis.yml` #135
-* Move `CHANGELOG.rst` to `CHANGELOG.md` and update it #158
+* Move `CHANGELOG.rst` to `CHANGELOG.md` and update it #159
