@@ -95,7 +95,7 @@ class RSAKey(Key):
 
     def _process_jwk(self, jwk_dict):
         if not jwk_dict.get('kty') == 'RSA':
-            raise JWKError("Incorrect key type.  Expected: 'RSA', Recieved: %s" % jwk_dict.get('kty'))
+            raise JWKError("Incorrect key type.  Expected: 'RSA', Received: %s" % jwk_dict.get('kty'))
 
         e = base64_to_long(jwk_dict.get('e', 256))
         n = base64_to_long(jwk_dict.get('n'))
