@@ -10,6 +10,9 @@ after_success:
   - codecov
 matrix:
   include:
+    # Linting
+    - python: 3.6
+      env: TOX_ENV=flake8
     # CPython 2.7
     - python: 2.7
       env: TOXENV=py27-base
@@ -77,6 +80,3 @@ matrix:
       env: TOXENV=pypy-pycrypto-norsa
     - python: pypy3.5
       env: TOXENV=pypy-compatibility
-    # Linting
-    - python: 3.6
-      env: TOX_ENV=flake8
