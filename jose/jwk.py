@@ -6,7 +6,6 @@ import six
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWKError
 from jose.utils import base64url_decode, base64url_encode
-from jose.utils import constant_time_string_compare
 from jose.backends.base import Key
 
 try:
@@ -135,7 +134,7 @@ class HMACKey(Key):
         return hmac.new(self.prepared_key, msg, self.hash_alg).digest()
 
     def verify(self, msg, sig):
-        return constant_time_string_compare(sig, self.sign(msg))
+        return hmac.compare_digest(sig, self.sign(msg))
 
     def to_dict(self):
         return {
