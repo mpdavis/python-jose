@@ -36,7 +36,7 @@ def get_key(algorithm):
 
 def register_key(algorithm, key_class):
     if not issubclass(key_class, Key):
-        raise TypeError("Key class not a subclass of jwk.Key")
+        raise TypeError("Key class is not a subclass of jwk.Key")
     ALGORITHMS.KEYS[algorithm] = key_class
     ALGORITHMS.SUPPORTED.add(algorithm)
     return True
@@ -53,11 +53,11 @@ def construct(key_data, algorithm=None):
         algorithm = key_data.get('alg', None)
 
     if not algorithm:
-        raise JWKError('Unable to find a algorithm for key: %s' % key_data)
+        raise JWKError('Unable to find an algorithm for key: %s' % key_data)
 
     key_class = get_key(algorithm)
     if not key_class:
-        raise JWKError('Unable to find a algorithm for key: %s' % key_data)
+        raise JWKError('Unable to find an algorithm for key: %s' % key_data)
     return key_class(key_data, algorithm)
 
 
@@ -119,7 +119,10 @@ class HMACKey(Key):
 
     def _process_jwk(self, jwk_dict):
         if not jwk_dict.get('kty') == 'oct':
+            raise JWKError("Incorrect key type.  Expected: 'oct', Received: %s" % jwk_dict.get('kty'))
+
             raise JWKError("Incorrect key type. Expected: 'oct', Received: %s" % jwk_dict.get('kty'))
+
 
         k = jwk_dict.get('k')
         k = k.encode('utf-8')
