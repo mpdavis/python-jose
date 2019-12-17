@@ -1,3 +1,4 @@
+import json
 
 from jose.constants import ALGORITHMS
 from jose.exceptions import JOSEError, JWKError
@@ -195,7 +196,6 @@ class TestECAlgorithm:
             assert 'd' not in as_dict
 
         # as_dict should be serializable to JSON
-        import json
         json.dumps(as_dict)
 
     def test_to_dict(self):

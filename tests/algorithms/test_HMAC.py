@@ -1,3 +1,4 @@
+import json
 
 from jose.constants import ALGORITHMS
 from jose.exceptions import JOSEError
@@ -45,5 +46,4 @@ class TestHMACAlgorithm:
         assert as_dict['k'] == encoded
 
         # as_dict should be serializable to JSON
-        import json
         json.dumps(as_dict)
