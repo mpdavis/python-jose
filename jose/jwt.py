@@ -5,7 +5,7 @@ from calendar import timegm
 try:
     from collections.abc import Mapping  # Python3
 except ImportError:
-    from collections import Mapping  # Python2, will be depecrated in Python 3.8
+    from collections import Mapping  # Python2, will be deprecated in Python 3.8
 from datetime import datetime
 from datetime import timedelta
 from six import string_types
@@ -97,6 +97,14 @@ def decode(token, key, algorithms=None, options=None, audience=None,
                 'verify_sub': True,
                 'verify_jti': True,
                 'verify_at_hash': True,
+                'require_aud': False,
+                'require_iat': False,
+                'require_exp': False,
+                'require_nbf': False,
+                'require_iss': False,
+                'require_sub': False,
+                'require_jti': False,
+                'require_at_hash': False,
                 'leeway': 0,
             }
 
@@ -126,6 +134,14 @@ def decode(token, key, algorithms=None, options=None, audience=None,
         'verify_sub': True,
         'verify_jti': True,
         'verify_at_hash': True,
+        'require_aud': False,
+        'require_iat': False,
+        'require_exp': False,
+        'require_nbf': False,
+        'require_iss': False,
+        'require_sub': False,
+        'require_jti': False,
+        'require_at_hash': False,
         'leeway': 0,
     }
 
@@ -454,6 +470,14 @@ def _validate_claims(claims, audience=None, issuer=None, subject=None,
 
     if isinstance(leeway, timedelta):
         leeway = timedelta_total_seconds(leeway)
+
+    for require_claim in [
+        e[len("require_"):] for e in options.keys() if e.startswith("require_") and options[e]
+    ]:
+        if require_claim not in claims:
+            raise JWTError('missing required key "%s" among claims' % require_claim)
+        else:
+            options['verify_' + require_claim] = True  # override verify when required
 
     if not isinstance(audience, (string_types, type(None))):
         raise JWTError('audience must be a string or None')

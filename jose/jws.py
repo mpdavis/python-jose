@@ -20,7 +20,7 @@ def sign(payload, key, headers=None, algorithm=ALGORITHMS.HS256):
     """Signs a claims set and returns a JWS string.
 
     Args:
-        payload (str): A string to sign
+        payload (str or dict): A string to sign
         key (str or dict): The key to use for signing the claim set. Can be
             individual JWK or JWK set.
         headers (dict, optional): A set of headers that will be added to
