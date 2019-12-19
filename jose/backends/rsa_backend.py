@@ -1,6 +1,8 @@
 import binascii
 
 import six
+import warnings
+
 from pyasn1.error import PyAsn1Error
 
 import rsa as pyrsa
@@ -201,7 +203,8 @@ class RSAKey(Key):
 
     def verify(self, msg, sig):
         if not self.is_public():
-            return False
+            warnings.warn("Attempting to verify a message with a private key. "
+                          "This is not recommended.")
         try:
             pyrsa.verify(msg, sig, self._prepared_key)
             return True

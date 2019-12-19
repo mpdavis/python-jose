@@ -1,6 +1,7 @@
 from base64 import b64encode
 
 import six
+import warnings
 
 import Crypto.Hash.SHA256
 import Crypto.Hash.SHA384
@@ -148,7 +149,8 @@ class RSAKey(Key):
 
     def verify(self, msg, sig):
         if not self.is_public():
-            return False
+            warnings.warn("Attempting to verify a message with a private key. "
+                          "This is not recommended.")
         try:
             return PKCS1_v1_5.new(self.prepared_key).verify(self.hash_alg.new(msg), sig)
         except Exception:
