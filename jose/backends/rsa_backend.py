@@ -170,7 +170,7 @@ class RSAKey(Key):
 
     def _process_jwk(self, jwk_dict):
         if not jwk_dict.get('kty') == 'RSA':
-            raise JWKError("Incorrect key type.  Expected: 'RSA', Recieved: %s" % jwk_dict.get('kty'))
+            raise JWKError("Incorrect key type. Expected: 'RSA', Received: %s" % jwk_dict.get('kty'))
 
         e = base64_to_long(jwk_dict.get('e'))
         n = base64_to_long(jwk_dict.get('n'))
@@ -248,18 +248,18 @@ class RSAKey(Key):
         data = {
             'alg': self._algorithm,
             'kty': 'RSA',
-            'n': long_to_base64(public_key.n),
-            'e': long_to_base64(public_key.e),
+            'n': long_to_base64(public_key.n).decode('ASCII'),
+            'e': long_to_base64(public_key.e).decode('ASCII'),
         }
 
         if not self.is_public():
             data.update({
-                'd': long_to_base64(self._prepared_key.d),
-                'p': long_to_base64(self._prepared_key.p),
-                'q': long_to_base64(self._prepared_key.q),
-                'dp': long_to_base64(self._prepared_key.exp1),
-                'dq': long_to_base64(self._prepared_key.exp2),
-                'qi': long_to_base64(self._prepared_key.coef),
+                'd': long_to_base64(self._prepared_key.d).decode('ASCII'),
+                'p': long_to_base64(self._prepared_key.p).decode('ASCII'),
+                'q': long_to_base64(self._prepared_key.q).decode('ASCII'),
+                'dp': long_to_base64(self._prepared_key.exp1).decode('ASCII'),
+                'dq': long_to_base64(self._prepared_key.exp2).decode('ASCII'),
+                'qi': long_to_base64(self._prepared_key.coef).decode('ASCII'),
             })
 
         return data

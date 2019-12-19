@@ -24,10 +24,6 @@ class JWTClaimsError(JWTError):
     pass
 
 
-class JWTSignatureError(JWTError):
-    pass
-
-
 class ExpiredSignatureError(JWTError):
     pass
 

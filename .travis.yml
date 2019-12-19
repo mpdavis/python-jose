@@ -10,6 +10,9 @@ after_success:
   - codecov
 matrix:
   include:
+    # Linting
+    - python: 3.6
+      env: TOX_ENV=flake8
     # CPython 2.7
     - python: 2.7
       env: TOXENV=py27-base
@@ -21,17 +24,6 @@ matrix:
       env: TOXENV=py27-pycrypto-norsa
     - python: 2.7
       env: TOXENV=py27-compatibility
-    # CPython 3.4
-    - python: 3.4
-      env: TOXENV=py34-base
-    - python: 3.4
-      env: TOXENV=py34-cryptography-only
-    - python: 3.4
-      env: TOXENV=py34-pycryptodome-norsa
-    - python: 3.4
-      env: TOXENV=py34-pycrypto-norsa
-    - python: 3.4
-      env: TOXENV=py34-compatibility
     # CPython 3.5
     - python: 3.5
       env: TOXENV=py35-base
@@ -77,17 +69,6 @@ matrix:
       env: TOXENV=py37-compatibility
       dist: xenial
       sudo: true
-    # PyPy 5.3.1
-    - python: pypy-5.3.1
-      env: TOXENV=pypy-base
-    - python: pypy-5.3.1
-      env: TOXENV=pypy-cryptography-only
-    - python: pypy-5.3.1
-      env: TOXENV=pypy-pycryptodome-norsa
-    - python: pypy-5.3.1
-      env: TOXENV=pypy-pycrypto-norsa
-    - python: pypy-5.3.1
-      env: TOXENV=pypy-compatibility
     # PyPy 3.5 (5.10.1?)
     - python: pypy3.5
       env: TOXENV=pypy-base
@@ -99,6 +80,3 @@ matrix:
       env: TOXENV=pypy-pycrypto-norsa
     - python: pypy3.5
       env: TOXENV=pypy-compatibility
-    # Linting
-    - python: 3.6
-      env: TOX_ENV=flake8

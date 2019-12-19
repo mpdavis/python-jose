@@ -5,7 +5,7 @@ from calendar import timegm
 try:
     from collections.abc import Mapping  # Python3
 except ImportError:
-    from collections import Mapping  # Python2, will be depecrated in Python 3.8
+    from collections import Mapping  # Python2, will be deprecated in Python 3.8
 from datetime import datetime
 from datetime import timedelta
 from six import string_types

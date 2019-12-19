@@ -1,4 +1,5 @@
 import base64
+import json
 import sys
 
 try:
@@ -369,6 +370,9 @@ class TestRSAAlgorithm:
             assert 'dp' not in as_dict
             assert 'dq' not in as_dict
             assert 'qi' not in as_dict
+
+        # as_dict should be serializable to JSON
+        json.dumps(as_dict)
 
     def assert_roundtrip(self, key):
         assert RSAKey(
