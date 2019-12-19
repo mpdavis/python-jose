@@ -47,7 +47,6 @@ install_requires += legacy_backend_requires
 
 setup(
     name='python-jose',
-    version=jose.__version__,
     author='Michael Davis',
     author_email='mike.philip.davis@gmail.com',
     description='JOSE implementation in Python',
@@ -71,7 +70,10 @@ setup(
         'Topic :: Utilities',
     ],
     extras_require=extras_require,
-    setup_requires=['pytest-runner'],
+    setup_requires=[
+        'pytest-runner',
+        'setuptools>=39.2.0',
+    ],
     tests_require=[
         'six',
         'ecdsa',
