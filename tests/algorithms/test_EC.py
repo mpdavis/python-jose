@@ -1,3 +1,4 @@
+import json
 
 from jose.constants import ALGORITHMS
 from jose.exceptions import JOSEError, JWKError
@@ -193,6 +194,9 @@ class TestECAlgorithm:
         else:
             # Private parameters should be absent
             assert 'd' not in as_dict
+
+        # as_dict should be serializable to JSON
+        json.dumps(as_dict)
 
     def test_to_dict(self):
         key = ECKey(private_key, ALGORITHMS.ES256)

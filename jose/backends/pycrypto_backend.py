@@ -185,8 +185,8 @@ class RSAKey(Key):
         data = {
             'alg': self._algorithm,
             'kty': 'RSA',
-            'n': long_to_base64(self.prepared_key.n),
-            'e': long_to_base64(self.prepared_key.e),
+            'n': long_to_base64(self.prepared_key.n).decode('ASCII'),
+            'e': long_to_base64(self.prepared_key.e).decode('ASCII'),
         }
 
         if not self.is_public():
@@ -201,12 +201,12 @@ class RSAKey(Key):
             dp = self.prepared_key.d % (self.prepared_key.p - 1)
             dq = self.prepared_key.d % (self.prepared_key.q - 1)
             data.update({
-                'd': long_to_base64(self.prepared_key.d),
-                'p': long_to_base64(self.prepared_key.q),
-                'q': long_to_base64(self.prepared_key.p),
-                'dp': long_to_base64(dq),
-                'dq': long_to_base64(dp),
-                'qi': long_to_base64(self.prepared_key.u),
+                'd': long_to_base64(self.prepared_key.d).decode('ASCII'),
+                'p': long_to_base64(self.prepared_key.q).decode('ASCII'),
+                'q': long_to_base64(self.prepared_key.p).decode('ASCII'),
+                'dp': long_to_base64(dq).decode('ASCII'),
+                'dq': long_to_base64(dp).decode('ASCII'),
+                'qi': long_to_base64(self.prepared_key.u).decode('ASCII'),
             })
 
         return data

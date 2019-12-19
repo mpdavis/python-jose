@@ -1,3 +1,4 @@
+import json
 
 from jose.constants import ALGORITHMS
 from jose.exceptions import JOSEError
@@ -31,7 +32,7 @@ class TestHMACAlgorithm:
 
     def test_to_dict(self):
         passphrase = 'The quick brown fox jumps over the lazy dog'
-        encoded = b'VGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIHRoZSBsYXp5IGRvZw'
+        encoded = 'VGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIHRoZSBsYXp5IGRvZw'
         key = HMACKey(passphrase, ALGORITHMS.HS256)
 
         as_dict = key.to_dict()
@@ -43,3 +44,6 @@ class TestHMACAlgorithm:
 
         assert 'k' in as_dict
         assert as_dict['k'] == encoded
+
+        # as_dict should be serializable to JSON
+        json.dumps(as_dict)

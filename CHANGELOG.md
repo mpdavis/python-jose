@@ -1,5 +1,9 @@
 # Changelog #
 
+## Development ##
+
+* Fix `to_dict` output, which should always be JSON encodeable. #139 (fixes #127 and #137)
+
 ## 3.1.0 -- 2019-12-10 ##
 
 This is a greatly overdue release.
