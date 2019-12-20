@@ -1,6 +1,5 @@
 
 import base64
-import hmac
 import six
 import struct
 import sys

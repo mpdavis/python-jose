@@ -3,7 +3,7 @@
 import os
 import platform
 
-import jose
+import jose  # noqa: F401
 
 from setuptools import setup
 

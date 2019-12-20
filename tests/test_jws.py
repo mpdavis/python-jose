@@ -1,11 +1,18 @@
 import json
+import warnings
+
+import pytest
 
 from jose import jwk
 from jose import jws
+from jose.backends import RSAKey
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWSError
 
-import pytest
+try:
+    from jose.backends.cryptography_backend import CryptographyRSAKey
+except ImportError:
+    CryptographyRSAKey = None
 
 
 @pytest.fixture
@@ -290,6 +297,20 @@ class TestRSA(object):
         token = jws.sign(payload, rsa_private_key, algorithm=ALGORITHMS.RS256)
         with pytest.raises(JWSError):
             jws.verify(token, rsa_public_key, ALGORITHMS.HS256)
+
+    @pytest.mark.skipif(RSAKey is CryptographyRSAKey, reason="Cryptography backend outright fails verification")
+    def test_private_verify_raises_warning(self, payload):
+        token = jws.sign(payload, rsa_private_key, algorithm='RS256')
+
+        # verify with public
+        jws.verify(token, rsa_public_key, algorithms='RS256')
+
+        with warnings.catch_warnings(record=True) as w:
+            # verify with private raises warning
+            jws.verify(token, rsa_private_key, algorithms='RS256')
+
+            assert ("Attempting to verify a message with a private key. "
+                    "This is not recommended.") == str(w[-1].message)
 
 
 ec_private_key = """-----BEGIN EC PRIVATE KEY-----
