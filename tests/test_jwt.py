@@ -366,6 +366,42 @@ class TestJWT:
         token = jwt.encode(claims, key)
         jwt.decode(token, key, audience=aud)
 
+    def test_aud_list_without_matches(self, key):
+
+        aud = 'audience'
+
+        claims = {
+            'aud': ['one audience', 'another audience']
+        }
+
+        token = jwt.encode(claims, key)
+        with pytest.raises(JWTError):
+            jwt.decode(token, key, audience=aud)
+
+    def test_aud_list_is_empty(self, key):
+
+        aud = 'audience'
+
+        claims = {
+            'aud': []
+        }
+
+        token = jwt.encode(claims, key)
+        with pytest.raises(JWTError):
+            jwt.decode(token, key, audience=aud)
+
+    def test_aud_list_is_not_none(self, key):
+
+        aud = 'audience'
+
+        claims = {
+            'aud': [aud, None]
+        }
+
+        token = jwt.encode(claims, key)
+        with pytest.raises(JWTError):
+            jwt.decode(token, key, audience=aud)
+
     def test_aud_list_is_strings(self, key):
 
         aud = 'audience'
@@ -412,6 +448,18 @@ class TestJWT:
     def test_aud_given_number(self, key):
 
         aud = 'audience'
+
+        claims = {
+            'aud': aud
+        }
+
+        token = jwt.encode(claims, key)
+        with pytest.raises(JWTError):
+            jwt.decode(token, key, audience=1)
+
+    def test_aud_not_string_or_list_given_number(self, key):
+
+        aud = 1
 
         claims = {
             'aud': aud
