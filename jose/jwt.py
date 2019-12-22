@@ -479,9 +479,6 @@ def _validate_claims(claims, audience=None, issuer=None, subject=None,
         else:
             options['verify_' + require_claim] = True  # override verify when required
 
-    if not isinstance(audience, (string_types, type(None))):
-        raise JWTError('audience must be a string or None')
-
     if options.get('verify_iat'):
         _validate_iat(claims)
 
