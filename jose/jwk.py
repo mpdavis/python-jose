@@ -47,6 +47,10 @@ def construct(key_data, algorithm=None):
     key_data.
     """
 
+    # Set default algorithm to RS256 as "alg" is optional due to RFC 7517 4.4.
+    if not algorithm and isinstance(key_data, dict) and 'alg' not in key_data:
+        key_data['alg'] = ALGORITHMS.RS256
+
     # Allow for pulling the algorithm off of the passed in jwk.
     if not algorithm and isinstance(key_data, dict):
         algorithm = key_data.get('alg', None)
