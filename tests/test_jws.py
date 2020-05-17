@@ -298,7 +298,6 @@ class TestRSA(object):
         with pytest.raises(JWSError):
             jws.verify(token, rsa_public_key, ALGORITHMS.HS256)
 
-    @pytest.mark.skipif(RSAKey is CryptographyRSAKey, reason="Cryptography backend outright fails verification")
     def test_private_verify_raises_warning(self, payload):
         token = jws.sign(payload, rsa_private_key, algorithm='RS256')
 

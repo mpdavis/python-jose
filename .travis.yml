@@ -1,6 +1,6 @@
 # Travis infra requires pinning dist:precise, at least as of 2017-09-01
 # detail: https://blog.travis-ci.com/2017-06-21-trusty-updates-2017-Q2-launch
-dist: precise
+dist: bionic
 language: python
 install:
   - pip install -U setuptools && pip install -U tox codecov tox-travis
@@ -8,6 +8,9 @@ script:
   - tox
 after_success:
   - codecov
+jobs:
+  allow_failures:
+  - python: 3.9-dev
 matrix:
   include:
     # Linting
@@ -47,36 +50,57 @@ matrix:
     - python: 3.6
       env: TOXENV=py36-compatibility
     # CPython 3.7
-    # xenial + sudo are currently needed to get 3.7
-    # https://github.com/travis-ci/travis-ci/issues/9815
     - python: 3.7
       env: TOXENV=py37-base
-      dist: xenial
-      sudo: true
     - python: 3.7
       env: TOXENV=py37-cryptography-only
-      dist: xenial
-      sudo: true
     - python: 3.7
       env: TOXENV=py37-pycryptodome-norsa
-      dist: xenial
-      sudo: true
     - python: 3.7
       env: TOXENV=py37-pycrypto-norsa
-      dist: xenial
-      sudo: true
     - python: 3.7
       env: TOXENV=py37-compatibility
-      dist: xenial
-      sudo: true
-    # PyPy 3.5 (5.10.1?)
-    - python: pypy3.5
+    # CPython 3.8
+    - python: 3.8
+      env: TOXENV=py38-base
+    - python: 3.8
+      env: TOXENV=py38-cryptography-only
+    - python: 3.8
+      env: TOXENV=py38-pycryptodome-norsa
+    - python: 3.8
+      env: TOXENV=py38-pycrypto-norsa
+    - python: 3.8
+      env: TOXENV=py38-compatibility
+    # CPython 3.9 - dev
+    - python: 3.9-dev
+      env: TOXENV=py39-base
+    - python: 3.9-dev
+      env: TOXENV=py39-cryptography-only
+    - python: 3.9-dev
+      env: TOXENV=py39-pycryptodome-norsa
+    - python: 3.9-dev
+      env: TOXENV=py39-pycrypto-norsa
+    - python: 3.9-dev
+      env: TOXENV=py39-compatibility
+    # PyPy 2.7
+    - python: pypy2
       env: TOXENV=pypy-base
-    - python: pypy3.5
+    - python: pypy2
       env: TOXENV=pypy-cryptography-only
-    - python: pypy3.5
+    - python: pypy2
       env: TOXENV=pypy-pycryptodome-norsa
-    - python: pypy3.5
+    - python: pypy2
       env: TOXENV=pypy-pycrypto-norsa
-    - python: pypy3.5
+    - python: pypy2
       env: TOXENV=pypy-compatibility
+    # PyPy 3.x
+    - python: pypy3
+      env: TOXENV=pypy-base
+    - python: pypy3
+      env: TOXENV=pypy3-cryptography-only
+    - python: pypy3
+      env: TOXENV=pypy3-pycryptodome-norsa
+    - python: pypy3
+      env: TOXENV=pypy3-pycrypto-norsa
+    - python: pypy3
+      env: TOXENV=pypy3-compatibility

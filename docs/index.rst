@@ -24,6 +24,7 @@ Contents
    jws/index
    jwt/index
    jwk/index
+   jwe/index
 
 
 APIs
@@ -35,6 +36,7 @@ APIs
    jws/api
    jwt/api
    jwk/api
+   jwe/api
 
 
 Principles

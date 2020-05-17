@@ -76,7 +76,7 @@ setup(
     ],
     tests_require=[
         'six',
-        'ecdsa',
+        'ecdsa<0.15',
         'pytest',
         'pytest-cov',
         'pytest-runner',
