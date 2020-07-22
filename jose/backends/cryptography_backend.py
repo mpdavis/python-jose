@@ -4,11 +4,6 @@ import math
 
 import six
 
-try:
-    from ecdsa import SigningKey as EcdsaSigningKey, VerifyingKey as EcdsaVerifyingKey
-except ImportError:
-    EcdsaSigningKey = EcdsaVerifyingKey = None
-
 from jose.backends.base import Key
 from jose.utils import base64_to_long, long_to_base64
 from jose.constants import ALGORITHMS
@@ -46,7 +41,7 @@ class CryptographyECKey(Key):
             self.prepared_key = key
             return
 
-        if None not in (EcdsaSigningKey, EcdsaVerifyingKey) and isinstance(key, (EcdsaSigningKey, EcdsaVerifyingKey)):
+        if hasattr(key, 'to_pem'):
             # convert to PEM and let cryptography below load it as PEM
             key = key.to_pem().decode('utf-8')
 
