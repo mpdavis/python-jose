@@ -1,5 +1,5 @@
 pycryptodome
 six
 rsa
-ecdsa
+ecdsa<0.15
 pyasn1
