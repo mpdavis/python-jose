@@ -1,8 +1,27 @@
 # Changelog #
 
-## Development ##
+## 3.2.0 -- 2020-07-29 ##
 
-* Fix `to_dict` output, which should always be JSON encodeable. #139 (fixes #127 and #137)
+### News ###
+
+* This will be the last release supporting Python 2.7, 3.5, and the PyCrypto
+  backend.
+
+### Bug fixes and Improvements ###
+
+* Use hmac.compare_digest instead of our own constant_time_string_compare #163
+* Fix `to_dict` output, which should always be JSON encodeable. #139 and #165
+  (fixes #127 and #137)
+* Require setuptools >= 39.2.0 #167 (fixes #161)
+* Emit a warning when verifying with a private key #168 (fixes #53 and #142)
+* Avoid loading python-ecdsa when using the cryptography backend, and pinned
+  python-ecdsa dependency to <0.15 #178
+
+### Housekeeping ###
+
+* Fixed some typos #160, #162, and #164
+
+
 
 ## 3.1.0 -- 2019-12-10 ##
 
