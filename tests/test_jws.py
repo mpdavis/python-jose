@@ -343,6 +343,10 @@ class TestEC(object):
         token = jws.sign(payload, ec_private_key, algorithm=ALGORITHMS.ES512)
         assert jws.verify(token, ec_public_key, ALGORITHMS.ES512) == payload
 
+    def test_EC256K(self, payload):
+        token = jws.sign(payload, ec_private_key, algorithm=ALGORITHMS.ES256K)
+        assert jws.verify(token, ec_public_key, ALGORITHMS.ES256K) == payload
+
     def test_wrong_alg(self, payload):
         token = jws.sign(payload, ec_private_key, algorithm=ALGORITHMS.ES256)
         with pytest.raises(JWSError):

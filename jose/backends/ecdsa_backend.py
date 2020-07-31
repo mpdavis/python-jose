@@ -26,6 +26,7 @@ class ECDSAECKey(Key):
         SHA256: ecdsa.curves.NIST256p,
         SHA384: ecdsa.curves.NIST384p,
         SHA512: ecdsa.curves.NIST521p,
+        SHA256: ecdsa.curves.SECP256k1,
     }
 
     def __init__(self, key, algorithm):
@@ -35,7 +36,8 @@ class ECDSAECKey(Key):
         self.hash_alg = {
             ALGORITHMS.ES256: self.SHA256,
             ALGORITHMS.ES384: self.SHA384,
-            ALGORITHMS.ES512: self.SHA512
+            ALGORITHMS.ES512: self.SHA512,
+            ALGORITHMS.ES256K: self.SHA256
         }.get(algorithm)
         self._algorithm = algorithm
 
@@ -120,6 +122,7 @@ class ECDSAECKey(Key):
             ecdsa.curves.NIST256p: 'P-256',
             ecdsa.curves.NIST384p: 'P-384',
             ecdsa.curves.NIST521p: 'P-521',
+            ecdsa.curves.SECP256k1: 'P-256K',
         }[self.prepared_key.curve]
 
         # Calculate the key size in bytes. Section 6.2.1.2 and 6.2.1.3 of
