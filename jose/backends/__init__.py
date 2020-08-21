@@ -22,4 +22,7 @@ try:
 except ImportError:
     from jose.backends.ecdsa_backend import ECDSAECKey as ECKey  # noqa: F401
 
-from jose.backends.native import HMACKey  # noqa: F401
+try:
+    from jose.backends.cryptography_backend import CryptographyHMACKey as HMACKey  # noqa: F401
+except ImportError:
+    from jose.backends.native import HMACKey  # noqa: F401
