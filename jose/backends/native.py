@@ -1,5 +1,6 @@
 import hashlib
 import hmac
+import os
 
 import six
 
@@ -7,6 +8,10 @@ from jose.backends.base import Key
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWKError
 from jose.utils import base64url_decode, base64url_encode
+
+
+def get_random_bytes(num_bytes):
+    return bytes(os.urandom(num_bytes))
 
 
 class HMACKey(Key):
