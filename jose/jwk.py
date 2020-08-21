@@ -22,7 +22,7 @@ except ImportError:
 def get_key(algorithm):
     if algorithm in ALGORITHMS.KEYS:
         return ALGORITHMS.KEYS[algorithm]
-    elif algorithm in ALGORITHMS.HMAC:
+    elif algorithm in ALGORITHMS.HMAC:  # noqa: F811
         return HMACKey
     elif algorithm in ALGORITHMS.RSA:
         from jose.backends import RSAKey  # noqa: F811
