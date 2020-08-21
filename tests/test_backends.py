@@ -17,6 +17,14 @@ except ImportError:
     PurePythonRSAKey = None
 
 try:
+    from jose.backends.cryptography_backend import CryptographyAESKey
+except ImportError:
+    CryptographyAESKey = None
+try:
+    from jose.backends.pycrypto_backend import AESKey as PyCryptoAESKey
+except ImportError:
+    PyCryptoAESKey = None
+try:
     from jose.backends.cryptography_backend import CryptographyHMACKey
 except ImportError:
     CryptographyHMACKey = None
@@ -24,6 +32,11 @@ except ImportError:
 from jose.backends.native import HMACKey as NativeHMACKey
 
 from jose.backends import ECKey, RSAKey, HMACKey
+
+try:
+    from jose.backends import AESKey
+except ImportError:
+    AESKey = None
 
 
 def test_default_ec_backend():
@@ -40,6 +53,15 @@ def test_default_rsa_backend():
         assert RSAKey is PyCryptoRSAKey
     else:
         assert RSAKey is PurePythonRSAKey
+
+
+def test_default_aes_backend():
+    if CryptographyAESKey is not None:
+        assert AESKey is CryptographyAESKey
+    elif PyCryptoAESKey is not None:
+        assert AESKey is PyCryptoAESKey
+    else:
+        assert AESKey is None
 
 
 def test_default_hmac_backend():

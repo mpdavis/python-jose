@@ -1,7 +1,7 @@
 from jose import jwk
 from jose.exceptions import JWKError
 from jose.backends.base import Key
-from jose.backends import ECKey, RSAKey, HMACKey
+from jose.backends import ECKey, RSAKey, HMACKey, AESKey
 
 import pytest
 
@@ -128,6 +128,10 @@ class TestJWK:
         assert issubclass(jwk.get_key("ES256"), Key)
 
         assert jwk.get_key("NONEXISTENT") is None
+
+    @pytest.mark.skipif(AESKey is None, reason="No AES provider")
+    def test_get_aes_key(self):
+        assert issubclass(jwk.get_key("A256CBC-HS512"), Key)
 
     def test_register_key(self):
         assert jwk.register_key("ALG", jwk.Key)
