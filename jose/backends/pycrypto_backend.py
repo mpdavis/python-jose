@@ -63,7 +63,7 @@ class RSAKey(Key):
         self.hash_alg = {
             ALGORITHMS.RS256: self.SHA256,
             ALGORITHMS.RS384: self.SHA384,
-            ALGORITHMS.RS512: self.SHA512
+            ALGORITHMS.RS512: self.SHA512,
         }.get(algorithm)
         self._algorithm = algorithm
 
