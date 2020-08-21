@@ -1,6 +1,7 @@
 from __future__ import division
 
 import math
+import warnings
 
 import six
 
@@ -294,8 +295,12 @@ class CryptographyRSAKey(Key):
         return signature
 
     def verify(self, msg, sig):
+        if not self.is_public():
+            warnings.warn("Attempting to verify a message with a private key. "
+                          "This is not recommended.")
+
         try:
-            self.prepared_key.verify(
+            self.public_key().prepared_key.verify(
                 sig,
                 msg,
                 padding.PKCS1v15(),
