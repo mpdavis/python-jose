@@ -4,10 +4,10 @@ import math
 
 import six
 
-from jose.backends.base import Key
-from jose.utils import base64_to_long, long_to_base64
-from jose.constants import ALGORITHMS
-from jose.exceptions import JWKError
+from .base import Key
+from ..utils import base64_to_long, long_to_base64
+from ..constants import ALGORITHMS
+from ..exceptions import JWKError
 
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.backends import default_backend

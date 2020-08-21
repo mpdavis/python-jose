@@ -3,10 +3,10 @@ import hashlib
 import hmac
 import six
 
+from jose.backends.base import Key
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWKError
 from jose.utils import base64url_decode, base64url_encode
-from jose.backends.base import Key
 
 try:
     from jose.backends import RSAKey  # noqa: F401

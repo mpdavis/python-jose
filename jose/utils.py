@@ -1,8 +1,9 @@
 
 import base64
-import six
 import struct
 import sys
+
+import six
 
 if sys.version_info > (3,):
     # Deal with integer compatibilities between Python 2 and 3.
