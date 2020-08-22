@@ -7,6 +7,7 @@ try:
 except ImportError:
     PurePythonRSAKey = CryptographyRSAKey = PyCryptoRSAKey = None
 from jose.constants import ALGORITHMS
+from jose.exceptions import JWEError
 
 from .test_RSA import PRIVATE_KEYS
 
@@ -100,3 +101,24 @@ class TestBackendRsaCompatibility(object):
         key_2 = BackendTo(pem_load, ALGORITHMS.RS256)
 
         assert pem_reference == key_2.to_pem(encoding_save).strip()
+
+    @pytest.mark.parametrize("backend_wrap", CRYPTO_BACKENDS)
+    @pytest.mark.parametrize("backend_unwrap", CRYPTO_BACKENDS)
+    @pytest.mark.parametrize("algorithm", filter(lambda x: x in ALGORITHMS.SUPPORTED, ALGORITHMS.RSA_KW))
+    @pytest.mark.parametrize("private_key", PRIVATE_KEYS)
+    def test_key_wrap_parity(self, backend_wrap, backend_unwrap, private_key, algorithm):
+        if algorithm in (ALGORITHMS.RSA_OAEP, ALGORITHMS.RSA_OAEP_256) \
+                and PurePythonRSAKey in (backend_wrap, backend_unwrap):
+            pytest.skip("Pure RSA does not support OAEP")
+        key_wrap = backend_wrap(private_key, algorithm).public_key()
+        key_unwrap = backend_unwrap(private_key, algorithm)
+
+        unwrapped_key = b'test'
+        wrapped_key = key_wrap.wrap_key(unwrapped_key)
+
+        # verify unwrap to original key
+        actual = key_unwrap.unwrap_key(wrapped_key)
+        assert actual == unwrapped_key
+
+        with pytest.raises(JWEError):
+            key_unwrap.unwrap_key(b'n' * 64)
