@@ -1,7 +1,7 @@
 from jose import jwk
 from jose.exceptions import JWKError
 from jose.backends.base import Key
-from jose.backends import ECKey, RSAKey
+from jose.backends import ECKey, RSAKey, HMACKey, AESKey
 
 import pytest
 
@@ -45,7 +45,7 @@ class TestJWK:
 
     def test_invalid_hash_alg(self):
         with pytest.raises(JWKError):
-            key = jwk.HMACKey(hmac_key, 'RS512')
+            key = HMACKey(hmac_key, 'RS512')
 
         with pytest.raises(JWKError):
             key = RSAKey(rsa_key, 'HS512')
@@ -56,7 +56,7 @@ class TestJWK:
     def test_invalid_jwk(self):
 
         with pytest.raises(JWKError):
-            key = jwk.HMACKey(rsa_key, 'HS256')
+            key = HMACKey(rsa_key, 'HS256')
 
         with pytest.raises(JWKError):
             key = RSAKey(hmac_key, 'RS256')
@@ -122,12 +122,16 @@ class TestJWK:
 
     def test_get_key(self):
         hs_key = jwk.get_key("HS256")
-        assert hs_key == jwk.HMACKey
+        assert hs_key == HMACKey
         assert issubclass(hs_key, Key)
         assert issubclass(jwk.get_key("RS256"), Key)
         assert issubclass(jwk.get_key("ES256"), Key)
 
         assert jwk.get_key("NONEXISTENT") is None
+
+    @pytest.mark.skipif(AESKey is None, reason="No AES provider")
+    def test_get_aes_key(self):
+        assert issubclass(jwk.get_key("A256CBC-HS512"), Key)
 
     def test_register_key(self):
         assert jwk.register_key("ALG", jwk.Key)

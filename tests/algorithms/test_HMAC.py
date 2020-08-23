@@ -2,7 +2,7 @@ import json
 
 from jose.constants import ALGORITHMS
 from jose.exceptions import JOSEError
-from jose.jwk import HMACKey
+from jose.backends.native import HMACKey
 
 import pytest
 

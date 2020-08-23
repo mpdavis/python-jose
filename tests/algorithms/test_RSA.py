@@ -169,6 +169,11 @@ ymbpPjVPxSfCAHJr5Pcu5tuZ0knP
 -----END PRIVATE KEY-----
 """
 
+RSA_KW_ALGOS = (
+    pytest.param(ALGORITHMS.RSA_OAEP, id="RSA_OAEP"),
+    pytest.param(ALGORITHMS.RSA_OAEP_256, id="RSA_OAEP_256")
+)
+
 
 def _legacy_invalid_private_key_pkcs8_der():
     legacy_key = LEGACY_INVALID_PRIVATE_KEY_PKCS8_PEM.strip()
@@ -235,7 +240,7 @@ def test_pycrypto_RSA_key_instance():
 @pytest.mark.pycryptodome
 @pytest.mark.parametrize("private_key", PRIVATE_KEYS)
 @pytest.mark.skipif(None in (PyCryptoRSA, PyCryptoRSAKey), reason="Pycrypto/dome backend not available")
-def test_pycrypto_unencoded_cleartext(private_key):
+def test_pycrypto_sign_unencoded_cleartext(private_key):
     key = PyCryptoRSAKey(private_key, ALGORITHMS.RS256)
     msg = b'test'
     signature = key.sign(msg)
@@ -243,6 +248,22 @@ def test_pycrypto_unencoded_cleartext(private_key):
 
     assert bool(public_key.verify(msg, signature))
     assert not bool(public_key.verify(msg, 1))
+
+
+# TODO: Unclear why this test was marked as only for pycrypto
+@pytest.mark.pycrypto
+@pytest.mark.pycryptodome
+@pytest.mark.parametrize("private_key_pem", PRIVATE_KEYS)
+@pytest.mark.parametrize("algorithm", RSA_KW_ALGOS)
+@pytest.mark.skipif(None in (PyCryptoRSA, PyCryptoRSAKey),
+                    reason="Pycrypto/dome backend not available")
+def test_pycrypto_wrap_key_unencoded_cleartext(private_key_pem, algorithm):
+    private_key = PyCryptoRSAKey(private_key_pem, algorithm)
+    key = b'test'
+    public_key = private_key.public_key()
+    wrapped = public_key.wrap_key(key)
+    unwrapped = private_key.unwrap_key(wrapped)
+    assert unwrapped == key
 
 
 @pytest.mark.cryptography
@@ -262,6 +283,22 @@ def test_cryptography_RSA_key_instance():
 
     pem = pubkey.to_pem()
     assert pem.startswith(b'-----BEGIN PUBLIC KEY-----')
+
+
+@pytest.mark.cryptography
+@pytest.mark.parametrize("private_key_pem", PRIVATE_KEYS)
+@pytest.mark.parametrize("algorithm", RSA_KW_ALGOS)
+@pytest.mark.skipif(
+    None in (default_backend, pyca_rsa, CryptographyRSAKey),
+    reason="Cryptography backend not available"
+)
+def test_cryptography_wrap_key_unencoded_cleartext(private_key_pem, algorithm):
+    private_key = CryptographyRSAKey(private_key_pem, algorithm)
+    key = b'test'
+    public_key = private_key.public_key()
+    wrapped = public_key.wrap_key(key)
+    unwrapped = private_key.unwrap_key(wrapped)
+    assert unwrapped == key
 
 
 class TestRSAAlgorithm:

@@ -66,6 +66,8 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Utilities',
     ],
@@ -76,7 +78,7 @@ setup(
     ],
     tests_require=[
         'six',
-        'ecdsa',
+        'ecdsa<0.15',
         'pytest',
         'pytest-cov',
         'pytest-runner',
