@@ -52,6 +52,13 @@ class TestJWT:
                 key=key,
                 algorithms=[])
 
+    @pytest.mark.parametrize("key, token",
+                             [('1234567890', u'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoidGVzdCJ9.aNBlulVhiYSCzvsh1rTzXZC2eWJmNrMBjINT-0wQz4k'),
+                              ('123456789.0',u'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoidGVzdCJ9.D8WLFPMi3yKgua2jm3BKThFsParXpgxhIbsUc39zJDw')])
+    def test_numeric_key(self, key, token):
+        token_info = jwt.decode(token, key)
+        assert token_info == {"name": "test"}
+
     def test_invalid_claims_json(self):
         old_jws_verify = jws.verify
         try:
