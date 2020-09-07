@@ -77,6 +77,17 @@ class TestJWS(object):
         with pytest.raises(JWSError):
             jws.sign(payload, 'secret', algorithm='RS256')
 
+    @pytest.mark.parametrize("key", [
+        b'key',
+        'key',
+    ])
+    def test_round_trip_with_different_key_types(self, key):
+        signed_data = jws.sign({'testkey': 'testvalue'}, key, algorithm=ALGORITHMS.HS256)
+        verified_bytes = jws.verify(signed_data, key, algorithms=[ALGORITHMS.HS256])
+        verified_data = json.loads(verified_bytes.decode('utf-8'))
+        assert 'testkey' in verified_data.keys()
+        assert verified_data['testkey'] == 'testvalue'
+
 
 class TestHMAC(object):
 

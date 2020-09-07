@@ -165,6 +165,16 @@ class TestJWT:
 
         assert decoded == claims
 
+    @pytest.mark.parametrize('key', [
+        b'key',
+        'key',
+    ])
+    def test_round_trip_with_different_key_types(self, key):
+        token = jwt.encode({'testkey': 'testvalue'}, key, algorithm='HS256')
+        verified_data = jwt.decode(token, key, algorithms=['HS256'])
+        assert 'testkey' in verified_data.keys()
+        assert verified_data['testkey'] == 'testvalue'
+
     def test_leeway_is_int(self):
         pass
 
