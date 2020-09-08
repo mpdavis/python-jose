@@ -89,6 +89,14 @@ class TestJWS(object):
         assert verified_data['testkey'] == 'testvalue'
 
 
+class TestJWK(object):
+    def test_jwk(self, payload):
+        key_data = 'key'
+        key = jwk.construct(key_data, algorithm='HS256')
+        token = jws.sign(payload, key, algorithm=ALGORITHMS.HS256)
+        assert jws.verify(token, key_data, ALGORITHMS.HS256) == payload
+
+
 class TestHMAC(object):
 
     def testHMAC256(self, payload):
@@ -271,6 +279,10 @@ class TestGetKeys(object):
 
     def test_list(self):
         assert ['test', 'key'] == jws._get_keys(['test', 'key'])
+
+    def test_jwk(self):
+        jwkey = jwk.construct('key', algorithm='HS256')
+        assert (jwkey,) == jws._get_keys(jwkey)
 
 
 class TestRSA(object):
