@@ -61,9 +61,8 @@ def encrypt(plaintext, key, encryption=ALGORITHMS.A256GCM,
     enc_cek, iv, cipher_text, auth_tag = _encrypt_and_auth(
         key, algorithm, encryption, zip, plaintext, encoded_header)
 
-    jwe_string = _jwe_compact_serialize(
-        encoded_header, enc_cek, iv, cipher_text, auth_tag)
-    return jwe_string
+    jwe_string = _jwe_compact_serialize(encoded_header, enc_cek, iv, cipher_text, auth_tag)
+    return jwe_string.decode('utf-8')
 
 
 def decrypt(jwe_str, key):
@@ -195,7 +194,7 @@ def decrypt(jwe_str, key):
     if plain_text is not None:
         plain_text = _decompress(header.get("zip"), plain_text)
 
-    return plain_text if cek_valid else None
+    return plain_text.decode('utf-8') if cek_valid else None
 
 
 def get_unverified_header(jwe_str):

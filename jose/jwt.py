@@ -159,7 +159,7 @@ def decode(token, key, algorithms=None, options=None, audience=None,
     algorithm = jws.get_unverified_header(token)['alg']
 
     try:
-        claims = json.loads(payload.decode('utf-8'))
+        claims = json.loads(payload)
     except ValueError as e:
         raise JWTError('Invalid payload string: %s' % e)
 

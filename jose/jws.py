@@ -80,7 +80,7 @@ def verify(token, key, algorithms, verify=True):
     if verify:
         _verify_signature(signing_input, header, signature, key, algorithms)
 
-    return payload
+    return payload.decode('utf-8')
 
 
 def get_unverified_header(token):
@@ -142,11 +142,11 @@ def _encode_header(algorithm, additional_headers=None):
     if additional_headers:
         header.update(additional_headers)
 
-    json_header = json.dumps(
+    json_header = six.ensure_binary(json.dumps(
         header,
         separators=(',', ':'),
         sort_keys=True,
-    ).encode('utf-8')
+    ))
 
     return base64url_encode(json_header)
 
@@ -157,11 +157,11 @@ def _encode_payload(payload):
             payload = json.dumps(
                 payload,
                 separators=(',', ':'),
-            ).encode('utf-8')
+            )
         except ValueError:
             pass
 
-    return base64url_encode(payload)
+    return base64url_encode(six.ensure_binary(payload))
 
 
 def _sign_header_and_claims(encoded_header, encoded_claims, algorithm, key):
