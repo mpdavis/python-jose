@@ -94,7 +94,7 @@ def base64url_encode(data):
     """Helper method to base64url_encode a string.
 
     Args:
-        data (str): A base64url_encoded string to encode.
+        data (str): A string to base64url encode.
 
     """
     return base64.urlsafe_b64encode(data).replace(b'=', b'')
