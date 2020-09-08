@@ -9,6 +9,7 @@ except ImportError:
     from collections import Mapping, Iterable  # Python 2, will be deprecated in Python 3.8
 
 from jose import jwk
+from jose.backends.base import Key
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWSError
 from jose.exceptions import JWSSignatureError
@@ -163,10 +164,11 @@ def _encode_payload(payload):
     return base64url_encode(payload)
 
 
-def _sign_header_and_claims(encoded_header, encoded_claims, algorithm, key_data):
+def _sign_header_and_claims(encoded_header, encoded_claims, algorithm, key):
     signing_input = b'.'.join([encoded_header, encoded_claims])
     try:
-        key = jwk.construct(key_data, algorithm)
+        if not isinstance(key, Key):
+            key = jwk.construct(key, algorithm)
         signature = key.sign(signing_input)
     except Exception as e:
         raise JWSError(e)
@@ -213,7 +215,8 @@ def _load(jwt):
 
 def _sig_matches_keys(keys, signing_input, signature, alg):
     for key in keys:
-        key = jwk.construct(key, alg)
+        if not isinstance(key, Key):
+            key = jwk.construct(key, alg)
         try:
             if key.verify(signing_input, signature):
                 return True
@@ -223,6 +226,9 @@ def _sig_matches_keys(keys, signing_input, signature, alg):
 
 
 def _get_keys(key):
+
+    if isinstance(key, Key):
+        return (key,)
 
     try:
         key = json.loads(key, parse_int=str, parse_float=str)
