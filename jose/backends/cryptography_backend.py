@@ -208,15 +208,15 @@ class CryptographyECKey(Key):
             'alg': self._algorithm,
             'kty': 'EC',
             'crv': crv,
-            'x': long_to_base64(public_key.public_numbers().x, size=key_size).decode('ASCII'),
-            'y': long_to_base64(public_key.public_numbers().y, size=key_size).decode('ASCII'),
+            'x': long_to_base64(public_key.public_numbers().x, size=key_size).decode('utf-8'),
+            'y': long_to_base64(public_key.public_numbers().y, size=key_size).decode('utf-8'),
         }
 
         if not self.is_public():
             data['d'] = long_to_base64(
                 self.prepared_key.private_numbers().private_value,
                 size=key_size
-            ).decode('ASCII')
+            ).decode('utf-8')
 
         return data
 
@@ -393,18 +393,18 @@ class CryptographyRSAKey(Key):
         data = {
             'alg': self._algorithm,
             'kty': 'RSA',
-            'n': long_to_base64(public_key.public_numbers().n).decode('ASCII'),
-            'e': long_to_base64(public_key.public_numbers().e).decode('ASCII'),
+            'n': long_to_base64(public_key.public_numbers().n).decode('utf-8'),
+            'e': long_to_base64(public_key.public_numbers().e).decode('utf-8'),
         }
 
         if not self.is_public():
             data.update({
-                'd': long_to_base64(self.prepared_key.private_numbers().d).decode('ASCII'),
-                'p': long_to_base64(self.prepared_key.private_numbers().p).decode('ASCII'),
-                'q': long_to_base64(self.prepared_key.private_numbers().q).decode('ASCII'),
-                'dp': long_to_base64(self.prepared_key.private_numbers().dmp1).decode('ASCII'),
-                'dq': long_to_base64(self.prepared_key.private_numbers().dmq1).decode('ASCII'),
-                'qi': long_to_base64(self.prepared_key.private_numbers().iqmp).decode('ASCII'),
+                'd': long_to_base64(self.prepared_key.private_numbers().d).decode('utf-8'),
+                'p': long_to_base64(self.prepared_key.private_numbers().p).decode('utf-8'),
+                'q': long_to_base64(self.prepared_key.private_numbers().q).decode('utf-8'),
+                'dp': long_to_base64(self.prepared_key.private_numbers().dmp1).decode('utf-8'),
+                'dq': long_to_base64(self.prepared_key.private_numbers().dmq1).decode('utf-8'),
+                'qi': long_to_base64(self.prepared_key.private_numbers().iqmp).decode('utf-8'),
             })
 
         return data
@@ -610,7 +610,7 @@ class CryptographyHMACKey(Key):
         return {
             'alg': self._algorithm,
             'kty': 'oct',
-            'k': base64url_encode(self.prepared_key).decode('ASCII'),
+            'k': base64url_encode(self.prepared_key).decode('utf-8'),
         }
 
     def sign(self, msg):

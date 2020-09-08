@@ -131,14 +131,14 @@ class ECDSAECKey(Key):
             'alg': self._algorithm,
             'kty': 'EC',
             'crv': crv,
-            'x': long_to_base64(public_key.pubkey.point.x(), size=key_size).decode('ASCII'),
-            'y': long_to_base64(public_key.pubkey.point.y(), size=key_size).decode('ASCII'),
+            'x': long_to_base64(public_key.pubkey.point.x(), size=key_size).decode('utf-8'),
+            'y': long_to_base64(public_key.pubkey.point.y(), size=key_size).decode('utf-8'),
         }
 
         if not self.is_public():
             data['d'] = long_to_base64(
                 self.prepared_key.privkey.secret_multiplier,
                 size=key_size
-            ).decode('ASCII')
+            ).decode('utf-8')
 
         return data

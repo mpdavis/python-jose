@@ -76,5 +76,5 @@ class HMACKey(Key):
         return {
             'alg': self._algorithm,
             'kty': 'oct',
-            'k': base64url_encode(self.prepared_key).decode('ASCII'),
+            'k': base64url_encode(self.prepared_key).decode('utf-8'),
         }

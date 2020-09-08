@@ -21,7 +21,7 @@ b64_to_bstr = [
 ]
 
 b64b_to_bstr = [
-    (b64.encode('ascii'), bstr)
+    (b64.encode('utf-8'), bstr)
     for (b64, bstr) in b64_to_bstr
 ]
 
