@@ -44,11 +44,9 @@ def int_arr_to_long(arr):
 
 
 def base64_to_long(data):
-    if isinstance(data, six.text_type):
-        data = data.encode("ascii")
-
+    data = six.ensure_binary(data)
     # urlsafe_b64decode will happily convert b64encoded data
-    _d = base64.urlsafe_b64decode(bytes(data) + b'==')
+    _d = base64.urlsafe_b64decode(data + b'==')
     return int_arr_to_long(struct.unpack('%sB' % len(_d), _d))
 
 
@@ -82,6 +80,8 @@ def base64url_decode(data):
         data (str): A base64url_encoded string to decode.
 
     """
+    data = six.ensure_binary(data)
+
     rem = len(data) % 4
 
     if rem > 0:
