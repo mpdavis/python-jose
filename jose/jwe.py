@@ -22,7 +22,7 @@ def encrypt(plaintext, key, encryption=ALGORITHMS.A256GCM,
     """Encrypts plaintext and returns a JWE cmpact serialization string.
 
     Args:
-        plaintext (bytes): A bytes object to encrypt
+        plaintext (str): A string to encrypt
         key (str or dict): The key(s) to use for encrypting the content. Can be
             individual JWK or JWK set.
         encryption (str, optional): The content encryption algorithm used to
@@ -37,7 +37,7 @@ def encrypt(plaintext, key, encryption=ALGORITHMS.A256GCM,
         kid (str, optional): Key ID for the provided key
 
     Returns:
-        bytes: The string representation of the header, encrypted key,
+        str: The base64-encoded string representation of the header, encrypted key,
             initialization vector, ciphertext, and authentication tag.
 
     Raises:
@@ -74,7 +74,7 @@ def decrypt(jwe_str, key):
             individual JWK or JWK set.
 
     Returns:
-        bytes: The plaintext bytes, assuming the authentication tag is valid.
+        str: The base64-encoded str, assuming the authentication tag is valid.
 
     Raises:
         JWEError: If there is an exception verifying the token.
