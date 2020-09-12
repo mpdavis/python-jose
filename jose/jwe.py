@@ -44,9 +44,11 @@ def encrypt(plaintext, key, encryption=ALGORITHMS.A256GCM,
         JWEError: If there is an error signing the token.
 
     Examples:
+
         >>> from jose import jwe
-        >>> jwe.encrypt('Hello, World!', 'asecret128bitkey', algorithm='dir', encryption='A128GCM')
-        'eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..McILMB3dYsNJSuhcDzQshA.OfX9H_mcUpHDeRM4IA.CcnTWqaqxNsjT4eCaUABSg'
+        >>> jwe_string = jwe.encrypt('Hello, World!', 'asecret128bitkey', algorithm='dir', encryption='A128GCM')
+        >>> jwe_string
+        'eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0...'
 
     """
     plaintext = six.ensure_binary(plaintext)  # Make sure it's bytes
@@ -80,9 +82,13 @@ def decrypt(jwe_str, key):
         JWEError: If there is an exception verifying the token.
 
     Examples:
+
         >>> from jose import jwe
+        >>> jwe_string = ('eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..McILMB3dYsNJSuhcDzQshA.'
+        ...               'OfX9H_mcUpHDeRM4IA.CcnTWqaqxNsjT4eCaUABSg')
         >>> jwe.decrypt(jwe_string, 'asecret128bitkey')
         'Hello, World!'
+
     """
     header, encoded_header, encrypted_key, iv, cipher_text, auth_tag = _jwe_compact_deserialize(jwe_str)
 
@@ -208,6 +214,15 @@ def get_unverified_header(jwe_str):
 
     Raises:
         JWEError: If there is an exception decoding the JWE.
+
+    Examples:
+
+        >>> from jose import jwe
+        >>> jwe_string = ('eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..McILMB3dYsNJSuhcDzQshA.'
+        ...               'OfX9H_mcUpHDeRM4IA.CcnTWqaqxNsjT4eCaUABSg')
+        >>> jwe.get_unverified_header(jwe_string)
+        {'alg': 'dir', 'enc': 'A128GCM'}
+
     """
     header = _jwe_compact_deserialize(jwe_str)[0]
     return header
