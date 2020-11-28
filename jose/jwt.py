@@ -75,7 +75,7 @@ def decode(token, key, algorithms=None, options=None, audience=None,
             a tuple or list of keys (e.g. ("a1234...", "b3579"),
             a JSON string, (e.g. '["a1234", "b3579"]'),
             a dict with the 'keys' key that gives a tuple or list of keys (e.g {'keys': [...]} ) or
-            a dict or JSON string as defined by RFC 7517 (e.g.
+            a dict or JSON string for a JWK set as defined by RFC 7517 (e.g.
                 {'keys': [{'kty': 'oct', 'k': 'YTEyMzQ'}, {'kty': 'oct', 'k':'YjM1Nzk'}]} or
                 '{"keys": [{"kty":"oct","k":"YTEyMzQ"},{"kty":"oct","k":"YjM1Nzk"}]}'
             ) in which case the keys must be base64 url safe encoded (with optional padding).
