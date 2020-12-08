@@ -91,11 +91,22 @@ class ECDSAECKey(Key):
             return ecdsa.keys.VerifyingKey.from_public_point(point, self.curve)
 
     def sign(self, msg):
-        return self.prepared_key.sign(msg, hashfunc=self.hash_alg, sigencode=ecdsa.util.sigencode_string)
+        return self.prepared_key.sign(
+            msg,
+            hashfunc=self.hash_alg,
+            sigencode=ecdsa.util.sigencode_string,
+            allow_truncate=False
+        )
 
     def verify(self, msg, sig):
         try:
-            return self.prepared_key.verify(sig, msg, hashfunc=self.hash_alg, sigdecode=ecdsa.util.sigdecode_string)
+            return self.prepared_key.verify(
+                sig,
+                msg,
+                hashfunc=self.hash_alg,
+                sigdecode=ecdsa.util.sigdecode_string,
+                allow_truncate=False
+            )
         except Exception:
             return False
 
