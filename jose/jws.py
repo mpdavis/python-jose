@@ -37,7 +37,7 @@ def sign(payload, key, headers=None, algorithm=ALGORITHMS.HS256):
         JWSError: If there is an error signing the token.
 
     Examples:
-
+        >>> from jose import jws
         >>> jws.sign({'a': 'b'}, 'secret', algorithm='HS256')
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
 
@@ -70,8 +70,10 @@ def verify(token, key, algorithms, verify=True):
 
     Examples:
 
+        >>> from jose import jws
         >>> token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
         >>> jws.verify(token, 'secret', algorithms='HS256')
+        '{"a":"b"}'
 
     """
 
@@ -80,7 +82,7 @@ def verify(token, key, algorithms, verify=True):
     if verify:
         _verify_signature(signing_input, header, signature, key, algorithms)
 
-    return payload
+    return payload.decode('utf-8')
 
 
 def get_unverified_header(token):
@@ -94,6 +96,14 @@ def get_unverified_header(token):
 
     Raises:
         JWSError: If there is an exception decoding the token.
+
+    Examples:
+
+        >>> from jose import jws
+        >>> token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+        >>> jws.get_unverified_header(token)
+        {'alg': 'HS256', 'typ': 'JWT'}
+
     """
     header, claims, signing_input, signature = _load(token)
     return header
@@ -113,6 +123,14 @@ def get_unverified_headers(token):
 
     Raises:
         JWSError: If there is an exception decoding the token.
+
+    Examples:
+
+        >>> from jose import jws
+        >>> token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+        >>> jws.get_unverified_headers(token)
+        {'alg': 'HS256', 'typ': 'JWT'}
+
     """
     return get_unverified_header(token)
 
@@ -128,6 +146,14 @@ def get_unverified_claims(token):
 
     Raises:
         JWSError: If there is an exception decoding the token.
+
+    Examples:
+
+        >>> from jose import jws
+        >>> token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+        >>> jws.get_unverified_claims(token)
+        b'{"a":"b"}'
+
     """
     header, claims, signing_input, signature = _load(token)
     return claims
@@ -142,11 +168,11 @@ def _encode_header(algorithm, additional_headers=None):
     if additional_headers:
         header.update(additional_headers)
 
-    json_header = json.dumps(
+    json_header = six.ensure_binary(json.dumps(
         header,
         separators=(',', ':'),
         sort_keys=True,
-    ).encode('utf-8')
+    ))
 
     return base64url_encode(json_header)
 
@@ -157,11 +183,11 @@ def _encode_payload(payload):
             payload = json.dumps(
                 payload,
                 separators=(',', ':'),
-            ).encode('utf-8')
+            )
         except ValueError:
             pass
 
-    return base64url_encode(payload)
+    return base64url_encode(six.ensure_binary(payload))
 
 
 def _sign_header_and_claims(encoded_header, encoded_claims, algorithm, key):

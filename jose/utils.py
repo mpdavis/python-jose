@@ -44,11 +44,9 @@ def int_arr_to_long(arr):
 
 
 def base64_to_long(data):
-    if isinstance(data, six.text_type):
-        data = data.encode("ascii")
-
+    data = six.ensure_binary(data)
     # urlsafe_b64decode will happily convert b64encoded data
-    _d = base64.urlsafe_b64decode(bytes(data) + b'==')
+    _d = base64.urlsafe_b64decode(data + b'==')
     return int_arr_to_long(struct.unpack('%sB' % len(_d), _d))
 
 
@@ -75,29 +73,31 @@ def calculate_at_hash(access_token, hash_alg):
     return at_hash.decode('utf-8')
 
 
-def base64url_decode(input):
+def base64url_decode(data):
     """Helper method to base64url_decode a string.
 
     Args:
-        input (str): A base64url_encoded string to decode.
+        data (str): A base64url_encoded string to decode.
 
     """
-    rem = len(input) % 4
+    data = six.ensure_binary(data)
+
+    rem = len(data) % 4
 
     if rem > 0:
-        input += b'=' * (4 - rem)
+        data += b'=' * (4 - rem)
 
-    return base64.urlsafe_b64decode(input)
+    return base64.urlsafe_b64decode(data)
 
 
-def base64url_encode(input):
+def base64url_encode(data):
     """Helper method to base64url_encode a string.
 
     Args:
-        input (str): A base64url_encoded string to encode.
+        data (str): A string to base64url encode.
 
     """
-    return base64.urlsafe_b64encode(input).replace(b'=', b'')
+    return base64.urlsafe_b64encode(data).replace(b'=', b'')
 
 
 def timedelta_total_seconds(delta):

@@ -22,7 +22,7 @@ def encrypt(plaintext, key, encryption=ALGORITHMS.A256GCM,
     """Encrypts plaintext and returns a JWE cmpact serialization string.
 
     Args:
-        plaintext (bytes): A bytes object to encrypt
+        plaintext (str): A string to encrypt
         key (str or dict): The key(s) to use for encrypting the content. Can be
             individual JWK or JWK set.
         encryption (str, optional): The content encryption algorithm used to
@@ -37,16 +37,18 @@ def encrypt(plaintext, key, encryption=ALGORITHMS.A256GCM,
         kid (str, optional): Key ID for the provided key
 
     Returns:
-        bytes: The string representation of the header, encrypted key,
+        str: The base64-encoded string representation of the header, encrypted key,
             initialization vector, ciphertext, and authentication tag.
 
     Raises:
         JWEError: If there is an error signing the token.
 
     Examples:
+
         >>> from jose import jwe
-        >>> jwe.encrypt('Hello, World!', 'asecret128bitkey', algorithm='dir', encryption='A128GCM')
-        'eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..McILMB3dYsNJSuhcDzQshA.OfX9H_mcUpHDeRM4IA.CcnTWqaqxNsjT4eCaUABSg'
+        >>> jwe_string = jwe.encrypt('Hello, World!', 'asecret128bitkey', algorithm='dir', encryption='A128GCM')
+        >>> jwe_string
+        'eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0...'
 
     """
     plaintext = six.ensure_binary(plaintext)  # Make sure it's bytes
@@ -61,9 +63,8 @@ def encrypt(plaintext, key, encryption=ALGORITHMS.A256GCM,
     enc_cek, iv, cipher_text, auth_tag = _encrypt_and_auth(
         key, algorithm, encryption, zip, plaintext, encoded_header)
 
-    jwe_string = _jwe_compact_serialize(
-        encoded_header, enc_cek, iv, cipher_text, auth_tag)
-    return jwe_string
+    jwe_string = _jwe_compact_serialize(encoded_header, enc_cek, iv, cipher_text, auth_tag)
+    return jwe_string.decode('utf-8')
 
 
 def decrypt(jwe_str, key):
@@ -75,15 +76,19 @@ def decrypt(jwe_str, key):
             individual JWK or JWK set.
 
     Returns:
-        bytes: The plaintext bytes, assuming the authentication tag is valid.
+        str: The base64-encoded str, assuming the authentication tag is valid.
 
     Raises:
         JWEError: If there is an exception verifying the token.
 
     Examples:
+
         >>> from jose import jwe
+        >>> jwe_string = ('eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..McILMB3dYsNJSuhcDzQshA.'
+        ...               'OfX9H_mcUpHDeRM4IA.CcnTWqaqxNsjT4eCaUABSg')
         >>> jwe.decrypt(jwe_string, 'asecret128bitkey')
         'Hello, World!'
+
     """
     header, encoded_header, encrypted_key, iv, cipher_text, auth_tag = _jwe_compact_deserialize(jwe_str)
 
@@ -195,7 +200,7 @@ def decrypt(jwe_str, key):
     if plain_text is not None:
         plain_text = _decompress(header.get("zip"), plain_text)
 
-    return plain_text if cek_valid else None
+    return plain_text.decode('utf-8') if cek_valid else None
 
 
 def get_unverified_header(jwe_str):
@@ -209,6 +214,15 @@ def get_unverified_header(jwe_str):
 
     Raises:
         JWEError: If there is an exception decoding the JWE.
+
+    Examples:
+
+        >>> from jose import jwe
+        >>> jwe_string = ('eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..McILMB3dYsNJSuhcDzQshA.'
+        ...               'OfX9H_mcUpHDeRM4IA.CcnTWqaqxNsjT4eCaUABSg')
+        >>> jwe.get_unverified_header(jwe_string)
+        {'alg': 'dir', 'enc': 'A128GCM'}
+
     """
     header = _jwe_compact_deserialize(jwe_str)[0]
     return header

@@ -46,6 +46,7 @@ def encode(claims, key, algorithm=ALGORITHMS.HS256, headers=None, access_token=N
 
     Examples:
 
+        >>> from jose import jwt
         >>> jwt.encode({'a': 'b'}, 'secret', algorithm='HS256')
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
 
@@ -119,8 +120,10 @@ def decode(token, key, algorithms=None, options=None, audience=None,
 
     Examples:
 
+        >>> from jose import jwt
         >>> payload = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
         >>> jwt.decode(payload, 'secret', algorithms='HS256')
+        {'a': 'b'}
 
     """
 
@@ -159,7 +162,7 @@ def decode(token, key, algorithms=None, options=None, audience=None,
     algorithm = jws.get_unverified_header(token)['alg']
 
     try:
-        claims = json.loads(payload.decode('utf-8'))
+        claims = json.loads(payload)
     except ValueError as e:
         raise JWTError('Invalid payload string: %s' % e)
 

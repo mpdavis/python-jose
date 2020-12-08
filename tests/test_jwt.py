@@ -65,7 +65,7 @@ class TestJWT:
             token = u'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
 
             def return_invalid_json(token, key, algorithms, verify=True):
-                return b'["a", "b"}'
+                return '["a", "b"}'
 
             jws.verify = return_invalid_json
 
@@ -80,7 +80,7 @@ class TestJWT:
             token = u'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
 
             def return_encoded_array(token, key, algorithms, verify=True):
-                return b'["a","b"]'
+                return '["a","b"]'
 
             jws.verify = return_encoded_array
 

@@ -17,7 +17,7 @@ except ImportError:
 
 @pytest.fixture
 def payload():
-    payload = b"test payload"
+    payload = "test payload"
     return payload
 
 
@@ -84,7 +84,7 @@ class TestJWS(object):
     def test_round_trip_with_different_key_types(self, key):
         signed_data = jws.sign({'testkey': 'testvalue'}, key, algorithm=ALGORITHMS.HS256)
         verified_bytes = jws.verify(signed_data, key, algorithms=[ALGORITHMS.HS256])
-        verified_data = json.loads(verified_bytes.decode('utf-8'))
+        verified_data = json.loads(verified_bytes)
         assert 'testkey' in verified_data.keys()
         assert verified_data['testkey'] == 'testvalue'
 
@@ -290,7 +290,7 @@ class TestRSA(object):
     def test_jwk_set(self, jwk_set):
         # Would raise a JWSError if validation failed.
         payload = jws.verify(google_id_token, jwk_set, ALGORITHMS.RS256)
-        iss = json.loads(payload.decode('utf-8'))['iss']
+        iss = json.loads(payload)['iss']
         assert iss == "https://accounts.google.com"
 
     def test_jwk_set_failure(self, jwk_set):
