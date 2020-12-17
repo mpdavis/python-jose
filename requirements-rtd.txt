@@ -1,1 +1,1 @@
-sphinxcontrib-napoleon==0.3.4
+Sphinx==3.3.1
