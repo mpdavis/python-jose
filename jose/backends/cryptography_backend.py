@@ -20,8 +20,13 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, aead, mod
 from cryptography.hazmat.primitives.keywrap import aes_key_wrap, aes_key_unwrap, InvalidUnwrap
 from cryptography.hazmat.primitives.padding import PKCS7
 from cryptography.hazmat.primitives.serialization import load_pem_private_key, load_pem_public_key
-from cryptography.utils import int_from_bytes, int_to_bytes
 from cryptography.x509 import load_pem_x509_certificate
+
+if not hasattr(int, "from_bytes"):
+    from cryptography.utils import int_from_bytes, int_to_bytes
+else:
+    from cryptography.utils import int_to_bytes
+    int_from_bytes = int.from_bytes
 
 _binding = None
 
