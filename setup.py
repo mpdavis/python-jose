@@ -29,7 +29,7 @@ def _cryptography_version():
     if platform.python_implementation() == 'PyPy' and platform.python_version() < '5.4':
         return 'cryptography < 2.5'
 
-    return 'cryptography'
+    return 'cryptography < 3.5'
 
 
 pyasn1 = ['pyasn1']
