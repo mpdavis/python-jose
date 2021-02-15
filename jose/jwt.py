@@ -61,6 +61,14 @@ def encode(claims, key, algorithm=ALGORITHMS.HS256, headers=None, access_token=N
         claims['at_hash'] = calculate_at_hash(access_token,
                                               ALGORITHMS.HASHES[algorithm])
 
+    # if a type isn't passed in, set it here
+    if not headers:
+        headers = {
+            'typ': 'JWT'
+        }
+    elif 'typ' not in headers:
+        headers['typ'] = 'JWT'
+    
     return jws.sign(claims, key, headers=headers, algorithm=algorithm)
 
 
