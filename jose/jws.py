@@ -17,7 +17,7 @@ from jose.utils import base64url_encode
 from jose.utils import base64url_decode
 
 
-def sign(payload, key, headers=None, algorithm=ALGORITHMS.HS256):
+def sign(payload, key, headers=None, algorithm=ALGORITHMS.HS256, unencoded=False):
     """Signs a claims set and returns a JWS string.
 
     Args:
@@ -29,6 +29,8 @@ def sign(payload, key, headers=None, algorithm=ALGORITHMS.HS256):
             headers will override the default headers.
         algorithm (str, optional): The algorithm to use for signing the
             the claims.  Defaults to HS256.
+        unencoded (boolean, optional): If True, the payload is not wrapped
+            in base64url encoding.
 
     Returns:
         str: The string representation of the header, claims, and signature.
@@ -47,7 +49,7 @@ def sign(payload, key, headers=None, algorithm=ALGORITHMS.HS256):
         raise JWSError('Algorithm %s not supported.' % algorithm)
 
     encoded_header = _encode_header(algorithm, additional_headers=headers)
-    encoded_payload = _encode_payload(payload)
+    encoded_payload = _encode_payload(payload, unencoded)
     signed_output = _sign_header_and_claims(encoded_header, encoded_payload, algorithm, key)
 
     return signed_output
@@ -151,7 +153,7 @@ def _encode_header(algorithm, additional_headers=None):
     return base64url_encode(json_header)
 
 
-def _encode_payload(payload):
+def _encode_payload(payload, unencoded):
     if isinstance(payload, Mapping):
         try:
             payload = json.dumps(
@@ -160,8 +162,10 @@ def _encode_payload(payload):
             ).encode('utf-8')
         except ValueError:
             pass
-
-    return base64url_encode(payload)
+    if unencoded:
+        return payload
+    else:
+        return base64url_encode(payload)
 
 
 def _sign_header_and_claims(encoded_header, encoded_claims, algorithm, key):
