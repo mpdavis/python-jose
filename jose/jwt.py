@@ -68,7 +68,6 @@ def encode(claims, key, algorithm=ALGORITHMS.HS256, headers=None, access_token=N
         }
     elif 'typ' not in headers:
         headers['typ'] = 'JWT'
-    
     return jws.sign(claims, key, headers=headers, algorithm=algorithm)
 
 
