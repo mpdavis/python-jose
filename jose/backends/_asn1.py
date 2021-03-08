@@ -1,6 +1,6 @@
 """ASN1 encoding helpers for converting between PKCS1 and PKCS8.
 
-Required by rsa_backend and pycrypto_backend but not cryptography_backend.
+Required by rsa_backend but not cryptography_backend.
 """
 from pyasn1.codec.der import decoder, encoder
 from pyasn1.type import namedtype, univ

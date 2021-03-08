@@ -3,9 +3,8 @@ import pytest
 try:
     from jose.backends.rsa_backend import RSAKey as PurePythonRSAKey
     from jose.backends.cryptography_backend import CryptographyRSAKey
-    from jose.backends.pycrypto_backend import RSAKey as PyCryptoRSAKey
 except ImportError:
-    PurePythonRSAKey = CryptographyRSAKey = PyCryptoRSAKey = None
+    PurePythonRSAKey = CryptographyRSAKey =  None
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWEError
 
@@ -14,14 +13,13 @@ from .test_RSA import PRIVATE_KEYS
 CRYPTO_BACKENDS = (
     pytest.param(PurePythonRSAKey, id="python_rsa"),
     pytest.param(CryptographyRSAKey, id="pyca/cryptography"),
-    pytest.param(PyCryptoRSAKey, id="pycrypto/dome")
 )
 ENCODINGS = ("PKCS1", "PKCS8")
 
 
 @pytest.mark.backend_compatibility
 @pytest.mark.skipif(
-    None in (PurePythonRSAKey, CryptographyRSAKey, PyCryptoRSAKey),
+    None in (PurePythonRSAKey, CryptographyRSAKey),
     reason="Multiple crypto backends not available for backend compatibility tests"
 )
 class TestBackendRsaCompatibility(object):

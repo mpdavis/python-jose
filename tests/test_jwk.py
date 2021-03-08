@@ -43,6 +43,7 @@ class TestJWK:
         with pytest.raises(NotImplementedError):
             key.verify('', '')
 
+    @pytest.mark.skipif(RSAKey is None, reason="RSA is not available")
     def test_invalid_hash_alg(self):
         with pytest.raises(JWKError):
             key = HMACKey(hmac_key, 'RS512')
@@ -53,6 +54,7 @@ class TestJWK:
         with pytest.raises(JWKError):
             key = ECKey(ec_key, 'RS512')  # noqa: F841
 
+    @pytest.mark.skipif(RSAKey is None, reason="RSA is not available")
     def test_invalid_jwk(self):
 
         with pytest.raises(JWKError):
@@ -64,6 +66,7 @@ class TestJWK:
         with pytest.raises(JWKError):
             key = ECKey(rsa_key, 'ES256')  # noqa: F841
 
+    @pytest.mark.skipif(RSAKey is None,reason="RSA is not available")
     def test_RSAKey_errors(self):
 
         rsa_key = {
@@ -124,7 +127,8 @@ class TestJWK:
         hs_key = jwk.get_key("HS256")
         assert hs_key == HMACKey
         assert issubclass(hs_key, Key)
-        assert issubclass(jwk.get_key("RS256"), Key)
+        if RSAKey is not None:
+            assert issubclass(jwk.get_key("RS256"), Key)
         assert issubclass(jwk.get_key("ES256"), Key)
 
         assert jwk.get_key("NONEXISTENT") is None

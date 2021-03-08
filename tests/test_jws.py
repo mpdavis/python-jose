@@ -285,6 +285,7 @@ class TestGetKeys(object):
         assert (jwkey,) == jws._get_keys(jwkey)
 
 
+@pytest.mark.skipif(RSAKey is None, reason="RSA is not available")
 class TestRSA(object):
 
     def test_jwk_set(self, jwk_set):

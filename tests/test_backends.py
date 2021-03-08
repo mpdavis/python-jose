@@ -8,10 +8,6 @@ try:
 except ImportError:
     CryptographyRSAKey = CryptographyECKey = None
 try:
-    from jose.backends.pycrypto_backend import RSAKey as PyCryptoRSAKey
-except ImportError:
-    PyCryptoRSAKey = None
-try:
     from jose.backends.ecdsa_backend import ECDSAECKey as PurePythonECDSAKey
 except ImportError:
     PurePythonRSAKey = None
@@ -20,10 +16,6 @@ try:
     from jose.backends.cryptography_backend import CryptographyAESKey
 except ImportError:
     CryptographyAESKey = None
-try:
-    from jose.backends.pycrypto_backend import AESKey as PyCryptoAESKey
-except ImportError:
-    PyCryptoAESKey = None
 try:
     from jose.backends.cryptography_backend import CryptographyHMACKey
 except ImportError:
@@ -49,8 +41,6 @@ def test_default_ec_backend():
 def test_default_rsa_backend():
     if CryptographyRSAKey is not None:
         assert RSAKey is CryptographyRSAKey
-    elif PyCryptoRSAKey is not None:
-        assert RSAKey is PyCryptoRSAKey
     else:
         assert RSAKey is PurePythonRSAKey
 
@@ -58,8 +48,6 @@ def test_default_rsa_backend():
 def test_default_aes_backend():
     if CryptographyAESKey is not None:
         assert AESKey is CryptographyAESKey
-    elif PyCryptoAESKey is not None:
-        assert AESKey is PyCryptoAESKey
     else:
         assert AESKey is None
 
