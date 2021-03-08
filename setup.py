@@ -22,7 +22,7 @@ def get_packages(package):
 
 pyasn1 = ["pyasn1"]
 extras_require = {
-    "cryptography": ["cryptography"],
+    "cryptography": ["cryptography>=3.4.0"],
     "pycrypto": ["pycrypto >=2.6.0, <2.7.0"] + pyasn1,
     "pycryptodome": ["pycryptodome >=3.3.1, <4.0.0"] + pyasn1,
 }
