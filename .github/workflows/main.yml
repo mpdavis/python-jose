@@ -1,0 +1,75 @@
+name: main
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+
+    strategy:
+      fail-fast: false
+      matrix:
+        name: [
+          "py36-base",
+          "py36-cryptography-only",
+          "py36-pycryptodome-norsa",
+          "py36-py36-compatibility",
+
+          "py37-base",
+          "py37-cryptography-only",
+          "py37-pycryptodome-norsa",
+          "py37-py36-compatibility",
+
+          "py38-base",
+          "py38-cryptography-only",
+          "py38-pycryptodome-norsa",
+          "py38-py36-compatibility",
+        ]
+
+        include:
+          - name: "py36-base"
+            python: "3.6"
+            tox_env: "py36-base"
+
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Set up Python ${{ matrix.python }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Install dependencies
+      run: |
+        pip install -U setuptools
+        pip install -U tox codecov
+
+    - name: Test
+      if: "! matrix.use_coverage"
+      run: "tox -e ${{ matrix.tox_env }}"
+    # - name: Upload coverage
+    #   env:
+    #     CODECOV_NAME: ${{ matrix.name }}
+    #   run: bash scripts/upload-coverage.sh -F GHA,${{ runner.os }}
+
+  linting:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: |
+        pip install -U setuptools 
+        pip install -U tox
+    - run: tox -e flake8
