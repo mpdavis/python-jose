@@ -1,0 +1,46 @@
+name: main
+on:
+  push:
+    branches:
+      - "*"
+  pull_request:
+    branches:
+      - master
+jobs:
+  test:
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.6", "3.7", "3.8", "3.9", "pypy3"]
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        pip install -U setuptools
+        pip install -U tox codecov tox-gh-actions
+    - name: Log python & pip versions
+      run: |
+        python --version
+        pip --version
+    - name: Run unit tests
+      run: tox
+  linting:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: |
+        pip install -U setuptools 
+        pip install -U tox
+    - run: tox -e flake8
