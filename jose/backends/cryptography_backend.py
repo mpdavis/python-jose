@@ -20,7 +20,7 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, aead, mod
 from cryptography.hazmat.primitives.keywrap import aes_key_wrap, aes_key_unwrap, InvalidUnwrap
 from cryptography.hazmat.primitives.padding import PKCS7
 from cryptography.hazmat.primitives.serialization import load_pem_private_key, load_pem_public_key
-from cryptography.utils import int_from_bytes, int_to_bytes
+from cryptography.utils import int_to_bytes
 from cryptography.x509 import load_pem_x509_certificate
 
 _binding = None
@@ -145,8 +145,8 @@ class CryptographyECKey(Key):
 
         r_bytes = raw_signature[:component_length]
         s_bytes = raw_signature[component_length:]
-        r = int_from_bytes(r_bytes, "big")
-        s = int_from_bytes(s_bytes, "big")
+        r = int.from_bytes(r_bytes, "big")
+        s = int.from_bytes(s_bytes, "big")
         return encode_dss_signature(r, s)
 
     def sign(self, msg):
