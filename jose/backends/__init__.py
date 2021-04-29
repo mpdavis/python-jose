@@ -10,19 +10,9 @@ try:
     from jose.backends.cryptography_backend import CryptographyRSAKey as RSAKey  # noqa: F401
 except ImportError:
     try:
-        from jose.backends.pycrypto_backend import RSAKey  # noqa: F401
-
-        # time.clock was deprecated in python 3.3 in favor of time.perf_counter
-        # and removed in python 3.8. pycrypto was never updated for this. If
-        # time has no clock attribute, let it use perf_counter instead to work
-        # in 3.8+
-        # noinspection PyUnresolvedReferences
-        import time
-        if not hasattr(time, "clock"):
-            time.clock = time.perf_counter
-
-    except ImportError:
         from jose.backends.rsa_backend import RSAKey  # noqa: F401
+    except ImportError:
+        RSAKey = None
 
 try:
     from jose.backends.cryptography_backend import CryptographyECKey as ECKey  # noqa: F401
@@ -32,10 +22,7 @@ except ImportError:
 try:
     from jose.backends.cryptography_backend import CryptographyAESKey as AESKey  # noqa: F401
 except ImportError:
-    try:
-        from jose.backends.pycrypto_backend import AESKey  # noqa: F401
-    except ImportError:
-        AESKey = None
+    AESKey = None
 
 try:
     from jose.backends.cryptography_backend import CryptographyHMACKey as HMACKey  # noqa: F401

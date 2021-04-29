@@ -1,22 +1,20 @@
 import pytest
 
 try:
-    from jose.backends.pycrypto_backend import AESKey as PyCryptoAESKey
     from jose.backends.cryptography_backend import CryptographyAESKey
 except ImportError:
-    PyCryptoAESKey = CryptographyAESKey = None
+    CryptographyAESKey = None
+
 from jose.exceptions import JWEError
 from jose.constants import ALGORITHMS
 
 CRYPTO_BACKENDS = (
     pytest.param(CryptographyAESKey, id="pyca/cryptography"),
-    pytest.param(PyCryptoAESKey, id="pycrypto/dome"),
 )
 
 
 @pytest.mark.backend_compatibility
-@pytest.mark.skipif(
-    None in (CryptographyAESKey, PyCryptoAESKey),
+@pytest.mark.skipif(CryptographyAESKey is None,
     reason="Multiple crypto backends not available for backend compatibility tests"
 )
 class TestBackendAesCompatibility(object):

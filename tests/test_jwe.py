@@ -17,11 +17,7 @@ try:
     backends.append(jose.backends.cryptography_backend)
 except ImportError:
     pass
-try:
-    import jose.backends.pycrypto_backend  # noqa E402
-    backends.append(jose.backends.pycrypto_backend)
-except ImportError:
-    pass
+
 import jose.backends.native  # noqa E402
 
 try:

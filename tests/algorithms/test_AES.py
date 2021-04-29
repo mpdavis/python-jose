@@ -35,7 +35,7 @@ VECTORS = (
 
 
 @pytest.mark.cryptography
-@pytest.mark.skipif(PyCryptoAESKey is None, reason="Cryptography backend not available")
+@pytest.mark.skipif(CryptographyAESKey is None, reason="Cryptography backend not available")
 class TestCryptographyAesKeywrap():
     @pytest.mark.parametrize("alg,hex_key,hex_kek,expected", VECTORS)
     def test_wrap(self, alg, hex_key, hex_kek, expected):
@@ -50,26 +50,5 @@ class TestCryptographyAesKeywrap():
         bin_kek = unhexlify(hex_kek)
         bin_wrapped = unhexlify(hex_wrapped)
         aes_key = CryptographyAESKey(bin_kek, alg)
-        actual = hexlify(aes_key.unwrap_key(bin_wrapped)).upper()
-        assert actual == expected
-
-
-@pytest.mark.pycrypto
-@pytest.mark.pycryptodome
-@pytest.mark.skipif(PyCryptoAESKey is None, reason="Pycrypto/dome backend not available")
-class TestPycryptoAesKeywrap():
-    @pytest.mark.parametrize("alg,hex_key,hex_kek,expected", VECTORS)
-    def test_wrap(self, alg, hex_key, hex_kek, expected):
-        bin_key = unhexlify(hex_key)
-        bin_kek = unhexlify(hex_kek)
-        aes_key = PyCryptoAESKey(bin_kek, alg)
-        actual = hexlify(aes_key.wrap_key(bin_key)).upper()
-        assert actual == expected
-
-    @pytest.mark.parametrize("alg,expected,hex_kek,hex_wrapped", VECTORS)
-    def test_unwrap(self, alg, expected, hex_kek, hex_wrapped):
-        bin_kek = unhexlify(hex_kek)
-        bin_wrapped = unhexlify(hex_wrapped)
-        aes_key = PyCryptoAESKey(bin_kek, alg)
         actual = hexlify(aes_key.unwrap_key(bin_wrapped)).upper()
         assert actual == expected

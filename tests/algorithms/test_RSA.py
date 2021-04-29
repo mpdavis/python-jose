@@ -10,9 +10,8 @@ except ImportError:
 
 try:
     from Crypto.PublicKey import RSA as PyCryptoRSA
-    from jose.backends.pycrypto_backend import RSAKey as PyCryptoRSAKey
 except ImportError:
-    PyCryptoRSA = PyCryptoRSAKey = None
+    PyCryptoRSA =  None
 
 try:
     from cryptography.hazmat.backends import default_backend
@@ -225,45 +224,6 @@ class TestPurePythonRsa(object):
         excinfo.match("Invalid private key encoding")
 
 
-@pytest.mark.pycrypto
-@pytest.mark.pycryptodome
-@pytest.mark.skipif(None in (PyCryptoRSA, PyCryptoRSAKey), reason="Pycrypto/dome backend not available")
-def test_pycrypto_RSA_key_instance():
-    key = PyCryptoRSA.construct((long(
-        26057131595212989515105618545799160306093557851986992545257129318694524535510983041068168825614868056510242030438003863929818932202262132630250203397069801217463517914103389095129323580576852108653940669240896817348477800490303630912852266209307160550655497615975529276169196271699168537716821419779900117025818140018436554173242441334827711966499484119233207097432165756707507563413323850255548329534279691658369466534587631102538061857114141268972476680597988266772849780811214198186940677291891818952682545840788356616771009013059992237747149380197028452160324144544057074406611859615973035412993832273216732343819),
-                         long(65537)))
-    PyCryptoRSAKey(key, ALGORITHMS.RS256)
-
-
-# TODO: Unclear why this test was marked as only for pycrypto
-@pytest.mark.pycrypto
-@pytest.mark.pycryptodome
-@pytest.mark.parametrize("private_key", PRIVATE_KEYS)
-@pytest.mark.skipif(None in (PyCryptoRSA, PyCryptoRSAKey), reason="Pycrypto/dome backend not available")
-def test_pycrypto_sign_unencoded_cleartext(private_key):
-    key = PyCryptoRSAKey(private_key, ALGORITHMS.RS256)
-    msg = b'test'
-    signature = key.sign(msg)
-    public_key = key.public_key()
-
-    assert bool(public_key.verify(msg, signature))
-    assert not bool(public_key.verify(msg, 1))
-
-
-# TODO: Unclear why this test was marked as only for pycrypto
-@pytest.mark.pycrypto
-@pytest.mark.pycryptodome
-@pytest.mark.parametrize("private_key_pem", PRIVATE_KEYS)
-@pytest.mark.parametrize("algorithm", RSA_KW_ALGOS)
-@pytest.mark.skipif(None in (PyCryptoRSA, PyCryptoRSAKey),
-                    reason="Pycrypto/dome backend not available")
-def test_pycrypto_wrap_key_unencoded_cleartext(private_key_pem, algorithm):
-    private_key = PyCryptoRSAKey(private_key_pem, algorithm)
-    key = b'test'
-    public_key = private_key.public_key()
-    wrapped = public_key.wrap_key(key)
-    unwrapped = private_key.unwrap_key(wrapped)
-    assert unwrapped == key
 
 
 @pytest.mark.cryptography
@@ -301,6 +261,7 @@ def test_cryptography_wrap_key_unencoded_cleartext(private_key_pem, algorithm):
     assert unwrapped == key
 
 
+@pytest.mark.skipif(RSAKey is None, reason="RSA is not available")
 class TestRSAAlgorithm:
     def test_RSA_key(self):
         assert not RSAKey(private_key_4096_pkcs1, ALGORITHMS.RS256).is_public()
