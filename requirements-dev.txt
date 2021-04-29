@@ -1,4 +1,4 @@
-PyYAML==5.1
+PyYAML==5.4
 cov-core==1.15.0
 coverage==5.5
 coveralls==1.5.1
