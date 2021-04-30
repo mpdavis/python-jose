@@ -3,7 +3,7 @@ python-jose
 
 A JOSE implementation in Python
 
-|Build Status| |Coverage Status| |Docs|
+|Build Status| |Github Actions CI Status| |Coverage Status| |Docs|
 
 Docs are available on ReadTheDocs_.
 
@@ -100,6 +100,9 @@ This library was originally based heavily on the work of the folks over at PyJWT
 
 .. |Build Status| image:: https://travis-ci.org/mpdavis/python-jose.svg?branch=master
    :target: https://travis-ci.org/mpdavis/python-jose
+.. |Github Actions CI Status| image:: https://github.com/mpdavis/python-jose/workflows/main/badge.svg?branch=master
+   :target: https://github.com/mpdavis/python-jose/actions?workflow=main
+   :alt: Github Actions CI Status
 .. |Coverage Status| image:: http://codecov.io/github/mpdavis/python-jose/coverage.svg?branch=master
    :target: http://codecov.io/github/mpdavis/python-jose?branch=master
 .. |Docs| image:: https://readthedocs.org/projects/python-jose/badge/
@@ -111,3 +114,5 @@ This library was originally based heavily on the work of the folks over at PyJWT
 .. _pycrypto: https://www.dlitz.net/software/pycrypto/
 .. _python-ecdsa: https://github.com/warner/python-ecdsa
 .. _python-rsa: https://stuvel.eu/rsa
+
+
