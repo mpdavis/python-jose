@@ -114,5 +114,3 @@ This library was originally based heavily on the work of the folks over at PyJWT
 .. _pycrypto: https://www.dlitz.net/software/pycrypto/
 .. _python-ecdsa: https://github.com/warner/python-ecdsa
 .. _python-rsa: https://stuvel.eu/rsa
-
-
