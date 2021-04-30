@@ -1,12 +1,9 @@
 
 import base64
 import struct
-import sys
-
 
 # Piggyback of the backends implementation of the function that converts a long
 # to a bytes stream. Some plumbing is necessary to have the signatures match.
-
 try:
     from cryptography.utils import int_to_bytes as _long_to_bytes
 
