@@ -27,7 +27,7 @@ Installation
 Cryptographic Backends
 ----------------------
 
-As of 3.1.0, python-jose implements four different cryptographic backends.
+As of 3.2.0, python-jose implements three different cryptographic backends.
 The backend must be selected as an extra when installing python-jose.
 If you do not select a backend, the native-python backend will be installed.
 
@@ -37,16 +37,6 @@ Due to complexities with setuptools, the native-python backend is always install
 even if you select a different backend on install.
 We recommend that you remove unnecessary dependencies in production.
 
-#. cryptography
-
-   * This backend uses `pyca/cryptography`_ for all cryptographic operations.
-     This is the recommended backend and is selected over all other backends if any others are present.
-   * Installation: ``pip install python-jose[cryptography]``
-   * Unused dependencies:
-
-     * ``rsa``
-     * ``ecdsa``
-     * ``pyasn1``
 
 #. pycryptodome
 
