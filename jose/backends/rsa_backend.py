@@ -1,6 +1,5 @@
 import binascii
 
-import six
 import warnings
 
 from pyasn1.error import PyAsn1Error
@@ -147,10 +146,10 @@ class RSAKey(Key):
             self._prepared_key = key
             return
 
-        if isinstance(key, six.string_types):
+        if isinstance(key, str):
             key = key.encode('utf-8')
 
-        if isinstance(key, six.binary_type):
+        if isinstance(key, bytes):
             try:
                 self._prepared_key = pyrsa.PublicKey.load_pkcs1(key)
             except ValueError:

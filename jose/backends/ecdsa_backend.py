@@ -1,5 +1,4 @@
 import hashlib
-import six
 
 from jose.backends.base import Key
 import ecdsa
@@ -49,10 +48,10 @@ class ECDSAECKey(Key):
             self.prepared_key = self._process_jwk(key)
             return
 
-        if isinstance(key, six.string_types):
+        if isinstance(key, str):
             key = key.encode('utf-8')
 
-        if isinstance(key, six.binary_type):
+        if isinstance(key, bytes):
             # Attempt to load key. We don't know if it's
             # a Signing Key or a Verifying Key, so we try
             # the Verifying Key first.
