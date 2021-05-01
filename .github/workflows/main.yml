@@ -26,13 +26,19 @@ jobs:
       run: |
         pip install -U "pip>=21.1"
         pip install -U setuptools
-        pip install -U "tox>=3.23.0,<4" codecov tox-gh-actions
+        pip install -U "tox>=3.23.0,<4" codecov tox-gh-actions coverage
     - name: Log python & pip versions
       run: |
         python --version
         pip --version
     - name: Run unit tests
       run: tox
+    - name: "Coverage report"
+      run:  coverage xml
+    - name: "Upload coverage to Codecov"
+      uses: "codecov/codecov-action@v1"
+      with:
+        fail_ci_if_error: true
   linting:
     runs-on: ubuntu-latest
     steps:
