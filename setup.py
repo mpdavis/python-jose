@@ -7,7 +7,7 @@ import jose  # noqa: F401
 from setuptools import setup
 
 
-long_description = (Path(__file__) / 'README.rst').read_text()
+long_description = (Path(__file__).parent / 'README.rst').read_text()
 
 
 def get_packages(package):
@@ -46,8 +46,9 @@ setup(
     long_description=long_description,
     project_urls={
         'Documentation': 'https://python-jose.readthedocs.io/en/latest/',
-        'Source': 'http://github.com/mpdavis/python-jose/',
-        'Tracker': 'http://github.com/mpdavis/python-jose/issues/',
+        'Source': 'https://github.com/mpdavis/python-jose/',
+        'Tracker': 'https://github.com/mpdavis/python-jose/issues/',
+        'Changelog': 'https://github.com/mpdavis/python-jose/blob/master/CHANGELOG.md',
     },
     classifiers=[
         'Development Status :: 5 - Production/Stable',
