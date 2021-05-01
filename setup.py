@@ -1,15 +1,13 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import os
-import platform
+from pathlib import Path
 
 import jose  # noqa: F401
 
 from setuptools import setup
 
 
-with open(os.path.join(os.path.dirname(__file__), 'README.rst')) as readme:
-    long_description = readme.read()
+long_description = (Path(__file__) / 'README.rst').read_text()
 
 
 def get_packages(package):
@@ -23,18 +21,9 @@ def get_packages(package):
     ]
 
 
-def _cryptography_version():
-    # pyca/cryptography dropped support for PyPy < 5.4 in 2.5
-    # https://cryptography.io/en/latest/changelog/#v2-5
-    if platform.python_implementation() == 'PyPy' and platform.python_version() < '5.4':
-        return 'cryptography < 2.5'
-
-    return 'cryptography'
-
-
 pyasn1 = ['pyasn1']
 extras_require = {
-    'cryptography': [_cryptography_version()],
+    'cryptography': ['cryptography'],
     'pycrypto': ['pycrypto >=2.6.0, <2.7.0'] + pyasn1,
     'pycryptodome': ['pycryptodome >=3.3.1, <4.0.0'] + pyasn1,
 }
@@ -55,6 +44,11 @@ setup(
     url='http://github.com/mpdavis/python-jose',
     packages=get_packages('jose'),
     long_description=long_description,
+    project_urls={
+        'Documentation': 'https://python-jose.readthedocs.io/en/latest/',
+        'Source': 'http://github.com/mpdavis/python-jose/',
+        'Tracker': 'http://github.com/mpdavis/python-jose/issues/',
+    },
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
@@ -62,9 +56,11 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3 :: Only',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Utilities',
     ],
