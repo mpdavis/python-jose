@@ -27,7 +27,7 @@ Installation
 Cryptographic Backends
 ----------------------
 
-As of 3.1.0, python-jose implements four different cryptographic backends.
+As of 3.1.0, python-jose implements three different cryptographic backends.
 The backend must be selected as an extra when installing python-jose.
 If you do not select a backend, the native-python backend will be installed.
 
@@ -65,20 +65,6 @@ We recommend that you remove unnecessary dependencies in production.
    .. note::
 
        The native-python backend cannot process certificates.
-
-#. pycrypto
-
-   * This backend uses `pycrypto`_ for all cryptographic operations.
-   * Installation: ``pip install python-jose[pycrypto]``
-   * Unused dependencies:
-
-     * ``rsa``
-
-   .. warning::
-
-       The `pycrypto`_ project has not been maintained since 2013.
-       This backend is maintained for legacy compatibility purposes only.
-       Do not use this backend unless you cannot use any of the others.
 
 Usage
 -----
