@@ -8,12 +8,14 @@ on:
       - master
 jobs:
   test:
-    runs-on: "ubuntu-latest"
     timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.6", "3.7", "3.8", "3.9", "pypy3"]
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    name: "${{ matrix.os }}) Python: ${{ matrix.python-version }}"
     steps:
     - uses: actions/checkout@v2
       with:
