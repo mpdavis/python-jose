@@ -1,6 +1,5 @@
 import binascii
 
-import six
 import warnings
 
 from pyasn1.error import PyAsn1Error
@@ -147,10 +146,10 @@ class RSAKey(Key):
             self._prepared_key = key
             return
 
-        if isinstance(key, six.string_types):
+        if isinstance(key, str):
             key = key.encode('utf-8')
 
-        if isinstance(key, six.binary_type):
+        if isinstance(key, bytes):
             try:
                 self._prepared_key = pyrsa.PublicKey.load_pkcs1(key)
             except ValueError:
@@ -234,7 +233,7 @@ class RSAKey(Key):
             elif pem_format == 'PKCS1':
                 pem = pyrsa_pem.save_pem(der, pem_marker='RSA PRIVATE KEY')
             else:
-                raise ValueError("Invalid pem format specified: %r" % (pem_format,))
+                raise ValueError(f"Invalid pem format specified: {pem_format!r}")
         else:
             if pem_format == 'PKCS8':
                 pkcs1_der = self._prepared_key.save_pkcs1(format="DER")
@@ -244,7 +243,7 @@ class RSAKey(Key):
                 der = self._prepared_key.save_pkcs1(format='DER')
                 pem = pyrsa_pem.save_pem(der, pem_marker='RSA PUBLIC KEY')
             else:
-                raise ValueError("Invalid pem format specified: %r" % (pem_format,))
+                raise ValueError(f"Invalid pem format specified: {pem_format!r}")
         return pem
 
     def to_dict(self):

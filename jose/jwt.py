@@ -1,21 +1,12 @@
-
 import json
 
 from calendar import timegm
-try:
-    from collections.abc import Mapping  # Python3
-except ImportError:
-    from collections import Mapping  # Python2, will be deprecated in Python 3.8
-from datetime import datetime
-from datetime import timedelta
-from six import string_types
+from collections.abc import Mapping
+from datetime import datetime, timedelta
 
 from jose import jws
 
-from .exceptions import JWSError
-from .exceptions import JWTClaimsError
-from .exceptions import JWTError
-from .exceptions import ExpiredSignatureError
+from .exceptions import JWSError, JWTClaimsError, JWTError, ExpiredSignatureError
 from .constants import ALGORITHMS
 from .utils import timedelta_total_seconds, calculate_at_hash
 
@@ -347,11 +338,11 @@ def _validate_aud(claims, audience=None):
         return
 
     audience_claims = claims['aud']
-    if isinstance(audience_claims, string_types):
+    if isinstance(audience_claims, str):
         audience_claims = [audience_claims]
     if not isinstance(audience_claims, list):
         raise JWTClaimsError('Invalid claim format in token')
-    if any(not isinstance(c, string_types) for c in audience_claims):
+    if any(not isinstance(c, str) for c in audience_claims):
         raise JWTClaimsError('Invalid claim format in token')
     if audience not in audience_claims:
         raise JWTClaimsError('Invalid audience')
@@ -372,7 +363,7 @@ def _validate_iss(claims, issuer=None):
     """
 
     if issuer is not None:
-        if isinstance(issuer, string_types):
+        if isinstance(issuer, str):
             issuer = (issuer,)
         if claims.get('iss') not in issuer:
             raise JWTClaimsError('Invalid issuer')
@@ -397,7 +388,7 @@ def _validate_sub(claims, subject=None):
     if 'sub' not in claims:
         return
 
-    if not isinstance(claims['sub'], string_types):
+    if not isinstance(claims['sub'], str):
         raise JWTClaimsError('Subject must be a string.')
 
     if subject is not None:
@@ -423,7 +414,7 @@ def _validate_jti(claims):
     if 'jti' not in claims:
         return
 
-    if not isinstance(claims['jti'], string_types):
+    if not isinstance(claims['jti'], str):
         raise JWTClaimsError('JWT ID must be a string.')
 
 
@@ -479,7 +470,7 @@ def _validate_claims(claims, audience=None, issuer=None, subject=None,
         else:
             options['verify_' + require_claim] = True  # override verify when required
 
-    if not isinstance(audience, (string_types, type(None))):
+    if not isinstance(audience, ((str,), type(None))):
         raise JWTError('audience must be a string or None')
 
     if options.get('verify_iat'):

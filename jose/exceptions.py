@@ -1,5 +1,3 @@
-
-
 class JOSEError(Exception):
     pass
 

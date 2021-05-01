@@ -3,7 +3,7 @@ import six
 from ..utils import base64url_encode
 
 
-class Key(object):
+class Key:
     """
     A simple interface for implementing JWK keys.
     """

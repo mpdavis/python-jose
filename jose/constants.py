@@ -1,7 +1,7 @@
 import hashlib
 
 
-class Algorithms(object):
+class Algorithms:
     # DS Algorithms
     NONE = 'none'
     HS256 = 'HS256'
@@ -92,7 +92,7 @@ class Algorithms(object):
 ALGORITHMS = Algorithms()
 
 
-class Zips(object):
+class Zips:
     DEF = "DEF"
     NONE = None
     SUPPORTED = {DEF, NONE}
