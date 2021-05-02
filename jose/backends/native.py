@@ -2,7 +2,6 @@ import hashlib
 import hmac
 import os
 
-
 from jose.backends.base import Key
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWKError

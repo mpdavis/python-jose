@@ -4,7 +4,8 @@ try:
 except ImportError:
     PurePythonRSAKey = None
 try:
-    from jose.backends.cryptography_backend import CryptographyRSAKey, CryptographyECKey
+    from jose.backends.cryptography_backend import (CryptographyECKey,
+                                                    CryptographyRSAKey)
 except ImportError:
     CryptographyRSAKey = CryptographyECKey = None
 try:
@@ -21,9 +22,8 @@ try:
 except ImportError:
     CryptographyHMACKey = None
 
+from jose.backends import ECKey, HMACKey, RSAKey
 from jose.backends.native import HMACKey as NativeHMACKey
-
-from jose.backends import ECKey, RSAKey, HMACKey
 
 try:
     from jose.backends import AESKey

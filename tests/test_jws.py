@@ -3,8 +3,7 @@ import warnings
 
 import pytest
 
-from jose import jwk
-from jose import jws
+from jose import jwk, jws
 from jose.backends import RSAKey
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWSError

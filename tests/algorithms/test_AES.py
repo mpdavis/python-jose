@@ -1,4 +1,4 @@
-from binascii import unhexlify, hexlify
+from binascii import hexlify, unhexlify
 
 import pytest
 import six

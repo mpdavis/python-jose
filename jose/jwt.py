@@ -1,14 +1,14 @@
 import json
-
 from calendar import timegm
 from collections.abc import Mapping
 from datetime import datetime, timedelta
 
 from jose import jws
 
-from .exceptions import JWSError, JWTClaimsError, JWTError, ExpiredSignatureError
 from .constants import ALGORITHMS
-from .utils import timedelta_total_seconds, calculate_at_hash
+from .exceptions import (ExpiredSignatureError, JWSError, JWTClaimsError,
+                         JWTError)
+from .utils import calculate_at_hash, timedelta_total_seconds
 
 
 def encode(claims, key, algorithm=ALGORITHMS.HS256, headers=None, access_token=None):

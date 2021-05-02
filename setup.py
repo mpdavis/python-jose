@@ -2,10 +2,9 @@
 import os
 from pathlib import Path
 
-import jose  # noqa: F401
-
 from setuptools import setup
 
+import jose  # noqa: F401
 
 long_description = (Path(__file__).parent / 'README.rst').read_text()
 

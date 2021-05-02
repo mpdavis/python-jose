@@ -1,14 +1,12 @@
 import binascii
 import json
-from collections.abc import Mapping, Iterable
+from collections.abc import Iterable, Mapping
 
 from jose import jwk
 from jose.backends.base import Key
 from jose.constants import ALGORITHMS
-from jose.exceptions import JWSError
-from jose.exceptions import JWSSignatureError
-from jose.utils import base64url_encode
-from jose.utils import base64url_decode
+from jose.exceptions import JWSError, JWSSignatureError
+from jose.utils import base64url_decode, base64url_encode
 
 
 def sign(payload, key, headers=None, algorithm=ALGORITHMS.HS256):

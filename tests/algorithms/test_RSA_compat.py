@@ -1,8 +1,8 @@
 import pytest
 
 try:
-    from jose.backends.rsa_backend import RSAKey as PurePythonRSAKey
     from jose.backends.cryptography_backend import CryptographyRSAKey
+    from jose.backends.rsa_backend import RSAKey as PurePythonRSAKey
 except ImportError:
     PurePythonRSAKey = CryptographyRSAKey =  None
 from jose.constants import ALGORITHMS

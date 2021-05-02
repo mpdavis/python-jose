@@ -1,8 +1,8 @@
 import pytest
 
 try:
-    from jose.backends.ecdsa_backend import ECDSAECKey
     from jose.backends.cryptography_backend import CryptographyECKey
+    from jose.backends.ecdsa_backend import ECDSAECKey
 except ImportError:
     ECDSAECKey = CryptographyECKey = None
 from jose.constants import ALGORITHMS
