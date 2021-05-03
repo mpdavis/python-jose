@@ -12,7 +12,7 @@ matrix:
   include:
     # Linting
     - python: 3.8
-      env: TOXENV=flake8
+      env: TOXENV=lint
     # CPython 3.6
     - python: 3.6
       env: TOXENV=py36-base

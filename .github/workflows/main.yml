@@ -50,4 +50,4 @@ jobs:
       run: |
         pip install -U setuptools 
         pip install -U "tox>=3.23.0,<4"
-    - run: tox -e flake8
+    - run: tox -e lint
