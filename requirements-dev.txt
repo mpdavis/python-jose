@@ -7,4 +7,3 @@ docopt==0.6.2
 pytest==6.2.3
 pytest-cov==2.11.1
 -r requirements.txt
--r requirements-rtd.txt

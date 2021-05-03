@@ -36,7 +36,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../jose/jwt'))
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.coverage',
-    'sphinxcontrib.napoleon'
+    'sphinx.ext.napoleon'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
