@@ -51,3 +51,21 @@ jobs:
         pip install -U setuptools 
         pip install -U "tox>=3.23.0,<4"
     - run: tox -e lint
+  package:
+    name: "Build & verify package"
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: "actions/checkout@v2"
+      - uses: "actions/setup-python@v2"
+        with:
+          python-version: "3.8"
+      - name: "Install build, check-wheel-content, and twine"
+        run: "python -m pip install build twine check-wheel-contents"
+      - name: "Build package"
+        run: "python -m build --sdist --wheel ."
+      - name: "List result"
+        run: "ls -l dist"
+      - name: "Check wheel contents"
+        run: "check-wheel-contents dist/*.whl"
+      - name: "Check long_description"
+        run: "python -m twine check dist/*"
