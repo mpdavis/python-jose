@@ -2,7 +2,6 @@ import hashlib
 import hmac
 import os
 
-import six
 
 from jose.backends.base import Key
 from jose.constants import ALGORITHMS
@@ -35,10 +34,10 @@ class HMACKey(Key):
             self.prepared_key = self._process_jwk(key)
             return
 
-        if not isinstance(key, six.string_types) and not isinstance(key, bytes):
+        if not isinstance(key, str) and not isinstance(key, bytes):
             raise JWKError('Expecting a string- or bytes-formatted key.')
 
-        if isinstance(key, six.text_type):
+        if isinstance(key, str):
             key = key.encode('utf-8')
 
         invalid_strings = [

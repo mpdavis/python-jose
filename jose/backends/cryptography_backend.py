@@ -1,5 +1,3 @@
-from __future__ import division
-
 import math
 import warnings
 
@@ -79,10 +77,10 @@ class CryptographyECKey(Key):
             self.prepared_key = self._process_jwk(key)
             return
 
-        if isinstance(key, six.string_types):
+        if isinstance(key, str):
             key = key.encode('utf-8')
 
-        if isinstance(key, six.binary_type):
+        if isinstance(key, bytes):
             # Attempt to load key. We don't know if it's
             # a Public Key or a Private Key, so we try
             # the Public Key first.
@@ -258,10 +256,10 @@ class CryptographyRSAKey(Key):
             self.prepared_key = self._process_jwk(key)
             return
 
-        if isinstance(key, six.string_types):
+        if isinstance(key, str):
             key = key.encode('utf-8')
 
-        if isinstance(key, six.binary_type):
+        if isinstance(key, bytes):
             try:
                 if key.startswith(b'-----BEGIN CERTIFICATE-----'):
                     self._process_cert(key)
@@ -468,15 +466,15 @@ class CryptographyAESKey(Key):
         self._mode = self.MODES.get(self._algorithm)
 
         if algorithm in self.KEY_128 and len(key) != 16:
-            raise JWKError("Key must be 128 bit for alg {}".format(algorithm))
+            raise JWKError(f"Key must be 128 bit for alg {algorithm}")
         elif algorithm in self.KEY_192 and len(key) != 24:
-            raise JWKError("Key must be 192 bit for alg {}".format(algorithm))
+            raise JWKError(f"Key must be 192 bit for alg {algorithm}")
         elif algorithm in self.KEY_256 and len(key) != 32:
-            raise JWKError("Key must be 256 bit for alg {}".format(algorithm))
+            raise JWKError(f"Key must be 256 bit for alg {algorithm}")
         elif algorithm in self.KEY_384 and len(key) != 48:
-            raise JWKError("Key must be 384 bit for alg {}".format(algorithm))
+            raise JWKError(f"Key must be 384 bit for alg {algorithm}")
         elif algorithm in self.KEY_512 and len(key) != 64:
-            raise JWKError("Key must be 512 bit for alg {}".format(algorithm))
+            raise JWKError(f"Key must be 512 bit for alg {algorithm}")
 
         self._key = key
 
@@ -575,10 +573,10 @@ class CryptographyHMACKey(Key):
             self.prepared_key = self._process_jwk(key)
             return
 
-        if not isinstance(key, six.string_types) and not isinstance(key, bytes):
+        if not isinstance(key, str) and not isinstance(key, bytes):
             raise JWKError('Expecting a string- or bytes-formatted key.')
 
-        if isinstance(key, six.text_type):
+        if isinstance(key, str):
             key = key.encode('utf-8')
 
         invalid_strings = [

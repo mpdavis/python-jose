@@ -1,5 +1,4 @@
 import hashlib
-import six
 
 from jose.backends.base import Key
 import ecdsa
@@ -49,10 +48,10 @@ class ECDSAECKey(Key):
             self.prepared_key = self._process_jwk(key)
             return
 
-        if isinstance(key, six.string_types):
+        if isinstance(key, str):
             key = key.encode('utf-8')
 
-        if isinstance(key, six.binary_type):
+        if isinstance(key, bytes):
             # Attempt to load key. We don't know if it's
             # a Signing Key or a Verifying Key, so we try
             # the Verifying Key first.
@@ -85,7 +84,7 @@ class ECDSAECKey(Key):
             y = base64_to_long(jwk_dict.get('y'))
 
             if not ecdsa.ecdsa.point_is_valid(self.curve.generator, x, y):
-                raise JWKError("Point: %s, %s is not a valid point" % (x, y))
+                raise JWKError(f"Point: {x}, {y} is not a valid point")
 
             point = ecdsa.ellipticcurve.Point(self.curve.curve, x, y, self.curve.order)
             return ecdsa.keys.VerifyingKey.from_public_point(point, self.curve)

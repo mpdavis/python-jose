@@ -146,7 +146,7 @@ def decrypt(jwe_str, key):
             # recipient or not.
             cek_valid = True
         except NotImplementedError:
-            raise JWEError("alg {} is not implemented".format(alg))
+            raise JWEError(f"alg {alg} is not implemented")
         except Exception:
             # Record whether the CEK could be successfully determined for this
             # recipient or not.
@@ -186,7 +186,7 @@ def decrypt(jwe_str, key):
     try:
         plain_text = _decrypt_and_auth(cek_bytes, enc, cipher_text, iv, aad, auth_tag)
     except NotImplementedError:
-        raise JWEError("enc {} is not implemented".format(enc))
+        raise JWEError(f"enc {enc} is not implemented")
     except Exception as e:
         raise JWEError(e)
 
@@ -243,7 +243,7 @@ def _decrypt_and_auth(cek_bytes, enc, cipher_text, iv, aad, auth_tag):
         encryption_key = jwk.construct(cek_bytes, enc)
         auth_tag_check = auth_tag  # GCM check auth on decrypt
     else:
-        raise NotImplementedError("enc {} is not implemented!".format(enc))
+        raise NotImplementedError(f"enc {enc} is not implemented!")
 
     plaintext = encryption_key.decrypt(cipher_text, iv, aad, auth_tag)
     if auth_tag != auth_tag_check:
@@ -389,7 +389,7 @@ def _encrypt_and_auth(key, alg, enc, zip, plaintext, aad):
     try:
         cek_bytes, kw_cek = _get_cek(enc, alg, key)
     except NotImplementedError:
-        raise JWEError("alg {} is not implemented".format(alg))
+        raise JWEError(f"alg {alg} is not implemented")
 
     if enc in ALGORITHMS.HMAC_AUTH_TAG:
         encryption_key, mac_key, key_len = _get_encryption_key_mac_key_and_key_length_from_cek(cek_bytes, enc)
@@ -399,7 +399,7 @@ def _encrypt_and_auth(key, alg, enc, zip, plaintext, aad):
         encryption_key = jwk.construct(cek_bytes, enc)
         iv, ciphertext, auth_tag = encryption_key.encrypt(plaintext, aad)
     else:
-        raise NotImplementedError("enc {} is not implemented!".format(enc))
+        raise NotImplementedError(f"enc {enc} is not implemented!")
 
     return kw_cek, iv, ciphertext, auth_tag
 
@@ -558,7 +558,7 @@ def _get_random_cek_bytes_for_enc(enc):
     elif enc == ALGORITHMS.A256CBC_HS512:
         num_bits = 512
     else:
-        raise NotImplementedError("{} not supported".format(enc))
+        raise NotImplementedError(f"{enc} not supported")
     cek_bytes = get_random_bytes(num_bits // 8)
     return cek_bytes
 

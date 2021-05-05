@@ -1,12 +1,6 @@
-
 import binascii
 import json
-import six
-
-try:
-    from collections.abc import Mapping, Iterable  # Python 3
-except ImportError:
-    from collections import Mapping, Iterable  # Python 2, will be deprecated in Python 3.8
+from collections.abc import Mapping, Iterable
 
 from jose import jwk
 from jose.backends.base import Key
@@ -181,7 +175,7 @@ def _sign_header_and_claims(encoded_header, encoded_claims, algorithm, key):
 
 
 def _load(jwt):
-    if isinstance(jwt, six.text_type):
+    if isinstance(jwt, str):
         jwt = jwt.encode('utf-8')
     try:
         signing_input, crypto_segment = jwt.rsplit(b'.', 1)
@@ -251,7 +245,7 @@ def _get_keys(key):
 
     # Iterable but not text or mapping => list- or tuple-like
     elif (isinstance(key, Iterable) and
-          not (isinstance(key, six.string_types) or isinstance(key, six.binary_type))):
+          not (isinstance(key, str) or isinstance(key, bytes))):
         return key
 
     # Scalar value, wrap in tuple.
