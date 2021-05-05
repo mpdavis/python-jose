@@ -1,4 +1,3 @@
-
 import base64
 import json
 
@@ -53,8 +52,8 @@ class TestJWT:
                 algorithms=[])
 
     @pytest.mark.parametrize("key, token",
-                             [('1234567890', u'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoidGVzdCJ9.aNBlulVhiYSCzvsh1rTzXZC2eWJmNrMBjINT-0wQz4k'),
-                              ('123456789.0',u'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoidGVzdCJ9.D8WLFPMi3yKgua2jm3BKThFsParXpgxhIbsUc39zJDw')])
+                             [('1234567890', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoidGVzdCJ9.aNBlulVhiYSCzvsh1rTzXZC2eWJmNrMBjINT-0wQz4k'),
+                              ('123456789.0','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoidGVzdCJ9.D8WLFPMi3yKgua2jm3BKThFsParXpgxhIbsUc39zJDw')])
     def test_numeric_key(self, key, token):
         token_info = jwt.decode(token, key)
         assert token_info == {"name": "test"}
@@ -62,7 +61,7 @@ class TestJWT:
     def test_invalid_claims_json(self):
         old_jws_verify = jws.verify
         try:
-            token = u'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+            token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
 
             def return_invalid_json(token, key, algorithms, verify=True):
                 return b'["a", "b"}'
@@ -77,7 +76,7 @@ class TestJWT:
     def test_invalid_claims(self):
         old_jws_verify = jws.verify
         try:
-            token = u'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+            token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
 
             def return_encoded_array(token, key, algorithms, verify=True):
                 return b'["a","b"]'

@@ -21,10 +21,10 @@ def payload():
     return payload
 
 
-class TestJWS(object):
+class TestJWS:
 
     def test_unicode_token(self):
-        token = u'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+        token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
         jws.verify(token, 'secret', ['HS256'])
 
     def test_multiple_keys(self):
@@ -44,7 +44,7 @@ class TestJWS(object):
             jwk.HMACKey.verify = old_jwk_verify
 
     def test_invalid_algorithm(self):
-        token = u'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+        token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
         with pytest.raises(JWSError):
             jws.verify(token, 'secret', [None])
 
@@ -89,7 +89,7 @@ class TestJWS(object):
         assert verified_data['testkey'] == 'testvalue'
 
 
-class TestJWK(object):
+class TestJWK:
     def test_jwk(self, payload):
         key_data = 'key'
         key = jwk.construct(key_data, algorithm='HS256')
@@ -97,7 +97,7 @@ class TestJWK(object):
         assert jws.verify(token, key_data, ALGORITHMS.HS256) == payload
 
 
-class TestHMAC(object):
+class TestHMAC:
 
     def testHMAC256(self, payload):
         token = jws.sign(payload, 'secret', algorithm=ALGORITHMS.HS256)
@@ -212,24 +212,24 @@ Ks3IHH7tVltM6NsRk3jNdVMCAwEAAQ==
 
 @pytest.fixture
 def jwk_set():
-    return {u'keys': [{u'alg': u'RS256',
-                       u'e': u'AQAB',
-                       u'kid': u'40aa42edac0614d7ca3f57f97ee866cdfba3b61a',
-                       u'kty': u'RSA',
-                       u'n': u'6lm9AEGLPFpVqnfeVFuTIZsj7vz_kxla6uW1WWtosM_MtIjXkyyiSolxiSOs3bzG66iVm71023QyOzKYFbio0hI-yZauG3g9nH-zb_AHScsjAKagHtrHmTdtq0JcNkQnAaaUwxVbjwMlYAcOh87W5jWj_MAcPvc-qjy8-WJ81UgoOUZNiKByuF4-9igxKZeskGRXuTPX64kWGBmKl-tM7VnCGMKoK3m92NPrktfBoNN_EGGthNfQsKFUdQFJFtpMuiXp9Gib7dcMGabxcG2GUl-PU086kPUyUdUYiMN2auKSOxSUZgDjT7DcI8Sn8kdQ0-tImaHi54JNa1PNNdKRpw',
-                       u'use': u'sig'},
-                      {u'alg': u'RS256',
-                       u'e': u'AQAB',
-                       u'kid': u'8fbbeea40332d2c0d27e37e1904af29b64594e57',
-                       u'kty': u'RSA',
-                       u'n': u'z7h6_rt35-j6NV2iQvYIuR3xvsxmEImgMl8dc8CFl4SzEWrry3QILajKxQZA9YYYfXIcZUG_6R6AghVMJetNIl2AhCoEr3RQjjNsm9PE6h5p2kQ-zIveFeb__4oIkVihYtxtoYBSdVj69nXLUAJP2bxPfU8RDp5X7hT62pKR05H8QLxH8siIQ5qR2LGFw_dJcitAVRRQofuaj_9u0CLZBfinqyRkBc7a0zi7pBxtEiIbn9sRr8Kkb_Boap6BHbnLS-YFBVarcgFBbifRf7NlK5dqE9z4OUb-dx8wCMRIPVAx_hV4Qx2anTgp1sDA6V4vd4NaCOZX-mSctNZqQmKtNw',
-                       u'use': u'sig'},
-                      {u'alg': u'RS256',
-                       u'e': u'AQAB',
-                       u'kid': u'6758b0b8eb341e90454860432d6a1648bf4de03b',
-                       u'kty': u'RSA',
-                       u'n': u'5K0rYaA7xtqSe1nFn_nCA10uUXY81NcohMeFsYLbBlx_NdpsmbpgtXJ6ektYR7rUdtMMLu2IONlNhkWlx-lge91okyacUrWHP88PycilUE-RnyVjbPEm3seR0VefgALfN4y_e77ljq2F7W2_kbUkTvDzriDIWvQT0WwVF5FIOBydfDDs92S-queaKgLBwt50SXJCZryLew5ODrwVsFGI4Et6MLqjS-cgWpCNwzcRqjBRsse6DXnex_zSRII4ODzKIfX4qdFBKZHO_BkTsK9DNkUayrr9cz8rFRK6TEH6XTVabgsyd6LP6PTxhpiII_pTYRSWk7CGMnm2nO0dKxzaFQ',
-                       u'use': u'sig'}]}
+    return {'keys': [{'alg': 'RS256',
+                       'e': 'AQAB',
+                       'kid': '40aa42edac0614d7ca3f57f97ee866cdfba3b61a',
+                       'kty': 'RSA',
+                       'n': '6lm9AEGLPFpVqnfeVFuTIZsj7vz_kxla6uW1WWtosM_MtIjXkyyiSolxiSOs3bzG66iVm71023QyOzKYFbio0hI-yZauG3g9nH-zb_AHScsjAKagHtrHmTdtq0JcNkQnAaaUwxVbjwMlYAcOh87W5jWj_MAcPvc-qjy8-WJ81UgoOUZNiKByuF4-9igxKZeskGRXuTPX64kWGBmKl-tM7VnCGMKoK3m92NPrktfBoNN_EGGthNfQsKFUdQFJFtpMuiXp9Gib7dcMGabxcG2GUl-PU086kPUyUdUYiMN2auKSOxSUZgDjT7DcI8Sn8kdQ0-tImaHi54JNa1PNNdKRpw',
+                       'use': 'sig'},
+                      {'alg': 'RS256',
+                       'e': 'AQAB',
+                       'kid': '8fbbeea40332d2c0d27e37e1904af29b64594e57',
+                       'kty': 'RSA',
+                       'n': 'z7h6_rt35-j6NV2iQvYIuR3xvsxmEImgMl8dc8CFl4SzEWrry3QILajKxQZA9YYYfXIcZUG_6R6AghVMJetNIl2AhCoEr3RQjjNsm9PE6h5p2kQ-zIveFeb__4oIkVihYtxtoYBSdVj69nXLUAJP2bxPfU8RDp5X7hT62pKR05H8QLxH8siIQ5qR2LGFw_dJcitAVRRQofuaj_9u0CLZBfinqyRkBc7a0zi7pBxtEiIbn9sRr8Kkb_Boap6BHbnLS-YFBVarcgFBbifRf7NlK5dqE9z4OUb-dx8wCMRIPVAx_hV4Qx2anTgp1sDA6V4vd4NaCOZX-mSctNZqQmKtNw',
+                       'use': 'sig'},
+                      {'alg': 'RS256',
+                       'e': 'AQAB',
+                       'kid': '6758b0b8eb341e90454860432d6a1648bf4de03b',
+                       'kty': 'RSA',
+                       'n': '5K0rYaA7xtqSe1nFn_nCA10uUXY81NcohMeFsYLbBlx_NdpsmbpgtXJ6ektYR7rUdtMMLu2IONlNhkWlx-lge91okyacUrWHP88PycilUE-RnyVjbPEm3seR0VefgALfN4y_e77ljq2F7W2_kbUkTvDzriDIWvQT0WwVF5FIOBydfDDs92S-queaKgLBwt50SXJCZryLew5ODrwVsFGI4Et6MLqjS-cgWpCNwzcRqjBRsse6DXnex_zSRII4ODzKIfX4qdFBKZHO_BkTsK9DNkUayrr9cz8rFRK6TEH6XTVabgsyd6LP6PTxhpiII_pTYRSWk7CGMnm2nO0dKxzaFQ',
+                       'use': 'sig'}]}
 
 
 google_id_token = (
@@ -248,7 +248,7 @@ google_id_token = (
 )
 
 
-class TestGetKeys(object):
+class TestGetKeys:
 
     def test_dict(self):
         assert ({},) == jws._get_keys({})
@@ -286,7 +286,7 @@ class TestGetKeys(object):
 
 
 @pytest.mark.skipif(RSAKey is None, reason="RSA is not available")
-class TestRSA(object):
+class TestRSA:
 
     def test_jwk_set(self, jwk_set):
         # Would raise a JWSError if validation failed.
@@ -352,7 +352,7 @@ MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQAmHp3CvKZv4gHg1abWhGU2cDU9Mlv
 -----END PUBLIC KEY-----"""
 
 
-class TestEC(object):
+class TestEC:
 
     def test_EC256(self, payload):
         token = jws.sign(payload, ec_private_key, algorithm=ALGORITHMS.ES256)
@@ -372,7 +372,7 @@ class TestEC(object):
             jws.verify(token, rsa_public_key, ALGORITHMS.ES384)
 
 
-class TestLoad(object):
+class TestLoad:
 
     def test_header_not_mapping(self):
         token = 'WyJ0ZXN0Il0.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'

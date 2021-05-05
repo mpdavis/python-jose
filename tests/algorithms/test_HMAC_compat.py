@@ -21,7 +21,7 @@ SUPPORTED_ALGORITHMS = ALGORITHMS.HMAC
     CryptographyHMACKey is None,
     reason="Multiple crypto backends not available for backend compatibility tests"
 )
-class TestBackendAesCompatibility(object):
+class TestBackendAesCompatibility:
     @pytest.mark.parametrize("backend_sign", CRYPTO_BACKENDS)
     @pytest.mark.parametrize("backend_verify", CRYPTO_BACKENDS)
     @pytest.mark.parametrize("algorithm", SUPPORTED_ALGORITHMS)

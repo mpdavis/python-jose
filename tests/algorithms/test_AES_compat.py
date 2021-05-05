@@ -17,7 +17,7 @@ CRYPTO_BACKENDS = (
 @pytest.mark.skipif(CryptographyAESKey is None,
     reason="Multiple crypto backends not available for backend compatibility tests"
 )
-class TestBackendAesCompatibility(object):
+class TestBackendAesCompatibility:
     @pytest.mark.parametrize("backend_decrypt", CRYPTO_BACKENDS)
     @pytest.mark.parametrize("backend_encrypt", CRYPTO_BACKENDS)
     @pytest.mark.parametrize("algorithm", ALGORITHMS.AES_PSEUDO)
