@@ -22,7 +22,7 @@ ENCODINGS = ("PKCS1", "PKCS8")
     None in (PurePythonRSAKey, CryptographyRSAKey),
     reason="Multiple crypto backends not available for backend compatibility tests"
 )
-class TestBackendRsaCompatibility(object):
+class TestBackendRsaCompatibility:
 
     @pytest.mark.parametrize("BackendSign", CRYPTO_BACKENDS)
     @pytest.mark.parametrize("BackendVerify", CRYPTO_BACKENDS)

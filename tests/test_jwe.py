@@ -74,10 +74,10 @@ OCT_384_BIT_KEY = b"\x04\xd3\x1f\xc5T\x9d\xfc\xfe\x0bd\x9d\xfa?\xaaj\xcek|\xd4-o
 OCT_512_BIT_KEY = b"\x04\xd3\x1f\xc5T\x9d\xfc\xfe\x0bd\x9d\xfa?\xaaj\xcek|\xd4-ok\t\xdb\xc8\xb1\x00\xf0\x8f\x9c,\xcf\x04\xd3\x1f\xc5T\x9d\xfc\xfe\x0bd\x9d\xfa?\xaaj\xcek|\xd4-ok\t\xdb\xc8\xb1\x00\xf0\x8f\x9c,\xcf"
 
 
-class TestGetUnverifiedHeader(object):
+class TestGetUnverifiedHeader:
 
     def test_valid_header_and_auth_tag(self):
-        expected_header = {u"alg": u"RSA1_5", u"enc": u"A128CBC-HS256"}
+        expected_header = {"alg": "RSA1_5", "enc": "A128CBC-HS256"}
         jwe_str = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0." \
                   "UGhIOguC7IuEvf_NPVaXsGMoLOmwvc1GyqlIKOK1nN94nHPoltGRhWhw7" \
                   "Zx0-kFm1NJn8LE9XShH59_i8J0PH5ZZyNfGy2xGdULU7sHNF6Gp2vPLgN" \
@@ -113,7 +113,7 @@ class TestGetUnverifiedHeader(object):
             jwe.get_unverified_header(jwe_str)
 
     def test_wrong_auth_tag_is_ignored(self):
-        expected_header = {u"alg": u"RSA1_5", u"enc": u"A128CBC-HS256"}
+        expected_header = {"alg": "RSA1_5", "enc": "A128CBC-HS256"}
         jwe_str = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0." \
                   "UGhIOguC7IuEvf_NPVaXsGMoLOmwvc1GyqlIKOK1nN94nHPoltGRhWhw7" \
                   "Zx0-kFm1NJn8LE9XShH59_i8J0PH5ZZyNfGy2xGdULU7sHNF6Gp2vPLgN" \
@@ -131,7 +131,7 @@ class TestGetUnverifiedHeader(object):
 
 @pytest.mark.skipif(AESKey is None, reason="Test requires AES Backend")
 @pytest.mark.skipif(RSAKey is RSABackendRSAKey, reason="RSA Backend does not support all modes")
-class TestDecrypt(object):
+class TestDecrypt:
 
     JWE_RSA_PACKAGES = (
         pytest.param(
@@ -353,7 +353,7 @@ class TestDecrypt(object):
             jwe.decrypt(jwe_str, "key")
 
 
-class TestEncrypt(object):
+class TestEncrypt:
 
     @pytest.mark.skipif(AESKey is None, reason="No AES backend")
     def test_rfc7516_appendix_b_direct(self, monkeypatch):
@@ -398,7 +398,7 @@ class TestEncrypt(object):
         elif alg == ALGORITHMS.A256KW:
             key = OCT_256_BIT_KEY
         else:
-            pytest.fail("I don't know how to handle enc {}".format(alg))
+            pytest.fail(f"I don't know how to handle enc {alg}")
         expected = b"Live long and prosper."
         jwe_value = jwe.encrypt(expected[:], key, enc, alg, zip)
         actual = jwe.decrypt(jwe_value, key)
@@ -419,7 +419,7 @@ class TestEncrypt(object):
         elif enc == ALGORITHMS.A256CBC_HS512:
             key = OCT_512_BIT_KEY
         else:
-            pytest.fail("I don't know how to handle enc {}".format(enc))
+            pytest.fail(f"I don't know how to handle enc {enc}")
         expected = b"Live long and prosper."
         jwe_value = jwe.encrypt(expected[:], key, enc, ALGORITHMS.DIR, zip)
         actual = jwe.decrypt(jwe_value, key)

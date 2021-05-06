@@ -191,7 +191,7 @@ def _actually_invalid_private_key_pkcs8_pem():
 
 
 @pytest.mark.skipif(PurePythonRSAKey is None, reason="python-rsa backend not available")
-class TestPurePythonRsa(object):
+class TestPurePythonRsa:
 
     def test_python_rsa_legacy_pem_read(self):
         key = PurePythonRSAKey(LEGACY_INVALID_PRIVATE_KEY_PKCS8_PEM, ALGORITHMS.RS256)

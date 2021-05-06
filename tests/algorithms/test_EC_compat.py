@@ -15,7 +15,7 @@ from .test_EC import private_key
     None in (ECDSAECKey, CryptographyECKey),
     reason="Multiple crypto backends not available for backend compatibility tests"
 )
-class TestBackendEcdsaCompatibility(object):
+class TestBackendEcdsaCompatibility:
 
     @pytest.mark.parametrize("BackendSign", [ECDSAECKey, CryptographyECKey])
     @pytest.mark.parametrize("BackendVerify", [ECDSAECKey, CryptographyECKey])
