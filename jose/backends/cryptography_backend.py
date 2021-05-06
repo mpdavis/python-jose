@@ -486,7 +486,7 @@ class CryptographyAESKey(Key):
         return data
 
     def encrypt(self, plain_text, aad=None):
-        plain_text = six.ensure_binary(plain_text)
+        plain_text = ensure_binary(plain_text)
         try:
             iv = get_random_bytes(algorithms.AES.block_size//8)
             mode = self._mode(iv)
@@ -509,9 +509,9 @@ class CryptographyAESKey(Key):
             raise JWEError(e)
 
     def decrypt(self, cipher_text, iv=None, aad=None, tag=None):
-        cipher_text = six.ensure_binary(cipher_text)
+        cipher_text = ensure_binary(cipher_text)
         try:
-            iv = six.ensure_binary(iv)
+            iv = ensure_binary(iv)
             mode = self._mode(iv)
             if mode.name == "GCM":
                 if tag is None:
@@ -537,12 +537,12 @@ class CryptographyAESKey(Key):
             raise JWEError(e)
 
     def wrap_key(self, key_data):
-        key_data = six.ensure_binary(key_data)
+        key_data = ensure_binary(key_data)
         cipher_text = aes_key_wrap(self._key, key_data, default_backend())
         return cipher_text  # IV, cipher text, auth tag
 
     def unwrap_key(self, wrapped_key):
-        wrapped_key = six.ensure_binary(wrapped_key)
+        wrapped_key = ensure_binary(wrapped_key)
         try:
             plain_text = aes_key_unwrap(self._key, wrapped_key, default_backend())
         except InvalidUnwrap as cause:
@@ -611,15 +611,15 @@ class CryptographyHMACKey(Key):
         }
 
     def sign(self, msg):
-        msg = six.ensure_binary(msg)
+        msg = ensure_binary(msg)
         h = hmac.HMAC(self.prepared_key, self._hash_alg, backend=default_backend())
         h.update(msg)
         signature = h.finalize()
         return signature
 
     def verify(self, msg, sig):
-        msg = six.ensure_binary(msg)
-        sig = six.ensure_binary(sig)
+        msg = ensure_binary(msg)
+        sig = ensure_binary(sig)
         h = hmac.HMAC(self.prepared_key, self._hash_alg, backend=default_backend())
         h.update(msg)
         try:
