@@ -64,3 +64,6 @@ target/
 
 # PyTest
 .pytest_cache/
+
+# VSCode
+.vscode/
