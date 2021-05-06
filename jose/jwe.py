@@ -305,9 +305,9 @@ def _jwe_compact_deserialize(jwe_bytes):
     # values that together comprise the JOSE Header.
 
     try:
-        header = json.loads(six.ensure_str(header_data))
+        header = json.loads(header_data)
     except ValueError as e:
-        raise JWEParseError('Invalid header string: %s' % e)
+        raise JWEParseError(f'Invalid header string: {e}')
 
     if not isinstance(header, Mapping):
         raise JWEParseError('Invalid header string: must be a json object')

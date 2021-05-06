@@ -1,7 +1,6 @@
 import json
 
 import pytest
-import six
 
 import jose.backends
 from jose import jwe
@@ -429,7 +428,7 @@ class TestEncrypt:
         enc = ALGORITHMS.A256CBC_HS512
         alg = ALGORITHMS.RSA_OAEP_256
         encrypted = jwe.encrypt("Text", PUBLIC_KEY_PEM, enc, alg)
-        header = json.loads(six.ensure_str(base64url_decode(encrypted.split(b".")[0])))
+        header = json.loads(base64url_decode(encrypted.split(b".")[0]))
         assert header["enc"] == enc
         assert header["alg"] == alg
 
@@ -439,7 +438,7 @@ class TestEncrypt:
         alg = ALGORITHMS.RSA_OAEP_256
         encrypted = jwe.encrypt("Text", PUBLIC_KEY_PEM, enc, alg,
                                 cty="expected")
-        header = json.loads(six.ensure_str(base64url_decode(encrypted.split(b".")[0])))
+        header = json.loads(base64url_decode(encrypted.split(b".")[0]))
         assert header["cty"] == "expected"
 
     @pytest.mark.skipif(AESKey is None, reason="No AES backend")
@@ -447,7 +446,7 @@ class TestEncrypt:
         enc = ALGORITHMS.A256CBC_HS512
         alg = ALGORITHMS.RSA_OAEP_256
         encrypted = jwe.encrypt("Text", PUBLIC_KEY_PEM, enc, alg)
-        header = json.loads(six.ensure_str(base64url_decode(encrypted.split(b".")[0])))
+        header = json.loads(base64url_decode(encrypted.split(b".")[0]))
         assert "cty" not in header
 
     @pytest.mark.skipif(AESKey is None, reason="No AES backend")
@@ -456,7 +455,7 @@ class TestEncrypt:
         alg = ALGORITHMS.RSA_OAEP_256
         encrypted = jwe.encrypt(b"Text", PUBLIC_KEY_PEM, enc, alg,
                                 zip=ZIPS.DEF)
-        header = json.loads(six.ensure_str(base64url_decode(encrypted.split(b".")[0])))
+        header = json.loads(base64url_decode(encrypted.split(b".")[0]))
         assert header["zip"] == ZIPS.DEF
 
     @pytest.mark.skipif(AESKey is None, reason="No AES backend")
@@ -464,7 +463,7 @@ class TestEncrypt:
         enc = ALGORITHMS.A256CBC_HS512
         alg = ALGORITHMS.RSA_OAEP_256
         encrypted = jwe.encrypt(b"Text", PUBLIC_KEY_PEM, enc, alg)
-        header = json.loads(six.ensure_str(base64url_decode(encrypted.split(b".")[0])))
+        header = json.loads(base64url_decode(encrypted.split(b".")[0]))
         assert "zip" not in header
 
     @pytest.mark.skipif(AESKey is None, reason="No AES backend")
@@ -473,7 +472,7 @@ class TestEncrypt:
         alg = ALGORITHMS.RSA_OAEP_256
         encrypted = jwe.encrypt("Text", PUBLIC_KEY_PEM, enc, alg,
                                 zip=ZIPS.NONE)
-        header = json.loads(six.ensure_str(base64url_decode(encrypted.split(b".")[0])))
+        header = json.loads(base64url_decode(encrypted.split(b".")[0]))
         assert "zip" not in header
 
     @pytest.mark.skipif(AESKey is None, reason="No AES backend")
@@ -482,7 +481,7 @@ class TestEncrypt:
         alg = ALGORITHMS.RSA_OAEP_256
         encrypted = jwe.encrypt("Text", PUBLIC_KEY_PEM, enc, alg,
                                 kid="expected")
-        header = json.loads(six.ensure_str(base64url_decode(encrypted.split(b".")[0])))
+        header = json.loads(base64url_decode(encrypted.split(b".")[0]))
         assert header["kid"] == "expected"
 
     @pytest.mark.skipif(AESKey is None, reason="No AES backend")
@@ -490,5 +489,5 @@ class TestEncrypt:
         enc = ALGORITHMS.A256CBC_HS512
         alg = ALGORITHMS.RSA_OAEP_256
         encrypted = jwe.encrypt("Text", PUBLIC_KEY_PEM, enc, alg)
-        header = json.loads(six.ensure_str(base64url_decode(encrypted.split(b".")[0])))
+        header = json.loads(base64url_decode(encrypted.split(b".")[0]))
         assert "kid" not in header

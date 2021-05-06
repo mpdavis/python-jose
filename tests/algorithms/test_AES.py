@@ -1,7 +1,6 @@
 from binascii import hexlify, unhexlify
 
 import pytest
-import six
 
 from jose.constants import ALGORITHMS
 
