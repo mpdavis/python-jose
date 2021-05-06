@@ -12,8 +12,7 @@ except ImportError:
     ECDSAECKey = ecdsa = None
 
 try:
-    from cryptography.hazmat.backends import \
-        default_backend as CryptographyBackend
+    from cryptography.hazmat.backends import default_backend as CryptographyBackend
     from cryptography.hazmat.primitives.asymmetric import ec as CryptographyEc
 
     from jose.backends.cryptography_backend import CryptographyECKey
