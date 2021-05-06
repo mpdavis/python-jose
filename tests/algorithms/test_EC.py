@@ -1,19 +1,22 @@
 import json
 
+from jose.backends import ECKey
 from jose.constants import ALGORITHMS
 from jose.exceptions import JOSEError, JWKError
 
-from jose.backends import ECKey
 try:
-    from jose.backends.ecdsa_backend import ECDSAECKey
     import ecdsa
+
+    from jose.backends.ecdsa_backend import ECDSAECKey
 except ImportError:
     ECDSAECKey = ecdsa = None
 
 try:
-    from jose.backends.cryptography_backend import CryptographyECKey
+    from cryptography.hazmat.backends import \
+        default_backend as CryptographyBackend
     from cryptography.hazmat.primitives.asymmetric import ec as CryptographyEc
-    from cryptography.hazmat.backends import default_backend as CryptographyBackend
+
+    from jose.backends.cryptography_backend import CryptographyECKey
 except ImportError:
     CryptographyECKey = CryptographyEc = CryptographyBackend = None
 

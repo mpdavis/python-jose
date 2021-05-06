@@ -10,11 +10,11 @@ try:
 except ImportError:
     from collections import Mapping  # Python 2, will be deprecated in Python 3.8
 
+from . import jwk
 from .backends import get_random_bytes
 from .constants import ALGORITHMS, ZIPS
-from .exceptions import JWEParseError, JWEError
+from .exceptions import JWEError, JWEParseError
 from .utils import base64url_decode, base64url_encode
-from . import jwk
 
 
 def encrypt(plaintext, key, encryption=ALGORITHMS.A256GCM,

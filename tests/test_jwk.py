@@ -1,9 +1,9 @@
-from jose import jwk
-from jose.exceptions import JWKError
-from jose.backends.base import Key
-from jose.backends import ECKey, RSAKey, HMACKey, AESKey
-
 import pytest
+
+from jose import jwk
+from jose.backends import AESKey, ECKey, HMACKey, RSAKey
+from jose.backends.base import Key
+from jose.exceptions import JWKError
 
 hmac_key = {
     "kty": "oct",

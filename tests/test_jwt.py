@@ -1,14 +1,11 @@
 import base64
 import json
-
-from jose import jws
-from jose import jwt
-from jose.exceptions import JWTError
-
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 import pytest
+
+from jose import jws, jwt
+from jose.exceptions import JWTError
 
 
 @pytest.fixture
@@ -115,6 +112,7 @@ class TestJWT:
 
     def test_deterministic_headers(self):
         from collections import OrderedDict
+
         from jose.utils import base64url_decode
 
         claims = {"a": "b"}

@@ -1,10 +1,10 @@
 import json
 
+import pytest
+
+from jose.backends.native import HMACKey
 from jose.constants import ALGORITHMS
 from jose.exceptions import JOSEError
-from jose.backends.native import HMACKey
-
-import pytest
 
 
 class TestHMACAlgorithm:

@@ -3,8 +3,8 @@ import json
 import pytest
 
 from jose import jwt
-
 from jose.backends import RSAKey
+
 try:
     from jose.backends.rsa_backend import RSAKey as RsaRSAKey
 except ImportError:

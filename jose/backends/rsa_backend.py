@@ -1,21 +1,17 @@
 import binascii
-
 import warnings
-
-from pyasn1.error import PyAsn1Error
 
 import rsa as pyrsa
 import rsa.pem as pyrsa_pem
+from pyasn1.error import PyAsn1Error
 from rsa import DecryptionError
 
+from jose.backends._asn1 import (rsa_private_key_pkcs1_to_pkcs8,
+                                 rsa_private_key_pkcs8_to_pkcs1,
+                                 rsa_public_key_pkcs1_to_pkcs8)
 from jose.backends.base import Key
-from jose.backends._asn1 import (
-    rsa_private_key_pkcs1_to_pkcs8,
-    rsa_private_key_pkcs8_to_pkcs1,
-    rsa_public_key_pkcs1_to_pkcs8,
-)
 from jose.constants import ALGORITHMS
-from jose.exceptions import JWKError, JWEError
+from jose.exceptions import JWEError, JWKError
 from jose.utils import base64_to_long, long_to_base64
 
 ALGORITHMS.SUPPORTED.remove(ALGORITHMS.RSA_OAEP)  # RSA OAEP not supported

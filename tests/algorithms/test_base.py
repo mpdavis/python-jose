@@ -1,6 +1,6 @@
-from jose.jwk import Key
-
 import pytest
+
+from jose.jwk import Key
 
 
 @pytest.fixture

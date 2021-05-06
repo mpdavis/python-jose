@@ -1,8 +1,8 @@
 import hashlib
 
-from jose.backends.base import Key
 import ecdsa
 
+from jose.backends.base import Key
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWKError
 from jose.utils import base64_to_long, long_to_base64
