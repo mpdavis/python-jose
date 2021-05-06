@@ -12,7 +12,7 @@ from . import jwk
 from .backends import get_random_bytes
 from .constants import ALGORITHMS, ZIPS
 from .exceptions import JWEError, JWEParseError
-from .utils import base64url_decode, base64url_encode
+from .utils import base64url_decode, base64url_encode, ensure_binary
 
 
 def encrypt(plaintext, key, encryption=ALGORITHMS.A256GCM,

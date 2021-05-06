@@ -1,7 +1,6 @@
 import math
 import warnings
 
-import six
 from cryptography.exceptions import InvalidSignature, InvalidTag
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.bindings.openssl.binding import Binding
@@ -17,7 +16,7 @@ from cryptography.x509 import load_pem_x509_certificate
 
 from ..constants import ALGORITHMS
 from ..exceptions import JWEError, JWKError
-from ..utils import base64_to_long, base64url_decode, base64url_encode, long_to_base64
+from ..utils import base64_to_long, base64url_decode, base64url_encode, ensure_binary, long_to_base64
 from .base import Key
 
 _binding = None
