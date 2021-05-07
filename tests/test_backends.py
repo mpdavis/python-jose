@@ -4,8 +4,7 @@ try:
 except ImportError:
     PurePythonRSAKey = None
 try:
-    from jose.backends.cryptography_backend import (CryptographyECKey,
-                                                    CryptographyRSAKey)
+    from jose.backends.cryptography_backend import CryptographyECKey, CryptographyRSAKey
 except ImportError:
     CryptographyRSAKey = CryptographyECKey = None
 try:

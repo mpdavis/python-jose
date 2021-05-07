@@ -6,9 +6,9 @@ import rsa.pem as pyrsa_pem
 from pyasn1.error import PyAsn1Error
 from rsa import DecryptionError
 
-from jose.backends._asn1 import (rsa_private_key_pkcs1_to_pkcs8,
-                                 rsa_private_key_pkcs8_to_pkcs1,
-                                 rsa_public_key_pkcs1_to_pkcs8)
+from jose.backends._asn1 import (
+    rsa_private_key_pkcs1_to_pkcs8, rsa_private_key_pkcs8_to_pkcs1, rsa_public_key_pkcs1_to_pkcs8,
+)
 from jose.backends.base import Key
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWEError, JWKError

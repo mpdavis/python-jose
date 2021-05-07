@@ -7,23 +7,17 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.bindings.openssl.binding import Binding
 from cryptography.hazmat.primitives import hashes, hmac, serialization
 from cryptography.hazmat.primitives.asymmetric import ec, padding, rsa
-from cryptography.hazmat.primitives.asymmetric.utils import (
-    decode_dss_signature, encode_dss_signature)
-from cryptography.hazmat.primitives.ciphers import (Cipher, aead, algorithms,
-                                                    modes)
-from cryptography.hazmat.primitives.keywrap import (InvalidUnwrap,
-                                                    aes_key_unwrap,
-                                                    aes_key_wrap)
+from cryptography.hazmat.primitives.asymmetric.utils import decode_dss_signature, encode_dss_signature
+from cryptography.hazmat.primitives.ciphers import Cipher, aead, algorithms, modes
+from cryptography.hazmat.primitives.keywrap import InvalidUnwrap, aes_key_unwrap, aes_key_wrap
 from cryptography.hazmat.primitives.padding import PKCS7
-from cryptography.hazmat.primitives.serialization import (load_pem_private_key,
-                                                          load_pem_public_key)
+from cryptography.hazmat.primitives.serialization import load_pem_private_key, load_pem_public_key
 from cryptography.utils import int_to_bytes
 from cryptography.x509 import load_pem_x509_certificate
 
 from ..constants import ALGORITHMS
 from ..exceptions import JWEError, JWKError
-from ..utils import (base64_to_long, base64url_decode, base64url_encode,
-                     long_to_base64)
+from ..utils import base64_to_long, base64url_decode, base64url_encode, long_to_base64
 from .base import Key
 
 _binding = None
