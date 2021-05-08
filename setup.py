@@ -26,11 +26,8 @@ extras_require = {
     'pycrypto': ['pycrypto >=2.6.0, <2.7.0'] + pyasn1,
     'pycryptodome': ['pycryptodome >=3.3.1, <4.0.0'] + pyasn1,
 }
-legacy_backend_requires = ['ecdsa != 0.15', 'rsa'] + pyasn1
-install_requires = ['six <2.0']
-
 # TODO: work this into the extras selection instead.
-install_requires += legacy_backend_requires
+install_requires = ['ecdsa != 0.15', 'rsa'] + pyasn1
 
 
 setup(
@@ -70,7 +67,6 @@ setup(
         'setuptools>=39.2.0',
     ],
     tests_require=[
-        'six',
         'ecdsa != 0.15',
         'pytest',
         'pytest-cov',

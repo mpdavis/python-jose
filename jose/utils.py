@@ -95,3 +95,13 @@ def timedelta_total_seconds(delta):
         delta (timedelta): A timedelta to convert to seconds.
     """
     return delta.days * 24 * 60 * 60 + delta.seconds
+
+
+def ensure_binary(s):
+    """Coerce **s** to bytes."""
+
+    if isinstance(s, bytes):
+        return s
+    if isinstance(s, str):
+        return s.encode('utf-8', 'strict')
+    raise TypeError(f"not expecting type '{type(s)}'")
