@@ -59,10 +59,7 @@ def _backend_exception_types():
 
 
 @pytest.mark.ecdsa
-@pytest.mark.skipif(
-    None in (ECDSAECKey, ecdsa),
-    reason="python-ecdsa backend not available"
-)
+@pytest.mark.skipif(None in (ECDSAECKey, ecdsa), reason="python-ecdsa backend not available")
 def test_key_from_ecdsa():
     key = ecdsa.SigningKey.from_pem(private_key)
     assert not ECKey(key, ALGORITHMS.ES256).is_public()
@@ -70,11 +67,9 @@ def test_key_from_ecdsa():
 
 @pytest.mark.cryptography
 @pytest.mark.skipif(CryptographyECKey is None, reason="pyca/cryptography backend not available")
-@pytest.mark.parametrize("algorithm, expected_length", (
-        (ALGORITHMS.ES256, 32),
-        (ALGORITHMS.ES384, 48),
-        (ALGORITHMS.ES512, 66)
-))
+@pytest.mark.parametrize(
+    "algorithm, expected_length", ((ALGORITHMS.ES256, 32), (ALGORITHMS.ES384, 48), (ALGORITHMS.ES512, 66))
+)
 def test_cryptography_sig_component_length(algorithm, expected_length):
     # Put mapping inside here to avoid more complex handling for test runs that do not have pyca/cryptography
     mapping = {
@@ -83,8 +78,7 @@ def test_cryptography_sig_component_length(algorithm, expected_length):
         ALGORITHMS.ES512: CryptographyEc.SECP521R1,
     }
     key = CryptographyECKey(
-        CryptographyEc.generate_private_key(mapping[algorithm](), backend=CryptographyBackend()),
-        algorithm
+        CryptographyEc.generate_private_key(mapping[algorithm](), backend=CryptographyBackend()), algorithm
     )
     assert key._sig_component_length() == expected_length
 
@@ -104,14 +98,13 @@ def test_cryptograhy_raw_to_der():
 
 
 class TestECAlgorithm:
-
     def test_key_from_pem(self):
         assert not ECKey(private_key, ALGORITHMS.ES256).is_public()
 
     def test_to_pem(self):
         key = ECKey(private_key, ALGORITHMS.ES256)
         assert not key.is_public()
-        assert key.to_pem().strip() == private_key.strip().encode('utf-8')
+        assert key.to_pem().strip() == private_key.strip().encode("utf-8")
 
         public_pem = key.public_key().to_pem()
         assert ECKey(public_pem, ALGORITHMS.ES256).is_public()
@@ -120,7 +113,7 @@ class TestECAlgorithm:
     def test_key_too_short(self, Backend, ExceptionType):
         key = Backend(TOO_SHORT_PRIVATE_KEY, ALGORITHMS.ES512)
         with pytest.raises(ExceptionType):
-            key.sign(b'foo')
+            key.sign(b"foo")
 
     def test_get_public_key(self):
         key = ECKey(private_key, ALGORITHMS.ES256)
@@ -129,7 +122,7 @@ class TestECAlgorithm:
         assert pubkey == pubkey2
 
     def test_string_secret(self):
-        key = 'secret'
+        key = "secret"
         with pytest.raises(JOSEError):
             ECKey(key, ALGORITHMS.ES256)
 
@@ -140,10 +133,10 @@ class TestECAlgorithm:
 
     def test_invalid_algorithm(self):
         with pytest.raises(JWKError):
-            ECKey(private_key, 'nonexistent')
+            ECKey(private_key, "nonexistent")
 
         with pytest.raises(JWKError):
-            ECKey({'kty': 'bla'}, ALGORITHMS.ES256)
+            ECKey({"kty": "bla"}, ALGORITHMS.ES256)
 
     def test_EC_jwk(self):
         key = {
@@ -158,12 +151,12 @@ class TestECAlgorithm:
 
         assert not ECKey(key, ALGORITHMS.ES512).is_public()
 
-        del key['d']
+        del key["d"]
 
         # We are now dealing with a public key.
         assert ECKey(key, ALGORITHMS.ES512).is_public()
 
-        del key['x']
+        del key["x"]
 
         # This key is missing a required parameter.
         with pytest.raises(JWKError):
@@ -171,31 +164,31 @@ class TestECAlgorithm:
 
     def test_verify(self):
         key = ECKey(private_key, ALGORITHMS.ES256)
-        msg = b'test'
+        msg = b"test"
         signature = key.sign(msg)
         public_key = key.public_key()
 
         assert bool(public_key.verify(msg, signature))
-        assert not bool(public_key.verify(msg, b'not a signature'))
+        assert not bool(public_key.verify(msg, b"not a signature"))
 
     def assert_parameters(self, as_dict, private):
         assert isinstance(as_dict, dict)
 
         # Public parameters should always be there.
-        assert 'x' in as_dict
-        assert 'y' in as_dict
-        assert 'crv' in as_dict
+        assert "x" in as_dict
+        assert "y" in as_dict
+        assert "crv" in as_dict
 
-        assert 'kty' in as_dict
-        assert as_dict['kty'] == 'EC'
+        assert "kty" in as_dict
+        assert as_dict["kty"] == "EC"
 
         if private:
             # Private parameters as well
-            assert 'd' in as_dict
+            assert "d" in as_dict
 
         else:
             # Private parameters should be absent
-            assert 'd' not in as_dict
+            assert "d" not in as_dict
 
         # as_dict should be serializable to JSON
         json.dumps(as_dict)

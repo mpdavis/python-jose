@@ -10,7 +10,7 @@ except ImportError:
 try:
     from Crypto.PublicKey import RSA as PyCryptoRSA
 except ImportError:
-    PyCryptoRSA =  None
+    PyCryptoRSA = None
 
 try:
     from cryptography.hazmat.backends import default_backend
@@ -106,7 +106,7 @@ uwNcJ8daMgVZ0QBrD3CBcSZQrfC484BlV6spJ3C16qDVSQPt7sAI
 -----END RSA PRIVATE KEY-----"""
 PRIVATE_KEYS = (
     pytest.param(private_key_2048_pkcs1, id="RSA_2048_PKCS1"),
-    pytest.param(private_key_4096_pkcs1, id="RSA_4096_PKCS1")
+    pytest.param(private_key_4096_pkcs1, id="RSA_4096_PKCS1"),
 )
 
 LEGACY_INVALID_PRIVATE_KEY_PKCS8_PEM = b"""-----BEGIN PRIVATE KEY-----
@@ -165,21 +165,21 @@ ymbpPjVPxSfCAHJr5Pcu5tuZ0knP
 
 RSA_KW_ALGOS = (
     pytest.param(ALGORITHMS.RSA_OAEP, id="RSA_OAEP"),
-    pytest.param(ALGORITHMS.RSA_OAEP_256, id="RSA_OAEP_256")
+    pytest.param(ALGORITHMS.RSA_OAEP_256, id="RSA_OAEP_256"),
 )
 
 
 def _legacy_invalid_private_key_pkcs8_der():
     legacy_key = LEGACY_INVALID_PRIVATE_KEY_PKCS8_PEM.strip()
-    legacy_key = legacy_key[legacy_key.index(b"\n"):legacy_key.rindex(b"\n")]
+    legacy_key = legacy_key[legacy_key.index(b"\n") : legacy_key.rindex(b"\n")]
     return base64.b64decode(legacy_key)
 
 
 def _actually_invalid_private_key_pkcs8_der():
     legacy_key = _legacy_invalid_private_key_pkcs8_der()
-    invalid_key = legacy_key[:len(rsa_backend.LEGACY_INVALID_PKCS8_RSA_HEADER)]
+    invalid_key = legacy_key[: len(rsa_backend.LEGACY_INVALID_PKCS8_RSA_HEADER)]
     invalid_key += b"\x00"
-    invalid_key += legacy_key[len(rsa_backend.LEGACY_INVALID_PKCS8_RSA_HEADER):]
+    invalid_key += legacy_key[len(rsa_backend.LEGACY_INVALID_PKCS8_RSA_HEADER) :]
     return invalid_key
 
 
@@ -192,7 +192,6 @@ def _actually_invalid_private_key_pkcs8_pem():
 
 @pytest.mark.skipif(PurePythonRSAKey is None, reason="python-rsa backend not available")
 class TestPurePythonRsa:
-
     def test_python_rsa_legacy_pem_read(self):
         key = PurePythonRSAKey(LEGACY_INVALID_PRIVATE_KEY_PKCS8_PEM, ALGORITHMS.RS256)
         new_pem = key.to_pem(pem_format="PKCS8")
@@ -206,7 +205,7 @@ class TestPurePythonRsa:
 
     def test_python_rsa_legacy_private_key_pkcs8_to_pkcs1(self):
         legacy_key = _legacy_invalid_private_key_pkcs8_der()
-        legacy_pkcs1 = legacy_key[len(rsa_backend.LEGACY_INVALID_PKCS8_RSA_HEADER):]
+        legacy_pkcs1 = legacy_key[len(rsa_backend.LEGACY_INVALID_PKCS8_RSA_HEADER) :]
 
         assert rsa_backend._legacy_private_key_pkcs8_to_pkcs1(legacy_key) == legacy_pkcs1
 
@@ -219,37 +218,35 @@ class TestPurePythonRsa:
         excinfo.match("Invalid private key encoding")
 
 
-
-
 @pytest.mark.cryptography
 @pytest.mark.skipif(
-    None in (default_backend, pyca_rsa, CryptographyRSAKey),
-    reason="Cryptography backend not available"
+    None in (default_backend, pyca_rsa, CryptographyRSAKey), reason="Cryptography backend not available"
 )
 def test_cryptography_RSA_key_instance():
 
     key = pyca_rsa.RSAPublicNumbers(
         int(65537),
-        int(26057131595212989515105618545799160306093557851986992545257129318694524535510983041068168825614868056510242030438003863929818932202262132630250203397069801217463517914103389095129323580576852108653940669240896817348477800490303630912852266209307160550655497615975529276169196271699168537716821419779900117025818140018436554173242441334827711966499484119233207097432165756707507563413323850255548329534279691658369466534587631102538061857114141268972476680597988266772849780811214198186940677291891818952682545840788356616771009013059992237747149380197028452160324144544057074406611859615973035412993832273216732343819),
+        int(
+            26057131595212989515105618545799160306093557851986992545257129318694524535510983041068168825614868056510242030438003863929818932202262132630250203397069801217463517914103389095129323580576852108653940669240896817348477800490303630912852266209307160550655497615975529276169196271699168537716821419779900117025818140018436554173242441334827711966499484119233207097432165756707507563413323850255548329534279691658369466534587631102538061857114141268972476680597988266772849780811214198186940677291891818952682545840788356616771009013059992237747149380197028452160324144544057074406611859615973035412993832273216732343819
+        ),
     ).public_key(default_backend())
 
     pubkey = CryptographyRSAKey(key, ALGORITHMS.RS256)
     assert pubkey.is_public()
 
     pem = pubkey.to_pem()
-    assert pem.startswith(b'-----BEGIN PUBLIC KEY-----')
+    assert pem.startswith(b"-----BEGIN PUBLIC KEY-----")
 
 
 @pytest.mark.cryptography
 @pytest.mark.parametrize("private_key_pem", PRIVATE_KEYS)
 @pytest.mark.parametrize("algorithm", RSA_KW_ALGOS)
 @pytest.mark.skipif(
-    None in (default_backend, pyca_rsa, CryptographyRSAKey),
-    reason="Cryptography backend not available"
+    None in (default_backend, pyca_rsa, CryptographyRSAKey), reason="Cryptography backend not available"
 )
 def test_cryptography_wrap_key_unencoded_cleartext(private_key_pem, algorithm):
     private_key = CryptographyRSAKey(private_key_pem, algorithm)
-    key = b'test'
+    key = b"test"
     public_key = private_key.public_key()
     wrapped = public_key.wrap_key(key)
     unwrapped = private_key.unwrap_key(wrapped)
@@ -262,7 +259,7 @@ class TestRSAAlgorithm:
         assert not RSAKey(private_key_4096_pkcs1, ALGORITHMS.RS256).is_public()
 
     def test_string_secret(self):
-        key = 'secret'
+        key = "secret"
         with pytest.raises(JOSEError):
             RSAKey(key, ALGORITHMS.RS256)
 
@@ -271,8 +268,10 @@ class TestRSAAlgorithm:
         with pytest.raises(JOSEError):
             RSAKey(key, ALGORITHMS.RS256)
 
-    def test_bad_cert(self,):
-        key = '-----BEGIN CERTIFICATE-----'
+    def test_bad_cert(
+        self,
+    ):
+        key = "-----BEGIN CERTIFICATE-----"
         with pytest.raises(JOSEError):
             RSAKey(key, ALGORITHMS.RS256)
 
@@ -281,7 +280,7 @@ class TestRSAAlgorithm:
             RSAKey(private_key_4096_pkcs1, ALGORITHMS.ES256)
 
         with pytest.raises(JWKError):
-            RSAKey({'kty': 'bla'}, ALGORITHMS.RS256)
+            RSAKey({"kty": "bla"}, ALGORITHMS.RS256)
 
     def test_RSA_jwk(self):
         key = {
@@ -302,20 +301,20 @@ class TestRSAAlgorithm:
             "q": "uKE2dh-cTf6ERF4k4e_jy78GfPYUIaUyoSSJuBzp3Cubk3OCqs6grT8bR_cu0Dm1MZwWmtdqDyI95HrUeq3MP15vMMON8lHTeZu2lmKvwqW7anV5UzhM1iZ7z4yMkuUwFWoBvyY898EXvRD-hdqRxHlSqAZ192zB3pVFJ0s7pFc",
             "dp": "B8PVvXkvJrj2L-GYQ7v3y9r6Kw5g9SahXBwsWUzp19TVlgI-YV85q1NIb1rxQtD-IsXXR3-TanevuRPRt5OBOdiMGQp8pbt26gljYfKU_E9xn-RULHz0-ed9E9gXLKD4VGngpz-PfQ_q29pk5xWHoJp009Qf1HvChixRX 59ehik",
             "dq": "CLDmDGduhylc9o7r84rEUVn7pzQ6PF83Y-iBZx5NT-TpnOZKF1pErAMVeKzFEl41DlHHqqBLSM0W1sOFbwTxYWZDm6sI6og5iTbwQGIC3gnJKbi_7k_vJgGHwHxgPaX2PnvP-zyEkDERuf-ry4c_Z11Cq9AqC2yeL6kdKT1cYF8",
-            "qi": "3PiqvXQN0zwMeE-sBvZgi289XP9XCQF3VWqPzMKnIgQp7_Tugo6-NZBKCQsMf3HaEGBjTVJs_jcK8-TRXvaKe-7ZMaQj8VfBdYkssbu0NKDDhjJ-GtiseaDVWt7dcH0cfwxgFUHpQh7FoCrjFJ6h6ZEpMF6xmujs4qMpPz8aaI4"
+            "qi": "3PiqvXQN0zwMeE-sBvZgi289XP9XCQF3VWqPzMKnIgQp7_Tugo6-NZBKCQsMf3HaEGBjTVJs_jcK8-TRXvaKe-7ZMaQj8VfBdYkssbu0NKDDhjJ-GtiseaDVWt7dcH0cfwxgFUHpQh7FoCrjFJ6h6ZEpMF6xmujs4qMpPz8aaI4",
         }
         assert not RSAKey(key, ALGORITHMS.RS256).is_public()
 
-        del key['p']
+        del key["p"]
 
         # Some but not all extra parameters are present
         with pytest.raises(JWKError):
             RSAKey(key, ALGORITHMS.RS256)
 
-        del key['q']
-        del key['dp']
-        del key['dq']
-        del key['qi']
+        del key["q"]
+        del key["dp"]
+        del key["dq"]
+        del key["qi"]
 
         # None of the extra parameters are present, but 'key' is still private.
         assert not RSAKey(key, ALGORITHMS.RS256).is_public()
@@ -332,46 +331,43 @@ class TestRSAAlgorithm:
     @pytest.mark.parametrize("pkey", PRIVATE_KEYS)
     def test_to_pem(self, pkey):
         key = RSAKey(pkey, ALGORITHMS.RS256)
-        assert key.to_pem(pem_format='PKCS1').strip() == pkey.strip()
+        assert key.to_pem(pem_format="PKCS1").strip() == pkey.strip()
 
-        pkcs8 = key.to_pem(pem_format='PKCS8').strip()
+        pkcs8 = key.to_pem(pem_format="PKCS8").strip()
         assert pkcs8 != pkey.strip()
 
         newkey = RSAKey(pkcs8, ALGORITHMS.RS256)
-        assert newkey.to_pem(pem_format='PKCS1').strip() == pkey.strip()
+        assert newkey.to_pem(pem_format="PKCS1").strip() == pkey.strip()
 
     def assert_parameters(self, as_dict, private):
         assert isinstance(as_dict, dict)
 
         # Public parameters should always be there.
-        assert 'n' in as_dict
-        assert 'e' in as_dict
+        assert "n" in as_dict
+        assert "e" in as_dict
 
         if private:
             # Private parameters as well
-            assert 'd' in as_dict
-            assert 'p' in as_dict
-            assert 'q' in as_dict
-            assert 'dp' in as_dict
-            assert 'dq' in as_dict
-            assert 'qi' in as_dict
+            assert "d" in as_dict
+            assert "p" in as_dict
+            assert "q" in as_dict
+            assert "dp" in as_dict
+            assert "dq" in as_dict
+            assert "qi" in as_dict
         else:
             # Private parameters should be absent
-            assert 'd' not in as_dict
-            assert 'p' not in as_dict
-            assert 'q' not in as_dict
-            assert 'dp' not in as_dict
-            assert 'dq' not in as_dict
-            assert 'qi' not in as_dict
+            assert "d" not in as_dict
+            assert "p" not in as_dict
+            assert "q" not in as_dict
+            assert "dp" not in as_dict
+            assert "dq" not in as_dict
+            assert "qi" not in as_dict
 
         # as_dict should be serializable to JSON
         json.dumps(as_dict)
 
     def assert_roundtrip(self, key):
-        assert RSAKey(
-            key.to_dict(),
-            ALGORITHMS.RS256
-        ).to_dict() == key.to_dict()
+        assert RSAKey(key.to_dict(), ALGORITHMS.RS256).to_dict() == key.to_dict()
 
     @pytest.mark.parametrize("private_key", PRIVATE_KEYS)
     def test_to_dict(self, private_key):

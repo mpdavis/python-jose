@@ -17,6 +17,7 @@ class ECDSAECKey(Key):
 
     This is based off of the implementation in PyJWT 0.3.2
     """
+
     SHA256 = hashlib.sha256
     SHA384 = hashlib.sha384
     SHA512 = hashlib.sha512
@@ -29,12 +30,12 @@ class ECDSAECKey(Key):
 
     def __init__(self, key, algorithm):
         if algorithm not in ALGORITHMS.EC:
-            raise JWKError('hash_alg: %s is not a valid hash algorithm' % algorithm)
+            raise JWKError("hash_alg: %s is not a valid hash algorithm" % algorithm)
 
         self.hash_alg = {
             ALGORITHMS.ES256: self.SHA256,
             ALGORITHMS.ES384: self.SHA384,
-            ALGORITHMS.ES512: self.SHA512
+            ALGORITHMS.ES512: self.SHA512,
         }.get(algorithm)
         self._algorithm = algorithm
 
@@ -49,7 +50,7 @@ class ECDSAECKey(Key):
             return
 
         if isinstance(key, str):
-            key = key.encode('utf-8')
+            key = key.encode("utf-8")
 
         if isinstance(key, bytes):
             # Attempt to load key. We don't know if it's
@@ -65,23 +66,23 @@ class ECDSAECKey(Key):
             self.prepared_key = key
             return
 
-        raise JWKError('Unable to parse an ECKey from key: %s' % key)
+        raise JWKError("Unable to parse an ECKey from key: %s" % key)
 
     def _process_jwk(self, jwk_dict):
-        if not jwk_dict.get('kty') == 'EC':
-            raise JWKError("Incorrect key type. Expected: 'EC', Received: %s" % jwk_dict.get('kty'))
+        if not jwk_dict.get("kty") == "EC":
+            raise JWKError("Incorrect key type. Expected: 'EC', Received: %s" % jwk_dict.get("kty"))
 
-        if not all(k in jwk_dict for k in ['x', 'y', 'crv']):
-            raise JWKError('Mandatory parameters are missing')
+        if not all(k in jwk_dict for k in ["x", "y", "crv"]):
+            raise JWKError("Mandatory parameters are missing")
 
-        if 'd' in jwk_dict:
+        if "d" in jwk_dict:
             # We are dealing with a private key; the secret exponent is enough
             # to create an ecdsa key.
-            d = base64_to_long(jwk_dict.get('d'))
+            d = base64_to_long(jwk_dict.get("d"))
             return ecdsa.keys.SigningKey.from_secret_exponent(d, self.curve)
         else:
-            x = base64_to_long(jwk_dict.get('x'))
-            y = base64_to_long(jwk_dict.get('y'))
+            x = base64_to_long(jwk_dict.get("x"))
+            y = base64_to_long(jwk_dict.get("y"))
 
             if not ecdsa.ecdsa.point_is_valid(self.curve.generator, x, y):
                 raise JWKError(f"Point: {x}, {y} is not a valid point")
@@ -91,20 +92,13 @@ class ECDSAECKey(Key):
 
     def sign(self, msg):
         return self.prepared_key.sign(
-            msg,
-            hashfunc=self.hash_alg,
-            sigencode=ecdsa.util.sigencode_string,
-            allow_truncate=False
+            msg, hashfunc=self.hash_alg, sigencode=ecdsa.util.sigencode_string, allow_truncate=False
         )
 
     def verify(self, msg, sig):
         try:
             return self.prepared_key.verify(
-                sig,
-                msg,
-                hashfunc=self.hash_alg,
-                sigdecode=ecdsa.util.sigdecode_string,
-                allow_truncate=False
+                sig, msg, hashfunc=self.hash_alg, sigdecode=ecdsa.util.sigdecode_string, allow_truncate=False
             )
         except Exception:
             return False
@@ -127,9 +121,9 @@ class ECDSAECKey(Key):
             public_key = self.prepared_key
 
         crv = {
-            ecdsa.curves.NIST256p: 'P-256',
-            ecdsa.curves.NIST384p: 'P-384',
-            ecdsa.curves.NIST521p: 'P-521',
+            ecdsa.curves.NIST256p: "P-256",
+            ecdsa.curves.NIST384p: "P-384",
+            ecdsa.curves.NIST521p: "P-521",
         }[self.prepared_key.curve]
 
         # Calculate the key size in bytes. Section 6.2.1.2 and 6.2.1.3 of
@@ -138,17 +132,14 @@ class ECDSAECKey(Key):
         key_size = self.prepared_key.curve.baselen
 
         data = {
-            'alg': self._algorithm,
-            'kty': 'EC',
-            'crv': crv,
-            'x': long_to_base64(public_key.pubkey.point.x(), size=key_size).decode('ASCII'),
-            'y': long_to_base64(public_key.pubkey.point.y(), size=key_size).decode('ASCII'),
+            "alg": self._algorithm,
+            "kty": "EC",
+            "crv": crv,
+            "x": long_to_base64(public_key.pubkey.point.x(), size=key_size).decode("ASCII"),
+            "y": long_to_base64(public_key.pubkey.point.y(), size=key_size).decode("ASCII"),
         }
 
         if not self.is_public():
-            data['d'] = long_to_base64(
-                self.prepared_key.privkey.secret_multiplier,
-                size=key_size
-            ).decode('ASCII')
+            data["d"] = long_to_base64(self.prepared_key.privkey.secret_multiplier, size=key_size).decode("ASCII")
 
         return data

@@ -8,14 +8,12 @@ except ImportError:
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWEError
 
-CRYPTO_BACKENDS = (
-    pytest.param(CryptographyAESKey, id="pyca/cryptography"),
-)
+CRYPTO_BACKENDS = (pytest.param(CryptographyAESKey, id="pyca/cryptography"),)
 
 
 @pytest.mark.backend_compatibility
-@pytest.mark.skipif(CryptographyAESKey is None,
-    reason="Multiple crypto backends not available for backend compatibility tests"
+@pytest.mark.skipif(
+    CryptographyAESKey is None, reason="Multiple crypto backends not available for backend compatibility tests"
 )
 class TestBackendAesCompatibility:
     @pytest.mark.parametrize("backend_decrypt", CRYPTO_BACKENDS)
@@ -41,7 +39,7 @@ class TestBackendAesCompatibility:
         assert actual == plain_text
 
         with pytest.raises(JWEError):
-            key_decrypt.decrypt(b'n' * 64)
+            key_decrypt.decrypt(b"n" * 64)
 
     @pytest.mark.parametrize("backend_key_wrap", CRYPTO_BACKENDS)
     @pytest.mark.parametrize("backend_key_unwrap", CRYPTO_BACKENDS)
@@ -65,4 +63,4 @@ class TestBackendAesCompatibility:
         assert actual == plain_text
 
         with pytest.raises(JWEError):
-            key_unwrap.decrypt(b'n' * 64)
+            key_unwrap.decrypt(b"n" * 64)

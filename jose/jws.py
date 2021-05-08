@@ -36,7 +36,7 @@ def sign(payload, key, headers=None, algorithm=ALGORITHMS.HS256):
     """
 
     if algorithm not in ALGORITHMS.SUPPORTED:
-        raise JWSError('Algorithm %s not supported.' % algorithm)
+        raise JWSError("Algorithm %s not supported." % algorithm)
 
     encoded_header = _encode_header(algorithm, additional_headers=headers)
     encoded_payload = _encode_payload(payload)
@@ -126,19 +126,16 @@ def get_unverified_claims(token):
 
 
 def _encode_header(algorithm, additional_headers=None):
-    header = {
-        "typ": "JWT",
-        "alg": algorithm
-    }
+    header = {"typ": "JWT", "alg": algorithm}
 
     if additional_headers:
         header.update(additional_headers)
 
     json_header = json.dumps(
         header,
-        separators=(',', ':'),
+        separators=(",", ":"),
         sort_keys=True,
-    ).encode('utf-8')
+    ).encode("utf-8")
 
     return base64url_encode(json_header)
 
@@ -148,8 +145,8 @@ def _encode_payload(payload):
         try:
             payload = json.dumps(
                 payload,
-                separators=(',', ':'),
-            ).encode('utf-8')
+                separators=(",", ":"),
+            ).encode("utf-8")
         except ValueError:
             pass
 
@@ -157,7 +154,7 @@ def _encode_payload(payload):
 
 
 def _sign_header_and_claims(encoded_header, encoded_claims, algorithm, key):
-    signing_input = b'.'.join([encoded_header, encoded_claims])
+    signing_input = b".".join([encoded_header, encoded_claims])
     try:
         if not isinstance(key, Key):
             key = jwk.construct(key, algorithm)
@@ -167,40 +164,40 @@ def _sign_header_and_claims(encoded_header, encoded_claims, algorithm, key):
 
     encoded_signature = base64url_encode(signature)
 
-    encoded_string = b'.'.join([encoded_header, encoded_claims, encoded_signature])
+    encoded_string = b".".join([encoded_header, encoded_claims, encoded_signature])
 
-    return encoded_string.decode('utf-8')
+    return encoded_string.decode("utf-8")
 
 
 def _load(jwt):
     if isinstance(jwt, str):
-        jwt = jwt.encode('utf-8')
+        jwt = jwt.encode("utf-8")
     try:
-        signing_input, crypto_segment = jwt.rsplit(b'.', 1)
-        header_segment, claims_segment = signing_input.split(b'.', 1)
+        signing_input, crypto_segment = jwt.rsplit(b".", 1)
+        header_segment, claims_segment = signing_input.split(b".", 1)
         header_data = base64url_decode(header_segment)
     except ValueError:
-        raise JWSError('Not enough segments')
+        raise JWSError("Not enough segments")
     except (TypeError, binascii.Error):
-        raise JWSError('Invalid header padding')
+        raise JWSError("Invalid header padding")
 
     try:
-        header = json.loads(header_data.decode('utf-8'))
+        header = json.loads(header_data.decode("utf-8"))
     except ValueError as e:
-        raise JWSError('Invalid header string: %s' % e)
+        raise JWSError("Invalid header string: %s" % e)
 
     if not isinstance(header, Mapping):
-        raise JWSError('Invalid header string: must be a json object')
+        raise JWSError("Invalid header string: must be a json object")
 
     try:
         payload = base64url_decode(claims_segment)
     except (TypeError, binascii.Error):
-        raise JWSError('Invalid payload padding')
+        raise JWSError("Invalid payload padding")
 
     try:
         signature = base64url_decode(crypto_segment)
     except (TypeError, binascii.Error):
-        raise JWSError('Invalid crypto padding')
+        raise JWSError("Invalid crypto padding")
 
     return (header, payload, signing_input, signature)
 
@@ -228,10 +225,10 @@ def _get_keys(key):
         pass
 
     if isinstance(key, Mapping):
-        if 'keys' in key:
+        if "keys" in key:
             # JWK Set per RFC 7517
-            return key['keys']
-        elif 'kty' in key:
+            return key["keys"]
+        elif "kty" in key:
             # Individual JWK per RFC 7517
             return (key,)
         else:
@@ -242,8 +239,7 @@ def _get_keys(key):
             return (key,)
 
     # Iterable but not text or mapping => list- or tuple-like
-    elif (isinstance(key, Iterable) and
-          not (isinstance(key, str) or isinstance(key, bytes))):
+    elif isinstance(key, Iterable) and not (isinstance(key, str) or isinstance(key, bytes)):
         return key
 
     # Scalar value, wrap in tuple.
@@ -251,20 +247,20 @@ def _get_keys(key):
         return (key,)
 
 
-def _verify_signature(signing_input, header, signature, key='', algorithms=None):
+def _verify_signature(signing_input, header, signature, key="", algorithms=None):
 
-    alg = header.get('alg')
+    alg = header.get("alg")
     if not alg:
-        raise JWSError('No algorithm was specified in the JWS header.')
+        raise JWSError("No algorithm was specified in the JWS header.")
 
     if algorithms is not None and alg not in algorithms:
-        raise JWSError('The specified alg value is not allowed')
+        raise JWSError("The specified alg value is not allowed")
 
     keys = _get_keys(key)
     try:
         if not _sig_matches_keys(keys, signing_input, signature, alg):
             raise JWSSignatureError()
     except JWSSignatureError:
-        raise JWSError('Signature verification failed.')
+        raise JWSError("Signature verification failed.")
     except JWSError:
-        raise JWSError('Invalid or unsupported algorithm: %s' % alg)
+        raise JWSError("Invalid or unsupported algorithm: %s" % alg)

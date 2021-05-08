@@ -10,26 +10,27 @@ RSA_ENCRYPTION_ASN1_OID = "1.2.840.113549.1.1.1"
 
 class RsaAlgorithmIdentifier(univ.Sequence):
     """ASN1 structure for recording RSA PrivateKeyAlgorithm identifiers."""
+
     componentType = namedtype.NamedTypes(
-        namedtype.NamedType("rsaEncryption", univ.ObjectIdentifier()),
-        namedtype.NamedType("parameters", univ.Null())
+        namedtype.NamedType("rsaEncryption", univ.ObjectIdentifier()), namedtype.NamedType("parameters", univ.Null())
     )
 
 
 class PKCS8PrivateKey(univ.Sequence):
     """ASN1 structure for recording PKCS8 private keys."""
+
     componentType = namedtype.NamedTypes(
         namedtype.NamedType("version", univ.Integer()),
         namedtype.NamedType("privateKeyAlgorithm", RsaAlgorithmIdentifier()),
-        namedtype.NamedType("privateKey", univ.OctetString())
+        namedtype.NamedType("privateKey", univ.OctetString()),
     )
 
 
 class PublicKeyInfo(univ.Sequence):
     """ASN1 structure for recording PKCS8 public keys."""
+
     componentType = namedtype.NamedTypes(
-        namedtype.NamedType("algorithm", RsaAlgorithmIdentifier()),
-        namedtype.NamedType("publicKey", univ.BitString())
+        namedtype.NamedType("algorithm", RsaAlgorithmIdentifier()), namedtype.NamedType("publicKey", univ.BitString())
     )
 
 

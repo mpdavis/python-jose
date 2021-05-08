@@ -5,6 +5,7 @@ class Key:
     """
     A simple interface for implementing JWK keys.
     """
+
     def __init__(self, key, algorithm):
         pass
 
@@ -82,7 +83,7 @@ class DIRKey(Key):
 
     def to_dict(self):
         return {
-            'alg': self._alg,
-            'kty': 'oct',
-            'k': base64url_encode(self._key),
+            "alg": self._alg,
+            "kty": "oct",
+            "k": base64url_encode(self._key),
         }

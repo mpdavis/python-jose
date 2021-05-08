@@ -35,15 +35,19 @@ def get_key(algorithm):
         return HMACKey
     elif algorithm in ALGORITHMS.RSA:
         from jose.backends import RSAKey  # noqa: F811
+
         return RSAKey
     elif algorithm in ALGORITHMS.EC:
         from jose.backends import ECKey  # noqa: F811
+
         return ECKey
     elif algorithm in ALGORITHMS.AES:
         from jose.backends import AESKey  # noqa: F811
+
         return AESKey
     elif algorithm == ALGORITHMS.DIR:
         from jose.backends import DIRKey  # noqa: F811
+
         return DIRKey
     return None
 
@@ -64,12 +68,12 @@ def construct(key_data, algorithm=None):
 
     # Allow for pulling the algorithm off of the passed in jwk.
     if not algorithm and isinstance(key_data, dict):
-        algorithm = key_data.get('alg', None)
+        algorithm = key_data.get("alg", None)
 
     if not algorithm:
-        raise JWKError('Unable to find an algorithm for key: %s' % key_data)
+        raise JWKError("Unable to find an algorithm for key: %s" % key_data)
 
     key_class = get_key(algorithm)
     if not key_class:
-        raise JWKError('Unable to find an algorithm for key: %s' % key_data)
+        raise JWKError("Unable to find an algorithm for key: %s" % key_data)
     return key_class(key_data, algorithm)

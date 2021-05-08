@@ -21,122 +21,121 @@ def payload():
 
 
 class TestJWS:
-
     def test_unicode_token(self):
-        token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
-        jws.verify(token, 'secret', ['HS256'])
+        token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8"
+        jws.verify(token, "secret", ["HS256"])
 
     def test_multiple_keys(self):
         old_jwk_verify = jwk.HMACKey.verify
         try:
-            token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+            token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8"
 
             def raise_exception(self, msg, sig):
-                if self.prepared_key == b'incorrect':
+                if self.prepared_key == b"incorrect":
                     raise Exception("Mocked function jose.jwk.HMACKey.verify")
                 else:
                     return True
 
             jwk.HMACKey.verify = raise_exception
-            jws.verify(token, {'keys': ['incorrect', 'secret']}, ['HS256'])
+            jws.verify(token, {"keys": ["incorrect", "secret"]}, ["HS256"])
         finally:
             jwk.HMACKey.verify = old_jwk_verify
 
     def test_invalid_algorithm(self):
-        token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+        token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8"
         with pytest.raises(JWSError):
-            jws.verify(token, 'secret', [None])
+            jws.verify(token, "secret", [None])
 
     def test_not_enough_segments(self):
-        token = 'eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+        token = "eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8"
         with pytest.raises(JWSError):
-            jws.verify(token, 'secret', ['HS256'])
+            jws.verify(token, "secret", ["HS256"])
 
     def test_header_invalid_padding(self):
-        token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9A.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+        token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9A.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8"
         with pytest.raises(JWSError):
-            jws.verify(token, 'secret', ['HS256'])
+            jws.verify(token, "secret", ["HS256"])
 
     def test_header_not_json(self):
-        token = 'dGVzdA.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+        token = "dGVzdA.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8"
         with pytest.raises(JWSError):
-            jws.verify(token, 'secret', ['HS256'])
+            jws.verify(token, "secret", ["HS256"])
 
     def test_claims_invalid_padding(self):
-        token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.AeyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+        token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.AeyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8"
         with pytest.raises(JWSError):
-            jws.verify(token, 'secret', ['HS256'])
+            jws.verify(token, "secret", ["HS256"])
 
     def test_claims_not_json(self):
-        token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dGVzdA.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+        token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dGVzdA.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8"
         with pytest.raises(JWSError):
-            jws.verify(token, 'secret', ['HS256'])
+            jws.verify(token, "secret", ["HS256"])
 
     def test_invalid_key(self, payload):
         with pytest.raises(JWSError):
-            jws.sign(payload, 'secret', algorithm='RS256')
+            jws.sign(payload, "secret", algorithm="RS256")
 
-    @pytest.mark.parametrize("key", [
-        b'key',
-        'key',
-    ])
+    @pytest.mark.parametrize(
+        "key",
+        [
+            b"key",
+            "key",
+        ],
+    )
     def test_round_trip_with_different_key_types(self, key):
-        signed_data = jws.sign({'testkey': 'testvalue'}, key, algorithm=ALGORITHMS.HS256)
+        signed_data = jws.sign({"testkey": "testvalue"}, key, algorithm=ALGORITHMS.HS256)
         verified_bytes = jws.verify(signed_data, key, algorithms=[ALGORITHMS.HS256])
-        verified_data = json.loads(verified_bytes.decode('utf-8'))
-        assert 'testkey' in verified_data.keys()
-        assert verified_data['testkey'] == 'testvalue'
+        verified_data = json.loads(verified_bytes.decode("utf-8"))
+        assert "testkey" in verified_data.keys()
+        assert verified_data["testkey"] == "testvalue"
 
 
 class TestJWK:
     def test_jwk(self, payload):
-        key_data = 'key'
-        key = jwk.construct(key_data, algorithm='HS256')
+        key_data = "key"
+        key = jwk.construct(key_data, algorithm="HS256")
         token = jws.sign(payload, key, algorithm=ALGORITHMS.HS256)
         assert jws.verify(token, key_data, ALGORITHMS.HS256) == payload
 
 
 class TestHMAC:
-
     def testHMAC256(self, payload):
-        token = jws.sign(payload, 'secret', algorithm=ALGORITHMS.HS256)
-        assert jws.verify(token, 'secret', ALGORITHMS.HS256) == payload
+        token = jws.sign(payload, "secret", algorithm=ALGORITHMS.HS256)
+        assert jws.verify(token, "secret", ALGORITHMS.HS256) == payload
 
     def testHMAC384(self, payload):
-        token = jws.sign(payload, 'secret', algorithm=ALGORITHMS.HS384)
-        assert jws.verify(token, 'secret', ALGORITHMS.HS384) == payload
+        token = jws.sign(payload, "secret", algorithm=ALGORITHMS.HS384)
+        assert jws.verify(token, "secret", ALGORITHMS.HS384) == payload
 
     def testHMAC512(self, payload):
-        token = jws.sign(payload, 'secret', algorithm=ALGORITHMS.HS512)
-        assert jws.verify(token, 'secret', ALGORITHMS.HS512) == payload
+        token = jws.sign(payload, "secret", algorithm=ALGORITHMS.HS512)
+        assert jws.verify(token, "secret", ALGORITHMS.HS512) == payload
 
     def test_wrong_alg(self, payload):
-        token = jws.sign(payload, 'secret', algorithm=ALGORITHMS.HS256)
+        token = jws.sign(payload, "secret", algorithm=ALGORITHMS.HS256)
         with pytest.raises(JWSError):
-            jws.verify(token, 'secret', ALGORITHMS.HS384)
+            jws.verify(token, "secret", ALGORITHMS.HS384)
 
     def test_wrong_key(self, payload):
-        token = jws.sign(payload, 'secret', algorithm=ALGORITHMS.HS256)
+        token = jws.sign(payload, "secret", algorithm=ALGORITHMS.HS256)
         with pytest.raises(JWSError):
-            jws.verify(token, 'another', ALGORITHMS.HS256)
+            jws.verify(token, "another", ALGORITHMS.HS256)
 
     def test_unsupported_alg(self, payload):
         with pytest.raises(JWSError):
-            jws.sign(payload, 'secret', algorithm='SOMETHING')
+            jws.sign(payload, "secret", algorithm="SOMETHING")
 
     def test_add_headers(self, payload):
 
-        additional_headers = {
-            'test': 'header'
-        }
+        additional_headers = {"test": "header"}
 
         expected_headers = {
-            'test': 'header',
-            'alg': 'HS256',
-            'typ': 'JWT',
+            "test": "header",
+            "alg": "HS256",
+            "typ": "JWT",
         }
 
-        token = jws.sign(payload, 'secret', headers=additional_headers)
+        token = jws.sign(payload, "secret", headers=additional_headers)
         header, payload, signing_input, signature = jws._load(token)
         assert expected_headers == header
 
@@ -211,50 +210,60 @@ Ks3IHH7tVltM6NsRk3jNdVMCAwEAAQ==
 
 @pytest.fixture
 def jwk_set():
-    return {'keys': [{'alg': 'RS256',
-                       'e': 'AQAB',
-                       'kid': '40aa42edac0614d7ca3f57f97ee866cdfba3b61a',
-                       'kty': 'RSA',
-                       'n': '6lm9AEGLPFpVqnfeVFuTIZsj7vz_kxla6uW1WWtosM_MtIjXkyyiSolxiSOs3bzG66iVm71023QyOzKYFbio0hI-yZauG3g9nH-zb_AHScsjAKagHtrHmTdtq0JcNkQnAaaUwxVbjwMlYAcOh87W5jWj_MAcPvc-qjy8-WJ81UgoOUZNiKByuF4-9igxKZeskGRXuTPX64kWGBmKl-tM7VnCGMKoK3m92NPrktfBoNN_EGGthNfQsKFUdQFJFtpMuiXp9Gib7dcMGabxcG2GUl-PU086kPUyUdUYiMN2auKSOxSUZgDjT7DcI8Sn8kdQ0-tImaHi54JNa1PNNdKRpw',
-                       'use': 'sig'},
-                      {'alg': 'RS256',
-                       'e': 'AQAB',
-                       'kid': '8fbbeea40332d2c0d27e37e1904af29b64594e57',
-                       'kty': 'RSA',
-                       'n': 'z7h6_rt35-j6NV2iQvYIuR3xvsxmEImgMl8dc8CFl4SzEWrry3QILajKxQZA9YYYfXIcZUG_6R6AghVMJetNIl2AhCoEr3RQjjNsm9PE6h5p2kQ-zIveFeb__4oIkVihYtxtoYBSdVj69nXLUAJP2bxPfU8RDp5X7hT62pKR05H8QLxH8siIQ5qR2LGFw_dJcitAVRRQofuaj_9u0CLZBfinqyRkBc7a0zi7pBxtEiIbn9sRr8Kkb_Boap6BHbnLS-YFBVarcgFBbifRf7NlK5dqE9z4OUb-dx8wCMRIPVAx_hV4Qx2anTgp1sDA6V4vd4NaCOZX-mSctNZqQmKtNw',
-                       'use': 'sig'},
-                      {'alg': 'RS256',
-                       'e': 'AQAB',
-                       'kid': '6758b0b8eb341e90454860432d6a1648bf4de03b',
-                       'kty': 'RSA',
-                       'n': '5K0rYaA7xtqSe1nFn_nCA10uUXY81NcohMeFsYLbBlx_NdpsmbpgtXJ6ektYR7rUdtMMLu2IONlNhkWlx-lge91okyacUrWHP88PycilUE-RnyVjbPEm3seR0VefgALfN4y_e77ljq2F7W2_kbUkTvDzriDIWvQT0WwVF5FIOBydfDDs92S-queaKgLBwt50SXJCZryLew5ODrwVsFGI4Et6MLqjS-cgWpCNwzcRqjBRsse6DXnex_zSRII4ODzKIfX4qdFBKZHO_BkTsK9DNkUayrr9cz8rFRK6TEH6XTVabgsyd6LP6PTxhpiII_pTYRSWk7CGMnm2nO0dKxzaFQ',
-                       'use': 'sig'}]}
+    return {
+        "keys": [
+            {
+                "alg": "RS256",
+                "e": "AQAB",
+                "kid": "40aa42edac0614d7ca3f57f97ee866cdfba3b61a",
+                "kty": "RSA",
+                "n": "6lm9AEGLPFpVqnfeVFuTIZsj7vz_kxla6uW1WWtosM_MtIjXkyyiSolxiSOs3bzG66iVm71023QyOzKYFbio0hI-yZauG3g9nH-zb_AHScsjAKagHtrHmTdtq0JcNkQnAaaUwxVbjwMlYAcOh87W5jWj_MAcPvc-qjy8-WJ81UgoOUZNiKByuF4-9igxKZeskGRXuTPX64kWGBmKl-tM7VnCGMKoK3m92NPrktfBoNN_EGGthNfQsKFUdQFJFtpMuiXp9Gib7dcMGabxcG2GUl-PU086kPUyUdUYiMN2auKSOxSUZgDjT7DcI8Sn8kdQ0-tImaHi54JNa1PNNdKRpw",
+                "use": "sig",
+            },
+            {
+                "alg": "RS256",
+                "e": "AQAB",
+                "kid": "8fbbeea40332d2c0d27e37e1904af29b64594e57",
+                "kty": "RSA",
+                "n": "z7h6_rt35-j6NV2iQvYIuR3xvsxmEImgMl8dc8CFl4SzEWrry3QILajKxQZA9YYYfXIcZUG_6R6AghVMJetNIl2AhCoEr3RQjjNsm9PE6h5p2kQ-zIveFeb__4oIkVihYtxtoYBSdVj69nXLUAJP2bxPfU8RDp5X7hT62pKR05H8QLxH8siIQ5qR2LGFw_dJcitAVRRQofuaj_9u0CLZBfinqyRkBc7a0zi7pBxtEiIbn9sRr8Kkb_Boap6BHbnLS-YFBVarcgFBbifRf7NlK5dqE9z4OUb-dx8wCMRIPVAx_hV4Qx2anTgp1sDA6V4vd4NaCOZX-mSctNZqQmKtNw",
+                "use": "sig",
+            },
+            {
+                "alg": "RS256",
+                "e": "AQAB",
+                "kid": "6758b0b8eb341e90454860432d6a1648bf4de03b",
+                "kty": "RSA",
+                "n": "5K0rYaA7xtqSe1nFn_nCA10uUXY81NcohMeFsYLbBlx_NdpsmbpgtXJ6ektYR7rUdtMMLu2IONlNhkWlx-lge91okyacUrWHP88PycilUE-RnyVjbPEm3seR0VefgALfN4y_e77ljq2F7W2_kbUkTvDzriDIWvQT0WwVF5FIOBydfDDs92S-queaKgLBwt50SXJCZryLew5ODrwVsFGI4Et6MLqjS-cgWpCNwzcRqjBRsse6DXnex_zSRII4ODzKIfX4qdFBKZHO_BkTsK9DNkUayrr9cz8rFRK6TEH6XTVabgsyd6LP6PTxhpiII_pTYRSWk7CGMnm2nO0dKxzaFQ",
+                "use": "sig",
+            },
+        ]
+    }
 
 
 google_id_token = (
-    'eyJhbGciOiJSUzI1NiIsImtpZCI6IjhmYmJlZWE0MDMzMmQyYzBkMjdlMzdlMTkwN'
-    'GFmMjliNjQ1OTRlNTcifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5'
-    'jb20iLCJhdF9oYXNoIjoiUUY5RnRjcHlmbUFBanJuMHVyeUQ5dyIsImF1ZCI6IjQw'
-    'NzQwODcxODE5Mi5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsInN1YiI6IjEwN'
-    'zkzMjQxNjk2NTIwMzIzNDA3NiIsImF6cCI6IjQwNzQwODcxODE5Mi5hcHBzLmdvb2'
-    'dsZXVzZXJjb250ZW50LmNvbSIsImlhdCI6MTQ2ODYyMjQ4MCwiZXhwIjoxNDY4NjI'
-    '2MDgwfQ.Nz6VREh7smvfVRWNHlbKZ6W_DX57akRUGrDTcns06ndAwrslwUlBeFsWY'
-    'RLon_tDw0QCeQCGvw7l1AT440UQBRP-mtqK_2Yny2JmIQ7Ll6UAIHRhXOD1uj9w5v'
-    'X0jyI1MbjDtODeDWWn_9EDJRBd4xmwKhAONuWodTgSi7qGe1UVmzseFNNkKdoo54d'
-    'XhCJiyiRAMnWB_FQDveRJghche131pd9O_E4Wj6hf_zCcMTaDaLDOmElcQe-WsKWA'
-    'A3YwHFEWOLO_7x6u4uGmhItPGH7zsOTzYxPYhZMSZusgVg9fbE1kSlHVSyQrcp_rR'
-    'WNz7vOIbvIlBR9Jrq5MIqbkkg'
+    "eyJhbGciOiJSUzI1NiIsImtpZCI6IjhmYmJlZWE0MDMzMmQyYzBkMjdlMzdlMTkwN"
+    "GFmMjliNjQ1OTRlNTcifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5"
+    "jb20iLCJhdF9oYXNoIjoiUUY5RnRjcHlmbUFBanJuMHVyeUQ5dyIsImF1ZCI6IjQw"
+    "NzQwODcxODE5Mi5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsInN1YiI6IjEwN"
+    "zkzMjQxNjk2NTIwMzIzNDA3NiIsImF6cCI6IjQwNzQwODcxODE5Mi5hcHBzLmdvb2"
+    "dsZXVzZXJjb250ZW50LmNvbSIsImlhdCI6MTQ2ODYyMjQ4MCwiZXhwIjoxNDY4NjI"
+    "2MDgwfQ.Nz6VREh7smvfVRWNHlbKZ6W_DX57akRUGrDTcns06ndAwrslwUlBeFsWY"
+    "RLon_tDw0QCeQCGvw7l1AT440UQBRP-mtqK_2Yny2JmIQ7Ll6UAIHRhXOD1uj9w5v"
+    "X0jyI1MbjDtODeDWWn_9EDJRBd4xmwKhAONuWodTgSi7qGe1UVmzseFNNkKdoo54d"
+    "XhCJiyiRAMnWB_FQDveRJghche131pd9O_E4Wj6hf_zCcMTaDaLDOmElcQe-WsKWA"
+    "A3YwHFEWOLO_7x6u4uGmhItPGH7zsOTzYxPYhZMSZusgVg9fbE1kSlHVSyQrcp_rR"
+    "WNz7vOIbvIlBR9Jrq5MIqbkkg"
 )
 
 
 class TestGetKeys:
-
     def test_dict(self):
         assert ({},) == jws._get_keys({})
 
     def test_custom_object(self):
         class MyDict(dict):
             pass
+
         mydict = MyDict()
         assert (mydict,) == jws._get_keys(mydict)
 
@@ -263,39 +272,38 @@ class TestGetKeys:
         assert [{}, {}] == jws._get_keys(key)
 
     def test_RFC7517_jwk(self):
-        key = {'kty': 'hsa', 'k': 'secret', 'alg': 'HS256', 'use': 'sig'}
-        assert (key, ) == jws._get_keys(key)
+        key = {"kty": "hsa", "k": "secret", "alg": "HS256", "use": "sig"}
+        assert (key,) == jws._get_keys(key)
 
     def test_RFC7517_mapping(self):
         key = {"keys": [{}, {}]}
         assert [{}, {}] == jws._get_keys(key)
 
     def test_string(self):
-        assert ('test',) == jws._get_keys('test')
+        assert ("test",) == jws._get_keys("test")
 
     def test_tuple(self):
-        assert ('test', 'key') == jws._get_keys(('test', 'key'))
+        assert ("test", "key") == jws._get_keys(("test", "key"))
 
     def test_list(self):
-        assert ['test', 'key'] == jws._get_keys(['test', 'key'])
+        assert ["test", "key"] == jws._get_keys(["test", "key"])
 
     def test_jwk(self):
-        jwkey = jwk.construct('key', algorithm='HS256')
+        jwkey = jwk.construct("key", algorithm="HS256")
         assert (jwkey,) == jws._get_keys(jwkey)
 
 
 @pytest.mark.skipif(RSAKey is None, reason="RSA is not available")
 class TestRSA:
-
     def test_jwk_set(self, jwk_set):
         # Would raise a JWSError if validation failed.
         payload = jws.verify(google_id_token, jwk_set, ALGORITHMS.RS256)
-        iss = json.loads(payload.decode('utf-8'))['iss']
+        iss = json.loads(payload.decode("utf-8"))["iss"]
         assert iss == "https://accounts.google.com"
 
     def test_jwk_set_failure(self, jwk_set):
         # Remove the key that was used to sign this token.
-        del jwk_set['keys'][1]
+        del jwk_set["keys"][1]
         with pytest.raises(JWSError):
             payload = jws.verify(google_id_token, jwk_set, ALGORITHMS.RS256)  # noqa: F841
 
@@ -322,17 +330,18 @@ class TestRSA:
             jws.verify(token, rsa_public_key, ALGORITHMS.HS256)
 
     def test_private_verify_raises_warning(self, payload):
-        token = jws.sign(payload, rsa_private_key, algorithm='RS256')
+        token = jws.sign(payload, rsa_private_key, algorithm="RS256")
 
         # verify with public
-        jws.verify(token, rsa_public_key, algorithms='RS256')
+        jws.verify(token, rsa_public_key, algorithms="RS256")
 
         with warnings.catch_warnings(record=True) as w:
             # verify with private raises warning
-            jws.verify(token, rsa_private_key, algorithms='RS256')
+            jws.verify(token, rsa_private_key, algorithms="RS256")
 
-            assert ("Attempting to verify a message with a private key. "
-                    "This is not recommended.") == str(w[-1].message)
+            assert ("Attempting to verify a message with a private key. " "This is not recommended.") == str(
+                w[-1].message
+            )
 
 
 ec_private_key = """-----BEGIN EC PRIVATE KEY-----
@@ -352,7 +361,6 @@ MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQAmHp3CvKZv4gHg1abWhGU2cDU9Mlv
 
 
 class TestEC:
-
     def test_EC256(self, payload):
         token = jws.sign(payload, ec_private_key, algorithm=ALGORITHMS.ES256)
         assert jws.verify(token, ec_public_key, ALGORITHMS.ES256) == payload
@@ -372,18 +380,17 @@ class TestEC:
 
 
 class TestLoad:
-
     def test_header_not_mapping(self):
-        token = 'WyJ0ZXN0Il0.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+        token = "WyJ0ZXN0Il0.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8"
         with pytest.raises(JWSError):
-            jws.verify(token, 'secret', ['HS256'])
+            jws.verify(token, "secret", ["HS256"])
 
     def test_claims_not_mapping(self):
-        token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.WyJ0ZXN0Il0.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
+        token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.WyJ0ZXN0Il0.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8"
         with pytest.raises(JWSError):
-            jws.verify(token, 'secret', ['HS256'])
+            jws.verify(token, "secret", ["HS256"])
 
     def test_signature_padding(self):
-        token = 'eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.aatvagLDLoaiJKxOKqpBXSEGy7SYSifZhjntgm9ctpyj8'
+        token = "eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.aatvagLDLoaiJKxOKqpBXSEGy7SYSifZhjntgm9ctpyj8"
         with pytest.raises(JWSError):
-            jws.verify(token, 'secret', ['HS256'])
+            jws.verify(token, "secret", ["HS256"])
