@@ -1,6 +1,4 @@
-import six
-
-from ..utils import base64url_encode
+from ..utils import base64url_encode, ensure_binary
 
 
 class Key:
@@ -79,7 +77,7 @@ class Key:
 
 class DIRKey(Key):
     def __init__(self, key_data, algorithm):
-        self._key = six.ensure_binary(key_data)
+        self._key = ensure_binary(key_data)
         self._alg = algorithm
 
     def to_dict(self):

@@ -3,8 +3,6 @@ import json
 import zlib
 from struct import pack
 
-import six
-
 try:
     from collections.abc import Mapping  # Python 3
 except ImportError:
@@ -14,7 +12,7 @@ from . import jwk
 from .backends import get_random_bytes
 from .constants import ALGORITHMS, ZIPS
 from .exceptions import JWEError, JWEParseError
-from .utils import base64url_decode, base64url_encode
+from .utils import base64url_decode, base64url_encode, ensure_binary
 
 
 def encrypt(plaintext, key, encryption=ALGORITHMS.A256GCM,
@@ -49,7 +47,7 @@ def encrypt(plaintext, key, encryption=ALGORITHMS.A256GCM,
         'eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..McILMB3dYsNJSuhcDzQshA.OfX9H_mcUpHDeRM4IA.CcnTWqaqxNsjT4eCaUABSg'
 
     """
-    plaintext = six.ensure_binary(plaintext)  # Make sure it's bytes
+    plaintext = ensure_binary(plaintext)  # Make sure it's bytes
     if algorithm not in ALGORITHMS.SUPPORTED:
         raise JWEError('Algorithm %s not supported.' % algorithm)
     if encryption not in ALGORITHMS.SUPPORTED:
@@ -277,7 +275,7 @@ def _jwe_compact_deserialize(jwe_bytes):
     # Vector, the JWE Ciphertext, the JWE Authentication Tag, and the
     # JWE AAD, following the restriction that no line breaks,
     # whitespace, or other additional characters have been used.
-    jwe_bytes = six.ensure_binary(jwe_bytes)
+    jwe_bytes = ensure_binary(jwe_bytes)
     try:
         header_segment, encrypted_key_segment, iv_segment, \
             cipher_text_segment, auth_tag_segment = jwe_bytes.split(b'.', 4)
@@ -305,9 +303,9 @@ def _jwe_compact_deserialize(jwe_bytes):
     # values that together comprise the JOSE Header.
 
     try:
-        header = json.loads(six.ensure_str(header_data))
+        header = json.loads(header_data)
     except ValueError as e:
-        raise JWEParseError('Invalid header string: %s' % e)
+        raise JWEParseError(f'Invalid header string: {e}')
 
     if not isinstance(header, Mapping):
         raise JWEParseError('Invalid header string: must be a json object')
@@ -598,7 +596,7 @@ def _jwe_compact_serialize(encoded_header, encrypted_cek, iv, cipher_text, auth_
     Returns:
         (str): JWE compact serialized string
     """
-    cipher_text = six.ensure_binary(cipher_text)  # Maker sure it's bytes
+    cipher_text = ensure_binary(cipher_text)
     encoded_encrypted_cek = base64url_encode(encrypted_cek)
     encoded_iv = base64url_encode(iv)
     encoded_cipher_text = base64url_encode(cipher_text)
