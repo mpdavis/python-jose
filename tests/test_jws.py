@@ -132,8 +132,7 @@ class TestHMAC:
 
         expected_headers = {
             'test': 'header',
-            'alg': 'HS256',
-            'typ': 'JWT',
+            'alg': 'HS256'
         }
 
         token = jws.sign(payload, 'secret', headers=additional_headers)
