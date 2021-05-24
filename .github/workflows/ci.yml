@@ -1,4 +1,4 @@
-name: main
+name: CI
 on:
   push:
     branches:
@@ -8,12 +8,19 @@ on:
       - master
 jobs:
   test:
-    runs-on: "ubuntu-latest"
     timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.6", "3.7", "3.8", "3.9", "pypy3"]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        exclude:
+          - os: macos-latest
+            python-version:  "pypy3"
+          - os: windows-latest
+            python-version:  "pypy3"
+    runs-on: ${{ matrix.os }}
+    name: "${{ matrix.os }} Python: ${{ matrix.python-version }}"
     steps:
     - uses: actions/checkout@v2
       with:
