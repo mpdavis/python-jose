@@ -3,7 +3,7 @@ python-jose
 
 A JOSE implementation in Python
 
-|Build Status| |Github Actions CI Status| |Coverage Status| |Docs|
+|Github Actions CI Status| |Coverage Status| |Docs|
 
 Docs are available on ReadTheDocs_.
 
@@ -84,8 +84,6 @@ Thanks
 
 This library was originally based heavily on the work of the folks over at PyJWT_.
 
-.. |Build Status| image:: https://travis-ci.org/mpdavis/python-jose.svg?branch=master
-   :target: https://travis-ci.org/mpdavis/python-jose
 .. |Github Actions CI Status| image:: https://github.com/mpdavis/python-jose/workflows/main/badge.svg?branch=master
    :target: https://github.com/mpdavis/python-jose/actions?workflow=main
    :alt: Github Actions CI Status
