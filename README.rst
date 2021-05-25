@@ -27,7 +27,7 @@ Installation
 Cryptographic Backends
 ----------------------
 
-As of 3.1.0, python-jose implements three different cryptographic backends.
+As of 3.2.0, python-jose implements three different cryptographic backends.
 The backend must be selected as an extra when installing python-jose.
 If you do not select a backend, the native-python backend will be installed.
 
