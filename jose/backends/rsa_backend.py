@@ -7,7 +7,9 @@ from pyasn1.error import PyAsn1Error
 from rsa import DecryptionError
 
 from jose.backends._asn1 import (
-    rsa_private_key_pkcs1_to_pkcs8, rsa_private_key_pkcs8_to_pkcs1, rsa_public_key_pkcs1_to_pkcs8,
+    rsa_private_key_pkcs1_to_pkcs8,
+    rsa_private_key_pkcs8_to_pkcs1,
+    rsa_public_key_pkcs1_to_pkcs8,
 )
 from jose.backends.base import Key
 from jose.constants import ALGORITHMS
@@ -93,7 +95,7 @@ def _rsa_recover_prime_factors(n, e, d):
     return (p, q)
 
 
-def pem_to_spki(pem, fmt='PKCS8'):
+def pem_to_spki(pem, fmt="PKCS8"):
     key = RSAKey(pem, ALGORITHMS.RS256)
     return key.to_pem(fmt)
 
@@ -112,25 +114,25 @@ def _legacy_private_key_pkcs8_to_pkcs1(pkcs8_key):
     if not pkcs8_key.startswith(LEGACY_INVALID_PKCS8_RSA_HEADER + ASN1_SEQUENCE_ID):
         raise ValueError("Invalid private key encoding")
 
-    return pkcs8_key[len(LEGACY_INVALID_PKCS8_RSA_HEADER):]
+    return pkcs8_key[len(LEGACY_INVALID_PKCS8_RSA_HEADER) :]
 
 
 class RSAKey(Key):
-    SHA256 = 'SHA-256'
-    SHA384 = 'SHA-384'
-    SHA512 = 'SHA-512'
+    SHA256 = "SHA-256"
+    SHA384 = "SHA-384"
+    SHA512 = "SHA-512"
 
     def __init__(self, key, algorithm):
         if algorithm not in ALGORITHMS.RSA:
-            raise JWKError('hash_alg: %s is not a valid hash algorithm' % algorithm)
+            raise JWKError("hash_alg: %s is not a valid hash algorithm" % algorithm)
 
         if algorithm in ALGORITHMS.RSA_KW and algorithm != ALGORITHMS.RSA1_5:
-            raise JWKError('alg: %s is not supported by the RSA backend' % algorithm)
+            raise JWKError("alg: %s is not supported by the RSA backend" % algorithm)
 
         self.hash_alg = {
             ALGORITHMS.RS256: self.SHA256,
             ALGORITHMS.RS384: self.SHA384,
-            ALGORITHMS.RS512: self.SHA512
+            ALGORITHMS.RS512: self.SHA512,
         }.get(algorithm)
         self._algorithm = algorithm
 
@@ -143,7 +145,7 @@ class RSAKey(Key):
             return
 
         if isinstance(key, str):
-            key = key.encode('utf-8')
+            key = key.encode("utf-8")
 
         if isinstance(key, bytes):
             try:
@@ -156,7 +158,7 @@ class RSAKey(Key):
                         self._prepared_key = pyrsa.PrivateKey.load_pkcs1(key)
                     except ValueError:
                         try:
-                            der = pyrsa_pem.load_pem(key, b'PRIVATE KEY')
+                            der = pyrsa_pem.load_pem(key, b"PRIVATE KEY")
                             try:
                                 pkcs1_key = rsa_private_key_pkcs8_to_pkcs1(der)
                             except PyAsn1Error:
@@ -168,20 +170,20 @@ class RSAKey(Key):
                         except ValueError as e:
                             raise JWKError(e)
             return
-        raise JWKError('Unable to parse an RSA_JWK from key: %s' % key)
+        raise JWKError("Unable to parse an RSA_JWK from key: %s" % key)
 
     def _process_jwk(self, jwk_dict):
-        if not jwk_dict.get('kty') == 'RSA':
-            raise JWKError("Incorrect key type. Expected: 'RSA', Received: %s" % jwk_dict.get('kty'))
+        if not jwk_dict.get("kty") == "RSA":
+            raise JWKError("Incorrect key type. Expected: 'RSA', Received: %s" % jwk_dict.get("kty"))
 
-        e = base64_to_long(jwk_dict.get('e'))
-        n = base64_to_long(jwk_dict.get('n'))
+        e = base64_to_long(jwk_dict.get("e"))
+        n = base64_to_long(jwk_dict.get("n"))
 
-        if 'd' not in jwk_dict:
+        if "d" not in jwk_dict:
             return pyrsa.PublicKey(e=e, n=n)
         else:
-            d = base64_to_long(jwk_dict.get('d'))
-            extra_params = ['p', 'q', 'dp', 'dq', 'qi']
+            d = base64_to_long(jwk_dict.get("d"))
+            extra_params = ["p", "q", "dp", "dq", "qi"]
 
             if any(k in jwk_dict for k in extra_params):
                 # Precomputed private key parameters are available.
@@ -189,10 +191,10 @@ class RSAKey(Key):
                     # These values must be present when 'p' is according to
                     # Section 6.3.2 of RFC7518, so if they are not we raise
                     # an error.
-                    raise JWKError('Precomputed private key parameters are incomplete.')
+                    raise JWKError("Precomputed private key parameters are incomplete.")
 
-                p = base64_to_long(jwk_dict['p'])
-                q = base64_to_long(jwk_dict['q'])
+                p = base64_to_long(jwk_dict["p"])
+                q = base64_to_long(jwk_dict["q"])
                 return pyrsa.PrivateKey(e=e, n=n, d=d, p=p, q=q)
             else:
                 p, q = _rsa_recover_prime_factors(n, e, d)
@@ -203,8 +205,7 @@ class RSAKey(Key):
 
     def verify(self, msg, sig):
         if not self.is_public():
-            warnings.warn("Attempting to verify a message with a private key. "
-                          "This is not recommended.")
+            warnings.warn("Attempting to verify a message with a private key. " "This is not recommended.")
         try:
             pyrsa.verify(msg, sig, self._prepared_key)
             return True
@@ -219,25 +220,25 @@ class RSAKey(Key):
             return self
         return self.__class__(pyrsa.PublicKey(n=self._prepared_key.n, e=self._prepared_key.e), self._algorithm)
 
-    def to_pem(self, pem_format='PKCS8'):
+    def to_pem(self, pem_format="PKCS8"):
 
         if isinstance(self._prepared_key, pyrsa.PrivateKey):
-            der = self._prepared_key.save_pkcs1(format='DER')
-            if pem_format == 'PKCS8':
+            der = self._prepared_key.save_pkcs1(format="DER")
+            if pem_format == "PKCS8":
                 pkcs8_der = rsa_private_key_pkcs1_to_pkcs8(der)
-                pem = pyrsa_pem.save_pem(pkcs8_der, pem_marker='PRIVATE KEY')
-            elif pem_format == 'PKCS1':
-                pem = pyrsa_pem.save_pem(der, pem_marker='RSA PRIVATE KEY')
+                pem = pyrsa_pem.save_pem(pkcs8_der, pem_marker="PRIVATE KEY")
+            elif pem_format == "PKCS1":
+                pem = pyrsa_pem.save_pem(der, pem_marker="RSA PRIVATE KEY")
             else:
                 raise ValueError(f"Invalid pem format specified: {pem_format!r}")
         else:
-            if pem_format == 'PKCS8':
+            if pem_format == "PKCS8":
                 pkcs1_der = self._prepared_key.save_pkcs1(format="DER")
                 pkcs8_der = rsa_public_key_pkcs1_to_pkcs8(pkcs1_der)
-                pem = pyrsa_pem.save_pem(pkcs8_der, pem_marker='PUBLIC KEY')
-            elif pem_format == 'PKCS1':
-                der = self._prepared_key.save_pkcs1(format='DER')
-                pem = pyrsa_pem.save_pem(der, pem_marker='RSA PUBLIC KEY')
+                pem = pyrsa_pem.save_pem(pkcs8_der, pem_marker="PUBLIC KEY")
+            elif pem_format == "PKCS1":
+                der = self._prepared_key.save_pkcs1(format="DER")
+                pem = pyrsa_pem.save_pem(der, pem_marker="RSA PUBLIC KEY")
             else:
                 raise ValueError(f"Invalid pem format specified: {pem_format!r}")
         return pem
@@ -249,28 +250,29 @@ class RSAKey(Key):
             public_key = self._prepared_key
 
         data = {
-            'alg': self._algorithm,
-            'kty': 'RSA',
-            'n': long_to_base64(public_key.n).decode('ASCII'),
-            'e': long_to_base64(public_key.e).decode('ASCII'),
+            "alg": self._algorithm,
+            "kty": "RSA",
+            "n": long_to_base64(public_key.n).decode("ASCII"),
+            "e": long_to_base64(public_key.e).decode("ASCII"),
         }
 
         if not self.is_public():
-            data.update({
-                'd': long_to_base64(self._prepared_key.d).decode('ASCII'),
-                'p': long_to_base64(self._prepared_key.p).decode('ASCII'),
-                'q': long_to_base64(self._prepared_key.q).decode('ASCII'),
-                'dp': long_to_base64(self._prepared_key.exp1).decode('ASCII'),
-                'dq': long_to_base64(self._prepared_key.exp2).decode('ASCII'),
-                'qi': long_to_base64(self._prepared_key.coef).decode('ASCII'),
-            })
+            data.update(
+                {
+                    "d": long_to_base64(self._prepared_key.d).decode("ASCII"),
+                    "p": long_to_base64(self._prepared_key.p).decode("ASCII"),
+                    "q": long_to_base64(self._prepared_key.q).decode("ASCII"),
+                    "dp": long_to_base64(self._prepared_key.exp1).decode("ASCII"),
+                    "dq": long_to_base64(self._prepared_key.exp2).decode("ASCII"),
+                    "qi": long_to_base64(self._prepared_key.coef).decode("ASCII"),
+                }
+            )
 
         return data
 
     def wrap_key(self, key_data):
         if not self.is_public():
-            warnings.warn("Attempting to encrypt a message with a private key."
-                          " This is not recommended.")
+            warnings.warn("Attempting to encrypt a message with a private key." " This is not recommended.")
         wrapped_key = pyrsa.encrypt(key_data, self._prepared_key)
         return wrapped_key
 

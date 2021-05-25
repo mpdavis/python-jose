@@ -15,8 +15,7 @@ from .exceptions import JWEError, JWEParseError
 from .utils import base64url_decode, base64url_encode, ensure_binary
 
 
-def encrypt(plaintext, key, encryption=ALGORITHMS.A256GCM,
-            algorithm=ALGORITHMS.DIR, zip=None, cty=None, kid=None):
+def encrypt(plaintext, key, encryption=ALGORITHMS.A256GCM, algorithm=ALGORITHMS.DIR, zip=None, cty=None, kid=None):
     """Encrypts plaintext and returns a JWE cmpact serialization string.
 
     Args:
@@ -49,18 +48,16 @@ def encrypt(plaintext, key, encryption=ALGORITHMS.A256GCM,
     """
     plaintext = ensure_binary(plaintext)  # Make sure it's bytes
     if algorithm not in ALGORITHMS.SUPPORTED:
-        raise JWEError('Algorithm %s not supported.' % algorithm)
+        raise JWEError("Algorithm %s not supported." % algorithm)
     if encryption not in ALGORITHMS.SUPPORTED:
-        raise JWEError('Algorithm %s not supported.' % encryption)
+        raise JWEError("Algorithm %s not supported." % encryption)
     key = jwk.construct(key, algorithm)
     encoded_header = _encoded_header(algorithm, encryption, zip, cty, kid)
 
     plaintext = _compress(zip, plaintext)
-    enc_cek, iv, cipher_text, auth_tag = _encrypt_and_auth(
-        key, algorithm, encryption, zip, plaintext, encoded_header)
+    enc_cek, iv, cipher_text, auth_tag = _encrypt_and_auth(key, algorithm, encryption, zip, plaintext, encoded_header)
 
-    jwe_string = _jwe_compact_serialize(
-        encoded_header, enc_cek, iv, cipher_text, auth_tag)
+    jwe_string = _jwe_compact_serialize(encoded_header, enc_cek, iv, cipher_text, auth_tag)
     return jwe_string
 
 
@@ -97,9 +94,9 @@ def decrypt(jwe_str, key):
         alg = header["alg"]
         enc = header["enc"]
         if alg not in ALGORITHMS.SUPPORTED:
-            raise JWEError('Algorithm %s not supported.' % alg)
+            raise JWEError("Algorithm %s not supported." % alg)
         if enc not in ALGORITHMS.SUPPORTED:
-            raise JWEError('Algorithm %s not supported.' % enc)
+            raise JWEError("Algorithm %s not supported." % enc)
 
     except KeyError:
         raise JWEParseError("alg and enc headers are required!")
@@ -277,13 +274,14 @@ def _jwe_compact_deserialize(jwe_bytes):
     # whitespace, or other additional characters have been used.
     jwe_bytes = ensure_binary(jwe_bytes)
     try:
-        header_segment, encrypted_key_segment, iv_segment, \
-            cipher_text_segment, auth_tag_segment = jwe_bytes.split(b'.', 4)
+        header_segment, encrypted_key_segment, iv_segment, cipher_text_segment, auth_tag_segment = jwe_bytes.split(
+            b".", 4
+        )
         header_data = base64url_decode(header_segment)
     except ValueError:
-        raise JWEParseError('Not enough segments')
+        raise JWEParseError("Not enough segments")
     except (TypeError, binascii.Error):
-        raise JWEParseError('Invalid header')
+        raise JWEParseError("Invalid header")
 
     # Verify that the octet sequence resulting from decoding the
     # encoded JWE Protected Header is a UTF-8-encoded representation
@@ -305,30 +303,30 @@ def _jwe_compact_deserialize(jwe_bytes):
     try:
         header = json.loads(header_data)
     except ValueError as e:
-        raise JWEParseError(f'Invalid header string: {e}')
+        raise JWEParseError(f"Invalid header string: {e}")
 
     if not isinstance(header, Mapping):
-        raise JWEParseError('Invalid header string: must be a json object')
+        raise JWEParseError("Invalid header string: must be a json object")
 
     try:
         encrypted_key = base64url_decode(encrypted_key_segment)
     except (TypeError, binascii.Error):
-        raise JWEParseError('Invalid encrypted key')
+        raise JWEParseError("Invalid encrypted key")
 
     try:
         iv = base64url_decode(iv_segment)
     except (TypeError, binascii.Error):
-        raise JWEParseError('Invalid IV')
+        raise JWEParseError("Invalid IV")
 
     try:
         ciphertext = base64url_decode(cipher_text_segment)
     except (TypeError, binascii.Error):
-        raise JWEParseError('Invalid cyphertext')
+        raise JWEParseError("Invalid cyphertext")
 
     try:
         auth_tag = base64url_decode(auth_tag_segment)
     except (TypeError, binascii.Error):
-        raise JWEParseError('Invalid auth tag')
+        raise JWEParseError("Invalid auth tag")
 
     return header, header_segment, encrypted_key, iv, ciphertext, auth_tag
 
@@ -355,9 +353,9 @@ def _encoded_header(alg, enc, zip, cty, kid):
         header["kid"] = kid
     json_header = json.dumps(
         header,
-        separators=(',', ':'),
+        separators=(",", ":"),
         sort_keys=True,
-    ).encode('utf-8')
+    ).encode("utf-8")
     return base64url_encode(json_header)
 
 
@@ -499,8 +497,7 @@ def _get_direct_key_wrap_cek(key):
         cek_bytes = _get_key_bytes_from_key(key)
         wrapped_cek = b""
     else:
-        raise NotImplementedError(
-            "JWK type {} not supported!".format(jwk_data['kty']))
+        raise NotImplementedError("JWK type {} not supported!".format(jwk_data["kty"]))
     return cek_bytes, wrapped_cek
 
 
@@ -601,5 +598,14 @@ def _jwe_compact_serialize(encoded_header, encrypted_cek, iv, cipher_text, auth_
     encoded_iv = base64url_encode(iv)
     encoded_cipher_text = base64url_encode(cipher_text)
     encoded_auth_tag = base64url_encode(auth_tag)
-    return encoded_header + b"." + encoded_encrypted_cek + b"." + \
-        encoded_iv + b"." + encoded_cipher_text + b"." + encoded_auth_tag
+    return (
+        encoded_header
+        + b"."
+        + encoded_encrypted_cek
+        + b"."
+        + encoded_iv
+        + b"."
+        + encoded_cipher_text
+        + b"."
+        + encoded_auth_tag
+    )

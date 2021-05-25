@@ -9,6 +9,7 @@ try:
     def long_to_bytes(n, blocksize=0):
         return _long_to_bytes(n, blocksize or None)
 
+
 except ImportError:
     from ecdsa.ecdsa import int_to_string as _long_to_bytes
 
@@ -19,15 +20,15 @@ except ImportError:
         else:
             assert len(ret) <= blocksize
             padding = blocksize - len(ret)
-            return b'\x00' * padding + ret
+            return b"\x00" * padding + ret
 
 
 def long_to_base64(data, size=0):
-    return base64.urlsafe_b64encode(long_to_bytes(data, size)).strip(b'=')
+    return base64.urlsafe_b64encode(long_to_bytes(data, size)).strip(b"=")
 
 
 def int_arr_to_long(arr):
-    return int(''.join(["%02x" % byte for byte in arr]), 16)
+    return int("".join(["%02x" % byte for byte in arr]), 16)
 
 
 def base64_to_long(data):
@@ -35,8 +36,8 @@ def base64_to_long(data):
         data = data.encode("ascii")
 
     # urlsafe_b64decode will happily convert b64encoded data
-    _d = base64.urlsafe_b64decode(bytes(data) + b'==')
-    return int_arr_to_long(struct.unpack('%sB' % len(_d), _d))
+    _d = base64.urlsafe_b64decode(bytes(data) + b"==")
+    return int_arr_to_long(struct.unpack("%sB" % len(_d), _d))
 
 
 def calculate_at_hash(access_token, hash_alg):
@@ -55,11 +56,11 @@ def calculate_at_hash(access_token, hash_alg):
         hash_alg (callable): A callable returning a hash object, e.g. hashlib.sha256
 
     """
-    hash_digest = hash_alg(access_token.encode('utf-8')).digest()
+    hash_digest = hash_alg(access_token.encode("utf-8")).digest()
     cut_at = int(len(hash_digest) / 2)
     truncated = hash_digest[:cut_at]
     at_hash = base64url_encode(truncated)
-    return at_hash.decode('utf-8')
+    return at_hash.decode("utf-8")
 
 
 def base64url_decode(input):
@@ -72,7 +73,7 @@ def base64url_decode(input):
     rem = len(input) % 4
 
     if rem > 0:
-        input += b'=' * (4 - rem)
+        input += b"=" * (4 - rem)
 
     return base64.urlsafe_b64decode(input)
 
@@ -84,7 +85,7 @@ def base64url_encode(input):
         input (str): A base64url_encoded string to encode.
 
     """
-    return base64.urlsafe_b64encode(input).replace(b'=', b'')
+    return base64.urlsafe_b64encode(input).replace(b"=", b"")
 
 
 def timedelta_total_seconds(delta):
@@ -103,5 +104,5 @@ def ensure_binary(s):
     if isinstance(s, bytes):
         return s
     if isinstance(s, str):
-        return s.encode('utf-8', 'strict')
+        return s.encode("utf-8", "strict")
     raise TypeError(f"not expecting type '{type(s)}'")

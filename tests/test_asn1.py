@@ -11,7 +11,7 @@ except ImportError:
 pytestmark = [
     pytest.mark.pycrypto,
     pytest.mark.pycryptodome,
-    pytest.mark.skipif(_asn1 is None, reason="ASN1 backend not available")
+    pytest.mark.skipif(_asn1 is None, reason="ASN1 backend not available"),
 ]
 
 PKCS1_PRIVATE_KEY = b"""MIIJKwIBAAKCAgEAtSKfSeI0fukRIX38AHlKB1YPp

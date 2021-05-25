@@ -31,12 +31,14 @@ class JWKError(JOSEError):
 
 
 class JWEError(JOSEError):
-    """ Base error for all JWE errors """
+    """Base error for all JWE errors"""
+
     pass
 
 
 class JWEParseError(JWEError):
-    """ Could not parse the JWE string provided """
+    """Could not parse the JWE string provided"""
+
     pass
 
 
@@ -45,6 +47,7 @@ class JWEInvalidAuth(JWEError):
     The authentication tag did not match the protected sections of the
     JWE string provided
     """
+
     pass
 
 
@@ -52,4 +55,5 @@ class JWEAlgorithmUnsupportedError(JWEError):
     """
     The JWE algorithm is not supported by the backend
     """
+
     pass

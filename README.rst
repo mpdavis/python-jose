@@ -3,7 +3,7 @@ python-jose
 
 A JOSE implementation in Python
 
-|Github Actions CI Status| |Coverage Status| |Docs|
+|Github Actions CI Status| |Coverage Status| |Docs| |style|
 
 Docs are available on ReadTheDocs_.
 
@@ -98,3 +98,6 @@ This library was originally based heavily on the work of the folks over at PyJWT
 .. _pycrypto: https://www.dlitz.net/software/pycrypto/
 .. _python-ecdsa: https://github.com/warner/python-ecdsa
 .. _python-rsa: https://stuvel.eu/rsa
+.. |style| image:: https://img.shields.io/badge/code%20style-black-000000.svg
+   :target: https://github.com/psf/black
+   :alt: Code style: black

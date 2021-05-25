@@ -52,31 +52,31 @@ class CryptographyECKey(Key):
 
     def __init__(self, key, algorithm, cryptography_backend=default_backend):
         if algorithm not in ALGORITHMS.EC:
-            raise JWKError('hash_alg: %s is not a valid hash algorithm' % algorithm)
+            raise JWKError("hash_alg: %s is not a valid hash algorithm" % algorithm)
 
         self.hash_alg = {
             ALGORITHMS.ES256: self.SHA256,
             ALGORITHMS.ES384: self.SHA384,
-            ALGORITHMS.ES512: self.SHA512
+            ALGORITHMS.ES512: self.SHA512,
         }.get(algorithm)
         self._algorithm = algorithm
 
         self.cryptography_backend = cryptography_backend
 
-        if hasattr(key, 'public_bytes') or hasattr(key, 'private_bytes'):
+        if hasattr(key, "public_bytes") or hasattr(key, "private_bytes"):
             self.prepared_key = key
             return
 
-        if hasattr(key, 'to_pem'):
+        if hasattr(key, "to_pem"):
             # convert to PEM and let cryptography below load it as PEM
-            key = key.to_pem().decode('utf-8')
+            key = key.to_pem().decode("utf-8")
 
         if isinstance(key, dict):
             self.prepared_key = self._process_jwk(key)
             return
 
         if isinstance(key, str):
-            key = key.encode('utf-8')
+            key = key.encode("utf-8")
 
         if isinstance(key, bytes):
             # Attempt to load key. We don't know if it's
@@ -93,27 +93,27 @@ class CryptographyECKey(Key):
             self.prepared_key = key
             return
 
-        raise JWKError('Unable to parse an ECKey from key: %s' % key)
+        raise JWKError("Unable to parse an ECKey from key: %s" % key)
 
     def _process_jwk(self, jwk_dict):
-        if not jwk_dict.get('kty') == 'EC':
-            raise JWKError("Incorrect key type. Expected: 'EC', Received: %s" % jwk_dict.get('kty'))
+        if not jwk_dict.get("kty") == "EC":
+            raise JWKError("Incorrect key type. Expected: 'EC', Received: %s" % jwk_dict.get("kty"))
 
-        if not all(k in jwk_dict for k in ['x', 'y', 'crv']):
-            raise JWKError('Mandatory parameters are missing')
+        if not all(k in jwk_dict for k in ["x", "y", "crv"]):
+            raise JWKError("Mandatory parameters are missing")
 
-        x = base64_to_long(jwk_dict.get('x'))
-        y = base64_to_long(jwk_dict.get('y'))
+        x = base64_to_long(jwk_dict.get("x"))
+        y = base64_to_long(jwk_dict.get("y"))
         curve = {
-            'P-256': ec.SECP256R1,
-            'P-384': ec.SECP384R1,
-            'P-521': ec.SECP521R1,
-        }[jwk_dict['crv']]
+            "P-256": ec.SECP256R1,
+            "P-384": ec.SECP384R1,
+            "P-521": ec.SECP521R1,
+        }[jwk_dict["crv"]]
 
         public = ec.EllipticCurvePublicNumbers(x, y, curve())
 
-        if 'd' in jwk_dict:
-            d = base64_to_long(jwk_dict.get('d'))
+        if "d" in jwk_dict:
+            d = base64_to_long(jwk_dict.get("d"))
             private = ec.EllipticCurvePrivateNumbers(d, public)
 
             return private.private_key(self.cryptography_backend())
@@ -147,9 +147,10 @@ class CryptographyECKey(Key):
 
     def sign(self, msg):
         if self.hash_alg.digest_size * 8 > self.prepared_key.curve.key_size:
-            raise TypeError("this curve (%s) is too short "
-                            "for your digest (%d)" % (self.prepared_key.curve.name,
-                                                      8 * self.hash_alg.digest_size))
+            raise TypeError(
+                "this curve (%s) is too short "
+                "for your digest (%d)" % (self.prepared_key.curve.name, 8 * self.hash_alg.digest_size)
+            )
         signature = self.prepared_key.sign(msg, ec.ECDSA(self.hash_alg()))
         return self._der_to_raw(signature)
 
@@ -162,7 +163,7 @@ class CryptographyECKey(Key):
             return False
 
     def is_public(self):
-        return hasattr(self.prepared_key, 'public_bytes')
+        return hasattr(self.prepared_key, "public_bytes")
 
     def public_key(self):
         if self.is_public():
@@ -172,14 +173,13 @@ class CryptographyECKey(Key):
     def to_pem(self):
         if self.is_public():
             pem = self.prepared_key.public_bytes(
-                encoding=serialization.Encoding.PEM,
-                format=serialization.PublicFormat.SubjectPublicKeyInfo
+                encoding=serialization.Encoding.PEM, format=serialization.PublicFormat.SubjectPublicKeyInfo
             )
             return pem
         pem = self.prepared_key.private_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PrivateFormat.TraditionalOpenSSL,
-            encryption_algorithm=serialization.NoEncryption()
+            encryption_algorithm=serialization.NoEncryption(),
         )
         return pem
 
@@ -190,9 +190,9 @@ class CryptographyECKey(Key):
             public_key = self.prepared_key
 
         crv = {
-            'secp256r1': 'P-256',
-            'secp384r1': 'P-384',
-            'secp521r1': 'P-521',
+            "secp256r1": "P-256",
+            "secp384r1": "P-384",
+            "secp521r1": "P-521",
         }[self.prepared_key.curve.name]
 
         # Calculate the key size in bytes. Section 6.2.1.2 and 6.2.1.3 of
@@ -201,18 +201,16 @@ class CryptographyECKey(Key):
         key_size = (self.prepared_key.curve.key_size + 7) // 8
 
         data = {
-            'alg': self._algorithm,
-            'kty': 'EC',
-            'crv': crv,
-            'x': long_to_base64(public_key.public_numbers().x, size=key_size).decode('ASCII'),
-            'y': long_to_base64(public_key.public_numbers().y, size=key_size).decode('ASCII'),
+            "alg": self._algorithm,
+            "kty": "EC",
+            "crv": crv,
+            "x": long_to_base64(public_key.public_numbers().x, size=key_size).decode("ASCII"),
+            "y": long_to_base64(public_key.public_numbers().y, size=key_size).decode("ASCII"),
         }
 
         if not self.is_public():
-            data['d'] = long_to_base64(
-                self.prepared_key.private_numbers().private_value,
-                size=key_size
-            ).decode('ASCII')
+            private_value = self.prepared_key.private_numbers().private_value
+            data["d"] = long_to_base64(private_value, size=key_size).decode("ASCII")
 
         return data
 
@@ -228,25 +226,25 @@ class CryptographyRSAKey(Key):
 
     def __init__(self, key, algorithm, cryptography_backend=default_backend):
         if algorithm not in ALGORITHMS.RSA:
-            raise JWKError('hash_alg: %s is not a valid hash algorithm' % algorithm)
+            raise JWKError("hash_alg: %s is not a valid hash algorithm" % algorithm)
 
         self.hash_alg = {
             ALGORITHMS.RS256: self.SHA256,
             ALGORITHMS.RS384: self.SHA384,
-            ALGORITHMS.RS512: self.SHA512
+            ALGORITHMS.RS512: self.SHA512,
         }.get(algorithm)
         self._algorithm = algorithm
 
         self.padding = {
             ALGORITHMS.RSA1_5: self.RSA1_5,
             ALGORITHMS.RSA_OAEP: self.RSA_OAEP,
-            ALGORITHMS.RSA_OAEP_256: self.RSA_OAEP_256
+            ALGORITHMS.RSA_OAEP_256: self.RSA_OAEP_256,
         }.get(algorithm)
 
         self.cryptography_backend = cryptography_backend
 
         # if it conforms to RSAPublicKey interface
-        if hasattr(key, 'public_bytes') and hasattr(key, 'public_numbers'):
+        if hasattr(key, "public_bytes") and hasattr(key, "public_numbers"):
             self.prepared_key = key
             return
 
@@ -255,11 +253,11 @@ class CryptographyRSAKey(Key):
             return
 
         if isinstance(key, str):
-            key = key.encode('utf-8')
+            key = key.encode("utf-8")
 
         if isinstance(key, bytes):
             try:
-                if key.startswith(b'-----BEGIN CERTIFICATE-----'):
+                if key.startswith(b"-----BEGIN CERTIFICATE-----"):
                     self._process_cert(key)
                     return
 
@@ -271,23 +269,23 @@ class CryptographyRSAKey(Key):
                 raise JWKError(e)
             return
 
-        raise JWKError('Unable to parse an RSA_JWK from key: %s' % key)
+        raise JWKError("Unable to parse an RSA_JWK from key: %s" % key)
 
     def _process_jwk(self, jwk_dict):
-        if not jwk_dict.get('kty') == 'RSA':
-            raise JWKError("Incorrect key type. Expected: 'RSA', Received: %s" % jwk_dict.get('kty'))
+        if not jwk_dict.get("kty") == "RSA":
+            raise JWKError("Incorrect key type. Expected: 'RSA', Received: %s" % jwk_dict.get("kty"))
 
-        e = base64_to_long(jwk_dict.get('e', 256))
-        n = base64_to_long(jwk_dict.get('n'))
+        e = base64_to_long(jwk_dict.get("e", 256))
+        n = base64_to_long(jwk_dict.get("n"))
         public = rsa.RSAPublicNumbers(e, n)
 
-        if 'd' not in jwk_dict:
+        if "d" not in jwk_dict:
             return public.public_key(self.cryptography_backend())
         else:
             # This is a private key.
-            d = base64_to_long(jwk_dict.get('d'))
+            d = base64_to_long(jwk_dict.get("d"))
 
-            extra_params = ['p', 'q', 'dp', 'dq', 'qi']
+            extra_params = ["p", "q", "dp", "dq", "qi"]
 
             if any(k in jwk_dict for k in extra_params):
                 # Precomputed private key parameters are available.
@@ -295,13 +293,13 @@ class CryptographyRSAKey(Key):
                     # These values must be present when 'p' is according to
                     # Section 6.3.2 of RFC7518, so if they are not we raise
                     # an error.
-                    raise JWKError('Precomputed private key parameters are incomplete.')
+                    raise JWKError("Precomputed private key parameters are incomplete.")
 
-                p = base64_to_long(jwk_dict['p'])
-                q = base64_to_long(jwk_dict['q'])
-                dp = base64_to_long(jwk_dict['dp'])
-                dq = base64_to_long(jwk_dict['dq'])
-                qi = base64_to_long(jwk_dict['qi'])
+                p = base64_to_long(jwk_dict["p"])
+                q = base64_to_long(jwk_dict["q"])
+                dp = base64_to_long(jwk_dict["dp"])
+                dq = base64_to_long(jwk_dict["dq"])
+                qi = base64_to_long(jwk_dict["qi"])
             else:
                 # The precomputed private key parameters are not available,
                 # so we use cryptography's API to fill them in.
@@ -320,64 +318,49 @@ class CryptographyRSAKey(Key):
 
     def sign(self, msg):
         try:
-            signature = self.prepared_key.sign(
-                msg,
-                padding.PKCS1v15(),
-                self.hash_alg()
-            )
+            signature = self.prepared_key.sign(msg, padding.PKCS1v15(), self.hash_alg())
         except Exception as e:
             raise JWKError(e)
         return signature
 
     def verify(self, msg, sig):
         if not self.is_public():
-            warnings.warn("Attempting to verify a message with a private key. "
-                          "This is not recommended.")
+            warnings.warn("Attempting to verify a message with a private key. " "This is not recommended.")
 
         try:
-            self.public_key().prepared_key.verify(
-                sig,
-                msg,
-                padding.PKCS1v15(),
-                self.hash_alg()
-            )
+            self.public_key().prepared_key.verify(sig, msg, padding.PKCS1v15(), self.hash_alg())
             return True
         except InvalidSignature:
             return False
 
     def is_public(self):
-        return hasattr(self.prepared_key, 'public_bytes')
+        return hasattr(self.prepared_key, "public_bytes")
 
     def public_key(self):
         if self.is_public():
             return self
         return self.__class__(self.prepared_key.public_key(), self._algorithm)
 
-    def to_pem(self, pem_format='PKCS8'):
+    def to_pem(self, pem_format="PKCS8"):
         if self.is_public():
-            if pem_format == 'PKCS8':
+            if pem_format == "PKCS8":
                 fmt = serialization.PublicFormat.SubjectPublicKeyInfo
-            elif pem_format == 'PKCS1':
+            elif pem_format == "PKCS1":
                 fmt = serialization.PublicFormat.PKCS1
             else:
                 raise ValueError("Invalid format specified: %r" % pem_format)
-            pem = self.prepared_key.public_bytes(
-                encoding=serialization.Encoding.PEM,
-                format=fmt
-            )
+            pem = self.prepared_key.public_bytes(encoding=serialization.Encoding.PEM, format=fmt)
             return pem
 
-        if pem_format == 'PKCS8':
+        if pem_format == "PKCS8":
             fmt = serialization.PrivateFormat.PKCS8
-        elif pem_format == 'PKCS1':
+        elif pem_format == "PKCS1":
             fmt = serialization.PrivateFormat.TraditionalOpenSSL
         else:
             raise ValueError("Invalid format specified: %r" % pem_format)
 
         return self.prepared_key.private_bytes(
-            encoding=serialization.Encoding.PEM,
-            format=fmt,
-            encryption_algorithm=serialization.NoEncryption()
+            encoding=serialization.Encoding.PEM, format=fmt, encryption_algorithm=serialization.NoEncryption()
         )
 
     def to_dict(self):
@@ -387,21 +370,23 @@ class CryptographyRSAKey(Key):
             public_key = self.prepared_key
 
         data = {
-            'alg': self._algorithm,
-            'kty': 'RSA',
-            'n': long_to_base64(public_key.public_numbers().n).decode('ASCII'),
-            'e': long_to_base64(public_key.public_numbers().e).decode('ASCII'),
+            "alg": self._algorithm,
+            "kty": "RSA",
+            "n": long_to_base64(public_key.public_numbers().n).decode("ASCII"),
+            "e": long_to_base64(public_key.public_numbers().e).decode("ASCII"),
         }
 
         if not self.is_public():
-            data.update({
-                'd': long_to_base64(self.prepared_key.private_numbers().d).decode('ASCII'),
-                'p': long_to_base64(self.prepared_key.private_numbers().p).decode('ASCII'),
-                'q': long_to_base64(self.prepared_key.private_numbers().q).decode('ASCII'),
-                'dp': long_to_base64(self.prepared_key.private_numbers().dmp1).decode('ASCII'),
-                'dq': long_to_base64(self.prepared_key.private_numbers().dmq1).decode('ASCII'),
-                'qi': long_to_base64(self.prepared_key.private_numbers().iqmp).decode('ASCII'),
-            })
+            data.update(
+                {
+                    "d": long_to_base64(self.prepared_key.private_numbers().d).decode("ASCII"),
+                    "p": long_to_base64(self.prepared_key.private_numbers().p).decode("ASCII"),
+                    "q": long_to_base64(self.prepared_key.private_numbers().q).decode("ASCII"),
+                    "dp": long_to_base64(self.prepared_key.private_numbers().dmp1).decode("ASCII"),
+                    "dq": long_to_base64(self.prepared_key.private_numbers().dmq1).decode("ASCII"),
+                    "qi": long_to_base64(self.prepared_key.private_numbers().iqmp).decode("ASCII"),
+                }
+            )
 
         return data
 
@@ -415,22 +400,22 @@ class CryptographyRSAKey(Key):
 
     def unwrap_key(self, wrapped_key):
         try:
-            unwrapped_key = self.prepared_key.decrypt(
-                wrapped_key,
-                self.padding
-            )
+            unwrapped_key = self.prepared_key.decrypt(wrapped_key, self.padding)
             return unwrapped_key
         except Exception as e:
             raise JWEError(e)
 
 
 class CryptographyAESKey(Key):
-    KEY_128 = (ALGORITHMS.A128GCM, ALGORITHMS.A128GCMKW, ALGORITHMS.A128KW,
-               ALGORITHMS.A128CBC)
-    KEY_192 = (ALGORITHMS.A192GCM, ALGORITHMS.A192GCMKW, ALGORITHMS.A192KW,
-               ALGORITHMS.A192CBC)
-    KEY_256 = (ALGORITHMS.A256GCM, ALGORITHMS.A256GCMKW, ALGORITHMS.A256KW,
-               ALGORITHMS.A128CBC_HS256, ALGORITHMS.A256CBC)
+    KEY_128 = (ALGORITHMS.A128GCM, ALGORITHMS.A128GCMKW, ALGORITHMS.A128KW, ALGORITHMS.A128CBC)
+    KEY_192 = (ALGORITHMS.A192GCM, ALGORITHMS.A192GCMKW, ALGORITHMS.A192KW, ALGORITHMS.A192CBC)
+    KEY_256 = (
+        ALGORITHMS.A256GCM,
+        ALGORITHMS.A256GCMKW,
+        ALGORITHMS.A256KW,
+        ALGORITHMS.A128CBC_HS256,
+        ALGORITHMS.A256CBC,
+    )
     KEY_384 = (ALGORITHMS.A192CBC_HS384,)
     KEY_512 = (ALGORITHMS.A256CBC_HS512,)
 
@@ -451,14 +436,14 @@ class CryptographyAESKey(Key):
         ALGORITHMS.A256GCMKW: modes.GCM,
         ALGORITHMS.A128KW: None,
         ALGORITHMS.A192KW: None,
-        ALGORITHMS.A256KW: None
+        ALGORITHMS.A256KW: None,
     }
 
     def __init__(self, key, algorithm):
         if algorithm not in ALGORITHMS.AES:
-            raise JWKError('%s is not a valid AES algorithm' % algorithm)
+            raise JWKError("%s is not a valid AES algorithm" % algorithm)
         if algorithm not in ALGORITHMS.SUPPORTED.union(ALGORITHMS.AES_PSEUDO):
-            raise JWKError('%s is not a supported algorithm' % algorithm)
+            raise JWKError("%s is not a supported algorithm" % algorithm)
 
         self._algorithm = algorithm
         self._mode = self.MODES.get(self._algorithm)
@@ -477,26 +462,21 @@ class CryptographyAESKey(Key):
         self._key = key
 
     def to_dict(self):
-        data = {
-            'alg': self._algorithm,
-            'kty': 'oct',
-            'k': base64url_encode(self._key)
-        }
+        data = {"alg": self._algorithm, "kty": "oct", "k": base64url_encode(self._key)}
         return data
 
     def encrypt(self, plain_text, aad=None):
         plain_text = ensure_binary(plain_text)
         try:
-            iv = get_random_bytes(algorithms.AES.block_size//8)
+            iv = get_random_bytes(algorithms.AES.block_size // 8)
             mode = self._mode(iv)
             if mode.name == "GCM":
                 cipher = aead.AESGCM(self._key)
                 cipher_text_and_tag = cipher.encrypt(iv, plain_text, aad)
-                cipher_text = cipher_text_and_tag[:len(cipher_text_and_tag) - 16]
+                cipher_text = cipher_text_and_tag[: len(cipher_text_and_tag) - 16]
                 auth_tag = cipher_text_and_tag[-16:]
             else:
-                cipher = Cipher(algorithms.AES(self._key), mode,
-                                backend=default_backend())
+                cipher = Cipher(algorithms.AES(self._key), mode, backend=default_backend())
                 encryptor = cipher.encryptor()
                 padder = PKCS7(algorithms.AES.block_size).padder()
                 padded_data = padder.update(plain_text)
@@ -522,8 +502,7 @@ class CryptographyAESKey(Key):
                 except InvalidTag:
                     raise JWEError("Invalid JWE Auth Tag")
             else:
-                cipher = Cipher(algorithms.AES(self._key), mode,
-                                backend=default_backend())
+                cipher = Cipher(algorithms.AES(self._key), mode, backend=default_backend())
                 decryptor = cipher.decryptor()
                 padded_plain_text = decryptor.update(cipher_text)
                 padded_plain_text += decryptor.finalize()
@@ -555,15 +534,11 @@ class CryptographyHMACKey(Key):
     and the specified hash function.
     """
 
-    ALG_MAP = {
-        ALGORITHMS.HS256: hashes.SHA256(),
-        ALGORITHMS.HS384: hashes.SHA384(),
-        ALGORITHMS.HS512: hashes.SHA512()
-    }
+    ALG_MAP = {ALGORITHMS.HS256: hashes.SHA256(), ALGORITHMS.HS384: hashes.SHA384(), ALGORITHMS.HS512: hashes.SHA512()}
 
     def __init__(self, key, algorithm):
         if algorithm not in ALGORITHMS.HMAC:
-            raise JWKError('hash_alg: %s is not a valid hash algorithm' % algorithm)
+            raise JWKError("hash_alg: %s is not a valid hash algorithm" % algorithm)
         self._algorithm = algorithm
         self._hash_alg = self.ALG_MAP.get(algorithm)
 
@@ -572,31 +547,32 @@ class CryptographyHMACKey(Key):
             return
 
         if not isinstance(key, str) and not isinstance(key, bytes):
-            raise JWKError('Expecting a string- or bytes-formatted key.')
+            raise JWKError("Expecting a string- or bytes-formatted key.")
 
         if isinstance(key, str):
-            key = key.encode('utf-8')
+            key = key.encode("utf-8")
 
         invalid_strings = [
-            b'-----BEGIN PUBLIC KEY-----',
-            b'-----BEGIN RSA PUBLIC KEY-----',
-            b'-----BEGIN CERTIFICATE-----',
-            b'ssh-rsa'
+            b"-----BEGIN PUBLIC KEY-----",
+            b"-----BEGIN RSA PUBLIC KEY-----",
+            b"-----BEGIN CERTIFICATE-----",
+            b"ssh-rsa",
         ]
 
         if any(string_value in key for string_value in invalid_strings):
             raise JWKError(
-                'The specified key is an asymmetric key or x509 certificate and'
-                ' should not be used as an HMAC secret.')
+                "The specified key is an asymmetric key or x509 certificate and"
+                " should not be used as an HMAC secret."
+            )
 
         self.prepared_key = key
 
     def _process_jwk(self, jwk_dict):
-        if not jwk_dict.get('kty') == 'oct':
-            raise JWKError("Incorrect key type. Expected: 'oct', Received: %s" % jwk_dict.get('kty'))
+        if not jwk_dict.get("kty") == "oct":
+            raise JWKError("Incorrect key type. Expected: 'oct', Received: %s" % jwk_dict.get("kty"))
 
-        k = jwk_dict.get('k')
-        k = k.encode('utf-8')
+        k = jwk_dict.get("k")
+        k = k.encode("utf-8")
         k = bytes(k)
         k = base64url_decode(k)
 
@@ -604,9 +580,9 @@ class CryptographyHMACKey(Key):
 
     def to_dict(self):
         return {
-            'alg': self._algorithm,
-            'kty': 'oct',
-            'k': base64url_encode(self.prepared_key).decode('ASCII'),
+            "alg": self._algorithm,
+            "kty": "oct",
+            "k": base64url_encode(self.prepared_key).decode("ASCII"),
         }
 
     def sign(self, msg):

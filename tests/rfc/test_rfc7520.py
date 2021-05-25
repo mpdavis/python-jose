@@ -12,7 +12,6 @@ expected_payload = b"It\xe2\x80\x99s a dangerous business, Frodo, going out your
 # [Docs] [txt|pdf] [draft-ietf-jose-c...]
 
 
-
 # Internet Engineering Task Force (IETF)                         M. Miller
 # Request for Comments: 7520                           Cisco Systems, Inc.
 # Category: Informational                                         May 2015
@@ -60,8 +59,6 @@ expected_payload = b"It\xe2\x80\x99s a dangerous business, Frodo, going out your
 #    include Simplified BSD License text as described in Section 4.e of
 #    the Trust Legal Provisions and are provided without warranty as
 #    described in the Simplified BSD License.
-
-
 
 
 # Miller                        Informational                     [Page 1]
@@ -119,7 +116,6 @@ expected_payload = b"It\xe2\x80\x99s a dangerous business, Frodo, going out your
 #    5. JSON Web Encryption Examples ...................................39
 
 
-
 # Miller                        Informational                     [Page 2]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -175,7 +171,6 @@ expected_payload = b"It\xe2\x80\x99s a dangerous business, Frodo, going out your
 #            5.8.5. Output Results .....................................82
 
 
-
 # Miller                        Informational                     [Page 3]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -228,8 +223,6 @@ expected_payload = b"It\xe2\x80\x99s a dangerous business, Frodo, going out your
 #       8.2. Informative References ...................................120
 #    Acknowledgements .................................................120
 #    Author's Address .................................................120
-
-
 
 
 # Miller                        Informational                     [Page 4]
@@ -287,7 +280,6 @@ expected_payload = b"It\xe2\x80\x99s a dangerous business, Frodo, going out your
 #    the exchange results.
 
 
-
 # Miller                        Informational                     [Page 5]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -337,7 +329,7 @@ ec_public_key = {
     "use": "sig",
     "crv": "P-521",
     "x": "AHKZLLOsCOzz5cY97ewNUajB957y-C-U88c3v13nmGZx6sYl_oJXu9A5RkTKqjqvjyekWF-7ytDyRXYgCF5cj0Kt",
-    "y": "AdymlHvOiLxXkEhayXQnNCvDX4h9htZaCJN34kfmC6pV5OhQHiraVySsUdaQkAgDPrwQrJmbnX9cwlGfP-HqHZR1"
+    "y": "AdymlHvOiLxXkEhayXQnNCvDX4h9htZaCJN34kfmC6pV5OhQHiraVySsUdaQkAgDPrwQrJmbnX9cwlGfP-HqHZR1",
 }
 
 #                  Figure 1: Elliptic Curve P-521 Public Key
@@ -346,11 +338,6 @@ ec_public_key = {
 #    key.  The field "crv" identifies the curve, which is curve P-521 for
 #    this example.  The values of the fields "x" and "y" are the
 #    base64url-encoded X and Y coordinates (respectively).
-
-
-
-
-
 
 
 # Miller                        Informational                     [Page 6]
@@ -402,13 +389,6 @@ ec_public_key = {
 #    to reach the expected length.
 
 
-
-
-
-
-
-
-
 # Miller                        Informational                     [Page 7]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -441,7 +421,7 @@ rsa_public_jwk = {
     "kid": "bilbo.baggins@hobbiton.example",
     "use": "sig",
     "n": "n4EPtAOCc9AlkeQHPzHStgAbgs7bTZLwUBZdR8_KuKPEHLd4rHVTeT-O-XV2jRojdNhxJWTDvNd7nqQ0VEiZQHz_AJmSCpMaJMRBSFKrKb2wqVwGU_NsYOYL-QtiWN2lbzcEe6XC0dApr5ydQLrHqkHHig3RBordaZ6Aj-oBHqFEHYpPe7Tpe-OfVfHd1E6cS6M1FZcD1NNLYD5lFHpPI9bTwJlsde3uhGqC0ZCuEHg8lhzwOHrtIQbS0FVbb9k3-tVTU4fg_3L_vniUFAKwuCLqKnS2BYwdq_mzSnbLY7h_qixoR7jig3__kRhuaxwUkRz5iaiQkqgc5gHdrNP5zw",
-    "e": "AQAB"
+    "e": "AQAB",
 }
 
 #                      Figure 3: RSA 2048-Bit Public Key
@@ -460,17 +440,6 @@ rsa_public_jwk = {
 
 #    Note that whitespace is added for readability as described in
 #    Section 1.1.
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                     [Page 8]
@@ -522,13 +491,6 @@ rsa_public_jwk = {
 #                     Figure 4: RSA 2048-Bit Private Key
 
 
-
-
-
-
-
-
-
 # Miller                        Informational                     [Page 9]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -567,7 +529,7 @@ hmac_key = {
     "kid": "018c0ae5-4d9b-471b-bfd6-eef314bc7037",
     "use": "sig",
     "alg": "HS256",
-    "k": "hJtXIZ2uSN5kbQfbtTNWbpdmhkV8FJG-Onbc6mxCcYg"
+    "k": "hJtXIZ2uSN5kbQfbtTNWbpdmhkV8FJG-Onbc6mxCcYg",
 }
 
 #                    Figure 5: HMAC SHA-256 Symmetric Key
@@ -578,19 +540,6 @@ hmac_key = {
 #    When used for the signing algorithm "HS256" (HMAC-SHA256), the field
 #    "k" value is 32 octets (or more) in length when decoded, padded with
 #    leading zero (0x00) octets to reach the minimum expected length.
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 10]
@@ -641,12 +590,6 @@ hmac_key = {
 #    "to."
 
 #                     Figure 7: Payload Content Plaintext
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 11]
@@ -700,11 +643,6 @@ hmac_key = {
 #                     Figure 9: JWS Protected Header JSON
 
 
-
-
-
-
-
 # Miller                        Informational                    [Page 12]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -752,15 +690,6 @@ hmac_key = {
 #    o  Signature (Figure 12)
 
 
-
-
-
-
-
-
-
-
-
 # Miller                        Informational                    [Page 13]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -785,6 +714,7 @@ hmac_key = {
 
 #                    Figure 13: JWS Compact Serialization
 
+
 class TestFourOneThree:
 
     token = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImJpbGJvLmJhZ2dpbnNAaG9iYml0b24uZXhhbXBsZSJ9.SXTigJlzIGEgZGFuZ2Vyb3VzIGJ1c2luZXNzLCBGcm9kbywgZ29pbmcgb3V0IHlvdXIgZG9vci4gWW91IHN0ZXAgb250byB0aGUgcm9hZCwgYW5kIGlmIHlvdSBkb24ndCBrZWVwIHlvdXIgZmVldCwgdGhlcmXigJlzIG5vIGtub3dpbmcgd2hlcmUgeW91IG1pZ2h0IGJlIHN3ZXB0IG9mZiB0by4.MRjdkly7_-oTPTS3AXP41iQIGKa80A0ZmTuV5MEaHoxnW2e5CZ5NlKtainoFmKZopdHM1O2U4mwzJdQx996ivp83xuglII7PNDi84wnB-BDkoBwA78185hX-Es4JIwmDLJK3lfWRa-XtL0RnltuYv746iYTh_qHRD68BNt1uSNCrUCTJDt5aAE6x8wW1Kt9eRo4QPocSadnHXFxnt8Is9UzpERV0ePPQdLuW3IS_de3xyIrDaLGdjluPxUAhb6L2aXic1U12podGU0KLUQSE_oI-ZnmKJ3F4uOZDnd6QZWJushZ41Axf_fcIe8u9ipH84ogoree7vjbU5y18kDquDg"
@@ -792,8 +722,9 @@ class TestFourOneThree:
     @pytest.mark.skipif(RSAKey is None, reason="RSA is not available")
     def test_signature(self):
 
-        payload = verify(self.token, rsa_public_jwk, 'RS256')
+        payload = verify(self.token, rsa_public_jwk, "RS256")
         assert payload == expected_payload
+
 
 #    The resulting JWS object using the general JWS JSON Serialization:
 
@@ -819,12 +750,6 @@ class TestFourOneThree:
 #    }
 
 #                  Figure 14: General JWS JSON Serialization
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 14]
@@ -875,12 +800,6 @@ class TestFourOneThree:
 #    o  RSA private key; this example uses the key from Figure 4.
 
 #    o  "alg" parameter of "PS384".
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 15]
@@ -934,11 +853,6 @@ class TestFourOneThree:
 #                 Figure 19: JWS Signature, base64url-encoded
 
 
-
-
-
-
-
 # Miller                        Informational                    [Page 16]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -972,27 +886,6 @@ class TestFourOneThree:
 #    6GYmJUAfmWjwZ6oD4ifKo8DYM-X72Eaw
 
 #                    Figure 20: JWS Compact Serialization
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 17]
@@ -1047,10 +940,6 @@ class TestFourOneThree:
 #                 Figure 22: Flattened JWS JSON Serialization
 
 
-
-
-
-
 # Miller                        Informational                    [Page 18]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -1098,13 +987,6 @@ class TestFourOneThree:
 #    hhbXBsZSJ9
 
 #             Figure 24: JWS Protected Header, base64url-encoded
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 19]
@@ -1168,9 +1050,8 @@ class TestFourThreeThree:
 
     def test_signature(self):
 
-        payload = verify(self.token, ec_public_key, 'ES512')
+        payload = verify(self.token, ec_public_key, "ES512")
         assert payload == expected_payload
-
 
 
 # Miller                        Informational                    [Page 20]
@@ -1227,8 +1108,6 @@ class TestFourThreeThree:
 #    Section 1.1.
 
 
-
-
 # Miller                        Informational                    [Page 21]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -1279,12 +1158,6 @@ class TestFourThreeThree:
 #                        Figure 32: JWS Signing Input
 
 
-
-
-
-
-
-
 # Miller                        Informational                    [Page 22]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -1328,24 +1201,8 @@ class TestFourFourThree:
 
     def test_signature(self):
 
-        payload = verify(self.token, hmac_key, 'HS256')
+        payload = verify(self.token, hmac_key, "HS256")
         assert payload == expected_payload
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 23]
@@ -1401,9 +1258,6 @@ class TestFourFourThree:
 #    Section 1.1.
 
 
-
-
-
 # Miller                        Informational                    [Page 24]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -1455,11 +1309,6 @@ class TestFourFourThree:
 #                        Figure 39: JWS Signing Input
 
 
-
-
-
-
-
 # Miller                        Informational                    [Page 25]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -1504,16 +1353,6 @@ class TestFourFourThree:
 #    }
 
 #                  Figure 42: General JWS JSON Serialization
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 26]
@@ -1570,8 +1409,6 @@ class TestFourFourThree:
 #                    Figure 44: JWS Protected Header JSON
 
 
-
-
 # Miller                        Informational                    [Page 27]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -1621,11 +1458,6 @@ class TestFourFourThree:
 
 #    The JWS Compact Serialization is not presented because it does not
 #    support this use case.
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 28]
@@ -1683,7 +1515,6 @@ class TestFourFourThree:
 #    Section 1.1.
 
 
-
 # Miller                        Informational                    [Page 29]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -1735,11 +1566,6 @@ class TestFourFourThree:
 #                 Figure 53: JWS Signature, base64url-encoded
 
 
-
-
-
-
-
 # Miller                        Informational                    [Page 30]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -1779,21 +1605,6 @@ class TestFourFourThree:
 #    }
 
 #                  Figure 54: General JWS JSON Serialization
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 31]
@@ -1851,7 +1662,6 @@ class TestFourFourThree:
 #       *  "HS256" for the third signature
 
 
-
 # Miller                        Informational                    [Page 32]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -1896,16 +1706,6 @@ class TestFourFourThree:
 #    UgeW91IG1pZ2h0IGJlIHN3ZXB0IG9mZiB0by4
 
 #                        Figure 59: JWS Signing Input
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 33]
@@ -1959,11 +1759,6 @@ class TestFourFourThree:
 #             Figure 62: Signature #2 JWS Unprotected Header JSON
 
 
-
-
-
-
-
 # Miller                        Informational                    [Page 34]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -2004,20 +1799,6 @@ class TestFourFourThree:
 #    }
 
 #                        Figure 65: Signature #2 JSON
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 35]
@@ -2067,15 +1848,6 @@ class TestFourFourThree:
 #               Figure 69: JWS Signature #3, base64url-encoded
 
 
-
-
-
-
-
-
-
-
-
 # Miller                        Informational                    [Page 36]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -2106,30 +1878,6 @@ class TestFourFourThree:
 #    The JWS Compact Serialization is not presented because it does not
 #    support this use case; the flattened JWS JSON Serialization is not
 #    presented because there is more than one signature.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 37]
@@ -2179,13 +1927,6 @@ class TestFourFourThree:
 #    }
 
 #                  Figure 71: General JWS JSON Serialization
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 38]
@@ -2241,9 +1982,6 @@ class TestFourFourThree:
 #    o  RSA public key; this example uses the key from Figure 73.
 
 
-
-
-
 # Miller                        Informational                    [Page 39]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -2297,9 +2035,6 @@ class TestFourFourThree:
 #                 Figure 73: RSA 2048-Bit Key, in JWK Format
 
 
-
-
-
 # Miller                        Informational                    [Page 40]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -2339,21 +2074,6 @@ class TestFourFourThree:
 #    MBs9M8XL223Fg47xlGsMXdfuY-4jaqVw
 
 #                 Figure 76: Encrypted Key, base64url-encoded
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 41]
@@ -2411,7 +2131,6 @@ class TestFourFourThree:
 #              Figure 80: Authentication Tag, base64url-encoded
 
 
-
 # Miller                        Informational                    [Page 42]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -2458,16 +2177,6 @@ class TestFourFourThree:
 #                    Figure 81: JWE Compact Serialization
 
 
-
-
-
-
-
-
-
-
-
-
 # Miller                        Informational                    [Page 43]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -2503,25 +2212,6 @@ class TestFourFourThree:
 #    }
 
 #                  Figure 82: General JWE JSON Serialization
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 44]
@@ -2572,12 +2262,6 @@ class TestFourFourThree:
 
 #    Note that whitespace is added for readability as described in
 #    Section 1.1.
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 45]
@@ -2635,7 +2319,6 @@ class TestFourFourThree:
 #          Y46J961Y2LRnreVwAGNw53p07Db8yD_92pDa97vqcZOdgtybH9q6uma-
 
 
-
 # Miller                        Informational                    [Page 46]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -2688,8 +2371,6 @@ class TestFourFourThree:
 
 #    o  Initialization Vector; this example uses the Initialization Vector
 #       from Figure 86.
-
-
 
 
 # Miller                        Informational                    [Page 47]
@@ -2746,8 +2427,6 @@ class TestFourFourThree:
 #             Figure 89: JWE Protected Header, base64url-encoded
 
 
-
-
 # Miller                        Informational                    [Page 48]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -2796,14 +2475,6 @@ class TestFourFourThree:
 #    o  Authentication Tag (Figure 91)
 
 
-
-
-
-
-
-
-
-
 # Miller                        Informational                    [Page 49]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -2839,25 +2510,6 @@ class TestFourFourThree:
 #    UCGiqJxhBI3IFVdPalHHvA
 
 #                    Figure 92: JWE Compact Serialization
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 50]
@@ -2900,20 +2552,6 @@ class TestFourFourThree:
 #    }
 
 #                  Figure 93: General JWE JSON Serialization
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 51]
@@ -2963,13 +2601,6 @@ class TestFourFourThree:
 #    A common use of password-based encryption is the import/export of
 #    keys.  Therefore, this example uses a JWK Set for the Plaintext
 #    content instead of the Plaintext from Figure 72.
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 52]
@@ -3027,7 +2658,6 @@ class TestFourFourThree:
 #                        Figure 95: Plaintext Content
 
 
-
 # Miller                        Informational                    [Page 53]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -3083,7 +2713,6 @@ class TestFourFourThree:
 #                Figure 100: Encrypted Key, base64url-encoded
 
 
-
 # Miller                        Informational                    [Page 54]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -3129,17 +2758,6 @@ class TestFourFourThree:
 #    o  Authentication Tag from Figure 104.
 
 
-
-
-
-
-
-
-
-
-
-
-
 # Miller                        Informational                    [Page 55]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -3176,26 +2794,6 @@ class TestFourFourThree:
 #    o  Authentication Tag (Figure 104)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # Miller                        Informational                    [Page 56]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -3224,32 +2822,6 @@ class TestFourFourThree:
 #    0HlwodAhOCILG5SQ2LQ9dg
 
 #                    Figure 105: JWE Compact Serialization
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 57]
@@ -3284,28 +2856,6 @@ class TestFourFourThree:
 #    }
 
 #                 Figure 106: General JWE JSON Serialization
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 58]
@@ -3361,9 +2911,6 @@ class TestFourFourThree:
 #    o  EC public key; this example uses the public key from Figure 108.
 
 
-
-
-
 # Miller                        Informational                    [Page 59]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -3416,8 +2963,6 @@ class TestFourFourThree:
 
 #    o  Ephemeral EC private key on the same curve as the EC public key;
 #       this example uses the private key from Figure 111.
-
-
 
 
 # Miller                        Informational                    [Page 60]
@@ -3475,7 +3020,6 @@ class TestFourFourThree:
 #                    Figure 113: JWE Protected Header JSON
 
 
-
 # Miller                        Informational                    [Page 61]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -3517,19 +3061,6 @@ class TestFourFourThree:
 #    WuGzxmcreYjpHGJoa17EBg
 
 #              Figure 116: Authentication Tag, base64url-encoded
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 62]
@@ -3576,18 +3107,6 @@ class TestFourFourThree:
 #                    Figure 117: JWE Compact Serialization
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 # Miller                        Informational                    [Page 63]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -3620,28 +3139,6 @@ class TestFourFourThree:
 #    }
 
 #                 Figure 118: General JWE JSON Serialization
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 64]
@@ -3686,18 +3183,6 @@ class TestFourFourThree:
 
 #    Note that whitespace is added for readability as described in
 #    Section 1.1.
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 65]
@@ -3746,14 +3231,6 @@ class TestFourFourThree:
 
 #    NOTE: The Content Encryption Key (CEK) is not randomly generated;
 #    instead, it is determined using ECDH-ES key agreement.
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 66]
@@ -3806,10 +3283,6 @@ class TestFourFourThree:
 #    }
 
 #                    Figure 124: JWE Protected Header JSON
-
-
-
-
 
 
 # Miller                        Informational                    [Page 67]
@@ -3867,7 +3340,6 @@ class TestFourFourThree:
 #    o  Authentication Tag (Figure 116)
 
 
-
 # Miller                        Informational                    [Page 68]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -3923,7 +3395,6 @@ class TestFourFourThree:
 #                 Figure 129: General JWE JSON Serialization
 
 
-
 # Miller                        Informational                    [Page 69]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -3971,13 +3442,6 @@ class TestFourFourThree:
 #    refa467QzzKx6QAB
 
 #            Figure 131: Initialization Vector, base64url-encoded
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 70]
@@ -4034,8 +3498,6 @@ class TestFourFourThree:
 #              Figure 135: Authentication Tag, base64url-encoded
 
 
-
-
 # Miller                        Informational                    [Page 71]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -4074,22 +3536,6 @@ class TestFourFourThree:
 #    vbb32Xvllea2OtmHAdccRQ
 
 #                    Figure 136: JWE Compact Serialization
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 72]
@@ -4137,17 +3583,6 @@ class TestFourFourThree:
 #    o  "enc" parameter of "A128CBC-HS256".
 
 
-
-
-
-
-
-
-
-
-
-
-
 # Miller                        Informational                    [Page 73]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -4191,17 +3626,6 @@ class TestFourFourThree:
 #    KkYT0GX_2jHlfqN_
 
 #    Figure 141: Initialization Vector for Key Wrapping, base64url-encoded
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 74]
@@ -4250,16 +3674,6 @@ class TestFourFourThree:
 #                    Figure 144: JWE Protected Header JSON
 
 
-
-
-
-
-
-
-
-
-
-
 # Miller                        Informational                    [Page 75]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -4300,20 +3714,6 @@ class TestFourFourThree:
 #    DKW7jrb4WaRSNfbXVPlT5g
 
 #              Figure 147: Authentication Tag, base64url-encoded
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 76]
@@ -4359,19 +3759,6 @@ class TestFourFourThree:
 #                    Figure 148: JWE Compact Serialization
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 # Miller                        Informational                    [Page 77]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -4403,29 +3790,6 @@ class TestFourFourThree:
 #    }
 
 #                 Figure 149: General JWE JSON Serialization
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 78]
@@ -4476,12 +3840,6 @@ class TestFourFourThree:
 #    o  "alg" parameter of "A128KW".
 
 #    o  "enc" parameter of "A128GCM".
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 79]
@@ -4535,11 +3893,6 @@ class TestFourFourThree:
 #       Figure 155, encoded to base64url [RFC4648] as Figure 156.
 
 
-
-
-
-
-
 # Miller                        Informational                    [Page 80]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -4587,15 +3940,6 @@ class TestFourFourThree:
 #              Figure 158: Authentication Tag, base64url-encoded
 
 
-
-
-
-
-
-
-
-
-
 # Miller                        Informational                    [Page 81]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -4634,22 +3978,6 @@ class TestFourFourThree:
 #    ER7MWJZ1FBI_NKvn7Zb1Lw
 
 #                    Figure 159: JWE Compact Serialization
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 82]
@@ -4700,12 +4028,6 @@ class TestFourFourThree:
 #    }
 
 #                Figure 161: Flattened JWE JSON Serialization
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 83]
@@ -4759,11 +4081,6 @@ class TestFourFourThree:
 #             Figure 162: Compressed Plaintext, base64url-encoded
 
 
-
-
-
-
-
 # Miller                        Informational                    [Page 84]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -4807,17 +4124,6 @@ class TestFourFourThree:
 #    04MjE2MGFkOTFhYzgiLCJlbmMiOiJBMTI4R0NNIiwiemlwIjoiREVGIn0
 
 #             Figure 167: JWE Protected Header, base64url-encoded
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 85]
@@ -4867,15 +4173,6 @@ class TestFourFourThree:
 #    o  Authentication Tag (Figure 169)
 
 
-
-
-
-
-
-
-
-
-
 # Miller                        Informational                    [Page 86]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -4920,16 +4217,6 @@ class TestFourFourThree:
 #    }
 
 #                 Figure 171: General JWE JSON Serialization
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 87]
@@ -4981,11 +4268,6 @@ class TestFourFourThree:
 
 #    o  Additional Authenticated Data; this example uses a vCard [RFC7095]
 #       from Figure 173, serialized to UTF-8.
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 88]
@@ -5042,8 +4324,6 @@ class TestFourFourThree:
 #        Figure 176: Additional Authenticated Data, base64url-encoded
 
 
-
-
 # Miller                        Informational                    [Page 89]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -5097,9 +4377,6 @@ class TestFourFourThree:
 #    o  Authentication Tag from Figure 181.
 
 
-
-
-
 # Miller                        Informational                    [Page 90]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -5138,24 +4415,6 @@ class TestFourFourThree:
 #    support this use case.
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # Miller                        Informational                    [Page 91]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -5189,27 +4448,6 @@ class TestFourFourThree:
 #    }
 
 #                 Figure 182: General JWE JSON Serialization
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 92]
@@ -5266,8 +4504,6 @@ class TestFourFourThree:
 #    o  Content encryption algorithm; this example uses "A128GCM".
 
 
-
-
 # Miller                        Informational                    [Page 93]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -5317,11 +4553,6 @@ class TestFourFourThree:
 #    eyJlbmMiOiJBMTI4R0NNIn0
 
 #             Figure 188: JWE Protected Header, base64url-encoded
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 94]
@@ -5377,9 +4608,6 @@ class TestFourFourThree:
 #    support this use case.
 
 
-
-
-
 # Miller                        Informational                    [Page 95]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -5420,20 +4648,6 @@ class TestFourFourThree:
 #    }
 
 #                 Figure 192: General JWE JSON Serialization
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 96]
@@ -5487,11 +4701,6 @@ class TestFourFourThree:
 #    o  Content encryption algorithm; this example uses "A128GCM".
 
 
-
-
-
-
-
 # Miller                        Informational                    [Page 97]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -5543,11 +4752,6 @@ class TestFourFourThree:
 #    o  Authentication Tag from Figure 198.
 
 
-
-
-
-
-
 # Miller                        Informational                    [Page 98]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -5593,15 +4797,6 @@ class TestFourFourThree:
 #    o  Ciphertext (Figure 197)
 
 #    o  Authentication Tag (Figure 198)
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                    [Page 99]
@@ -5658,8 +4853,6 @@ class TestFourFourThree:
 #                Figure 201: Flattened JWE JSON Serialization
 
 
-
-
 # Miller                        Informational                   [Page 100]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -5713,9 +4906,6 @@ class TestFourFourThree:
 #       from Figure 203.
 
 
-
-
-
 # Miller                        Informational                   [Page 101]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -5755,21 +4945,6 @@ class TestFourFourThree:
 #    }
 
 #     Figure 205: Recipient #1 JWE Per-Recipient Unprotected Header JSON
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                   [Page 102]
@@ -5817,17 +4992,6 @@ class TestFourFourThree:
 #      Figure 207: Ephemeral Private Key for Recipient #2, in JWK Format
 
 
-
-
-
-
-
-
-
-
-
-
-
 # Miller                        Informational                   [Page 103]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -5865,23 +5029,6 @@ class TestFourFourThree:
 #    }
 
 #     Figure 209: Recipient #2 JWE Per-Recipient Unprotected Header JSON
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                   [Page 104]
@@ -5937,9 +5084,6 @@ class TestFourFourThree:
 #    o  Authentication Tag from Figure 213.
 
 
-
-
-
 # Miller                        Informational                   [Page 105]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -5992,10 +5136,6 @@ class TestFourFourThree:
 #       Figure 216, encoded to base64url [RFC4648] as Figure 217.
 
 
-
-
-
-
 # Miller                        Informational                   [Page 106]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -6041,17 +5181,6 @@ class TestFourFourThree:
 #              Figure 219: Authentication Tag, base64url-encoded
 
 
-
-
-
-
-
-
-
-
-
-
-
 # Miller                        Informational                   [Page 107]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -6087,25 +5216,6 @@ class TestFourFourThree:
 #    The JWE Compact Serialization is not presented because it does not
 #    support this use case; the flattened JWE JSON Serialization is not
 #    presented because there is more than one recipient.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                   [Page 108]
@@ -6163,7 +5273,6 @@ class TestFourFourThree:
 #      "protected": "eyJlbmMiOiJBMTI4Q0JDLUhTMjU2In0",
 
 
-
 # Miller                        Informational                   [Page 109]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -6217,7 +5326,6 @@ class TestFourFourThree:
 #    }
 
 #                 Figure 222: Payload Content, in JSON Format
-
 
 
 # Miller                        Informational                   [Page 110]
@@ -6274,8 +5382,6 @@ class TestFourFourThree:
 #             Figure 224: RSA 2048-Bit Private Key, in JWK Format
 
 
-
-
 # Miller                        Informational                   [Page 111]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -6322,14 +5428,6 @@ class TestFourFourThree:
 #    o  Payload content (Figure 223)
 
 #    o  Signature (Figure 227)
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                   [Page 112]
@@ -6385,9 +5483,6 @@ class TestFourFourThree:
 #            Figure 230: Initialization Vector, base64url-encoded
 
 
-
-
-
 # Miller                        Informational                   [Page 113]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -6432,16 +5527,6 @@ class TestFourFourThree:
 #    eyJhbGciOiJSU0EtT0FFUCIsImN0eSI6IkpXVCIsImVuYyI6IkExMjhHQ00ifQ
 
 #             Figure 233: JWE Protected Header, base64url-encoded
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                   [Page 114]
@@ -6497,9 +5582,6 @@ class TestFourFourThree:
 #    o  Authentication Tag (Figure 235)
 
 
-
-
-
 # Miller                        Informational                   [Page 115]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -6539,21 +5621,6 @@ class TestFourFourThree:
 #    KnIKEhN8U-3C9s4gtSpjSw
 
 #                    Figure 236: JWE Compact Serialization
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                   [Page 116]
@@ -6603,15 +5670,6 @@ class TestFourFourThree:
 #                 Figure 237: General JWE JSON Serialization
 
 
-
-
-
-
-
-
-
-
-
 # Miller                        Informational                   [Page 117]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -6652,20 +5710,6 @@ class TestFourFourThree:
 #    }
 
 #                Figure 238: Flattened JWE JSON Serialization
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                   [Page 118]
@@ -6718,12 +5762,6 @@ class TestFourFourThree:
 #               <http://www.rfc-editor.org/info/rfc4648>.
 
 
-
-
-
-
-
-
 # Miller                        Informational                   [Page 119]
 
 # RFC 7520                      JOSE Cookbook                     May 2015
@@ -6763,21 +5801,6 @@ class TestFourFourThree:
 #    Cisco Systems, Inc.
 
 #    EMail: mamille2@cisco.com
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Miller                        Informational                   [Page 120]

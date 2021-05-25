@@ -4,7 +4,7 @@ try:
     from jose.backends.cryptography_backend import CryptographyRSAKey
     from jose.backends.rsa_backend import RSAKey as PurePythonRSAKey
 except ImportError:
-    PurePythonRSAKey = CryptographyRSAKey =  None
+    PurePythonRSAKey = CryptographyRSAKey = None
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWEError
 
@@ -20,10 +20,9 @@ ENCODINGS = ("PKCS1", "PKCS8")
 @pytest.mark.backend_compatibility
 @pytest.mark.skipif(
     None in (PurePythonRSAKey, CryptographyRSAKey),
-    reason="Multiple crypto backends not available for backend compatibility tests"
+    reason="Multiple crypto backends not available for backend compatibility tests",
 )
 class TestBackendRsaCompatibility:
-
     @pytest.mark.parametrize("BackendSign", CRYPTO_BACKENDS)
     @pytest.mark.parametrize("BackendVerify", CRYPTO_BACKENDS)
     @pytest.mark.parametrize("private_key", PRIVATE_KEYS)
@@ -31,14 +30,14 @@ class TestBackendRsaCompatibility:
         key_sign = BackendSign(private_key, ALGORITHMS.RS256)
         key_verify = BackendVerify(private_key, ALGORITHMS.RS256).public_key()
 
-        msg = b'test'
+        msg = b"test"
         sig = key_sign.sign(msg)
 
         # valid signature
         assert key_verify.verify(msg, sig)
 
         # invalid signature
-        assert not key_verify.verify(msg, b'n' * 64)
+        assert not key_verify.verify(msg, b"n" * 64)
 
     @pytest.mark.parametrize("encoding", ENCODINGS)
     @pytest.mark.parametrize("BackendFrom", CRYPTO_BACKENDS)
@@ -64,8 +63,9 @@ class TestBackendRsaCompatibility:
         key2_pem = key2.to_pem(pem_format=encoding).strip()
 
         import base64
-        a = base64.b64decode(key1_pem[key1_pem.index(b"\n"):key1_pem.rindex(b"\n")])
-        b = base64.b64decode(key2_pem[key2_pem.index(b"\n"):key2_pem.rindex(b"\n")])
+
+        a = base64.b64decode(key1_pem[key1_pem.index(b"\n") : key1_pem.rindex(b"\n")])
+        b = base64.b64decode(key2_pem[key2_pem.index(b"\n") : key2_pem.rindex(b"\n")])
         assert a == b
 
         assert key1_pem == key2_pem
@@ -105,13 +105,15 @@ class TestBackendRsaCompatibility:
     @pytest.mark.parametrize("algorithm", filter(lambda x: x in ALGORITHMS.SUPPORTED, ALGORITHMS.RSA_KW))
     @pytest.mark.parametrize("private_key", PRIVATE_KEYS)
     def test_key_wrap_parity(self, backend_wrap, backend_unwrap, private_key, algorithm):
-        if algorithm in (ALGORITHMS.RSA_OAEP, ALGORITHMS.RSA_OAEP_256) \
-                and PurePythonRSAKey in (backend_wrap, backend_unwrap):
+        if algorithm in (ALGORITHMS.RSA_OAEP, ALGORITHMS.RSA_OAEP_256) and PurePythonRSAKey in (
+            backend_wrap,
+            backend_unwrap,
+        ):
             pytest.skip("Pure RSA does not support OAEP")
         key_wrap = backend_wrap(private_key, algorithm).public_key()
         key_unwrap = backend_unwrap(private_key, algorithm)
 
-        unwrapped_key = b'test'
+        unwrapped_key = b"test"
         wrapped_key = key_wrap.wrap_key(unwrapped_key)
 
         # verify unwrap to original key
@@ -119,4 +121,4 @@ class TestBackendRsaCompatibility:
         assert actual == unwrapped_key
 
         with pytest.raises(JWEError):
-            key_unwrap.unwrap_key(b'n' * 64)
+            key_unwrap.unwrap_key(b"n" * 64)
