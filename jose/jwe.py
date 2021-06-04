@@ -1,12 +1,8 @@
 import binascii
 import json
 import zlib
+from collections.abc import Mapping
 from struct import pack
-
-try:
-    from collections.abc import Mapping  # Python 3
-except ImportError:
-    from collections import Mapping  # Python 2, will be deprecated in Python 3.8
 
 from . import jwk
 from .backends import get_random_bytes

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # python-jose documentation build configuration file, created by
 # sphinx-quickstart on Thu May  7 13:48:43 2015.
 #
