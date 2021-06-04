@@ -27,6 +27,11 @@ class ECDSAECKey(Key):
         SHA384: ecdsa.curves.NIST384p,
         SHA512: ecdsa.curves.NIST521p,
     }
+    CURVE_NAMES = (
+        (ecdsa.curves.NIST256p, "P-256"),
+        (ecdsa.curves.NIST384p, "P-384"),
+        (ecdsa.curves.NIST521p, "P-521"),
+    )
 
     def __init__(self, key, algorithm):
         if algorithm not in ALGORITHMS.EC:
@@ -119,12 +124,12 @@ class ECDSAECKey(Key):
             public_key = self.prepared_key.get_verifying_key()
         else:
             public_key = self.prepared_key
-
-        crv = {
-            ecdsa.curves.NIST256p: "P-256",
-            ecdsa.curves.NIST384p: "P-384",
-            ecdsa.curves.NIST521p: "P-521",
-        }[self.prepared_key.curve]
+        crv = None
+        for key, value in self.CURVE_NAMES:
+            if key == self.prepared_key.curve:
+                crv = value
+        if not crv:
+            raise KeyError(f"Can't match {self.prepared_key.curve}")
 
         # Calculate the key size in bytes. Section 6.2.1.2 and 6.2.1.3 of
         # RFC7518 prescribes that the 'x', 'y' and 'd' parameters of the curve
