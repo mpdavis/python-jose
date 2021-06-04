@@ -3,7 +3,7 @@ python-jose
 
 A JOSE implementation in Python
 
-|Github Actions CI Status| |Coverage Status| |Docs| |style|
+|pypi| |Github Actions CI Status| |Coverage Status| |Docs| |style|
 
 Docs are available on ReadTheDocs_.
 
@@ -27,7 +27,7 @@ Installation
 Cryptographic Backends
 ----------------------
 
-As of 3.2.0, python-jose implements three different cryptographic backends.
+As of 3.3.0, python-jose implements three different cryptographic backends.
 The backend must be selected as an extra when installing python-jose.
 If you do not select a backend, the native-python backend will be installed.
 
@@ -84,6 +84,9 @@ Thanks
 
 This library was originally based heavily on the work of the folks over at PyJWT_.
 
+.. |pypi| image:: https://img.shields.io/pypi/v/python-jose?style=flat-square
+   :target: https://pypi.org/project/python-jose/
+   :alt: PyPI
 .. |Github Actions CI Status| image:: https://github.com/mpdavis/python-jose/workflows/main/badge.svg?branch=master
    :target: https://github.com/mpdavis/python-jose/actions?workflow=main
    :alt: Github Actions CI Status
