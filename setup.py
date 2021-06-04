@@ -67,7 +67,7 @@ setup(
         "setuptools>=39.2.0",
     ],
     tests_require=[
-        "ecdsa != 0.15,<0.17.0",
+        "ecdsa != 0.15",
         "pytest",
         "pytest-cov",
         "pytest-runner",
