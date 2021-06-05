@@ -1,5 +1,23 @@
 # Changelog #
 
+## 3.3.0 -- 2020-06-04 ##
+
+### News ###
+
+* Remove support for python 2.7 & 3.5
+* Add support for Python 3.9
+* Remove PyCrypto backend
+* Fix deprecation warning from cryptography backend
+
+### Housekeeping ###
+
+* Switched from Travis CI to Github Actions
+* Added iSort & Black
+* Run CI Tests under Mac OS & Windows.
+* Updated Syntax to use Python 3.6+
+* Upgrade to latest pytest, remove used dev requirements.
+
+
 ## 3.2.0 -- 2020-07-29 ##
 
 ### News ###
