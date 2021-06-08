@@ -1,6 +1,6 @@
 import json
+import typing as tp
 from calendar import timegm
-from collections.abc import Mapping
 from datetime import datetime, timedelta
 
 from jose import jws
@@ -9,8 +9,16 @@ from .constants import ALGORITHMS
 from .exceptions import ExpiredSignatureError, JWSError, JWTClaimsError, JWTError
 from .utils import calculate_at_hash, timedelta_total_seconds
 
+TKey = tp.Union[str, tp.Dict[str, tp.Any]]
 
-def encode(claims, key, algorithm=ALGORITHMS.HS256, headers=None, access_token=None):
+
+def encode(
+    claims: tp.Dict[str, tp.Any],
+    key: TKey,
+    algorithm: str = ALGORITHMS.HS256,
+    headers: tp.Optional[tp.Dict[str, str]] = None,
+    access_token: tp.Optional[str] = None,
+) -> str:
     """Encodes a claims set and returns a JWT string.
 
     JWTs are JWS signed objects with a few reserved claims.
@@ -53,7 +61,16 @@ def encode(claims, key, algorithm=ALGORITHMS.HS256, headers=None, access_token=N
     return jws.sign(claims, key, headers=headers, algorithm=algorithm)
 
 
-def decode(token, key, algorithms=None, options=None, audience=None, issuer=None, subject=None, access_token=None):
+def decode(
+    token: str,
+    key: TKey,
+    algorithms: tp.Optional[tp.Union[str, tp.List[str]]] = None,
+    options: tp.Optional[tp.Dict[str, tp.Union[bool, int]]] = None,
+    audience: tp.Optional[str] = None,
+    issuer: tp.Optional[str] = None,
+    subject: tp.Optional[str] = None,
+    access_token: tp.Optional[str] = None,
+) -> tp.Dict[str, tp.Any]:
     """Verifies a JWT string's signature and validates reserved claims.
 
     Args:
@@ -136,7 +153,7 @@ def decode(token, key, algorithms=None, options=None, audience=None, issuer=None
     if options:
         defaults.update(options)
 
-    verify_signature = defaults.get("verify_signature", True)
+    verify_signature = bool(defaults.get("verify_signature", True))
 
     try:
         payload = jws.verify(token, key, algorithms, verify=verify_signature)
@@ -151,7 +168,7 @@ def decode(token, key, algorithms=None, options=None, audience=None, issuer=None
     except ValueError as e:
         raise JWTError("Invalid payload string: %s" % e)
 
-    if not isinstance(claims, Mapping):
+    if not isinstance(claims, dict):
         raise JWTError("Invalid payload string: must be a json object")
 
     _validate_claims(
@@ -167,7 +184,7 @@ def decode(token, key, algorithms=None, options=None, audience=None, issuer=None
     return claims
 
 
-def get_unverified_header(token):
+def get_unverified_header(token: str):
     """Returns the decoded headers without verification of any kind.
 
     Args:
@@ -187,7 +204,7 @@ def get_unverified_header(token):
     return headers
 
 
-def get_unverified_headers(token):
+def get_unverified_headers(token: str):
     """Returns the decoded headers without verification of any kind.
 
     This is simply a wrapper of get_unverified_header() for backwards
@@ -205,7 +222,7 @@ def get_unverified_headers(token):
     return get_unverified_header(token)
 
 
-def get_unverified_claims(token):
+def get_unverified_claims(token: str):
     """Returns the decoded claims without verification of any kind.
 
     Args:
@@ -227,7 +244,7 @@ def get_unverified_claims(token):
     except ValueError as e:
         raise JWTError("Invalid claims string: %s" % e)
 
-    if not isinstance(claims, Mapping):
+    if not isinstance(claims, dict):
         raise JWTError("Invalid claims string: must be a json object")
 
     return claims

@@ -1,6 +1,7 @@
 import binascii
 import json
-from collections.abc import Iterable, Mapping
+import typing as tp
+from collections.abc import Iterable
 
 from jose import jwk
 from jose.backends.base import Key
@@ -8,8 +9,10 @@ from jose.constants import ALGORITHMS
 from jose.exceptions import JWSError, JWSSignatureError
 from jose.utils import base64url_decode, base64url_encode
 
+TPayload = tp.Union[str, bytes, tp.Dict[str, tp.Any]]
 
-def sign(payload, key, headers=None, algorithm=ALGORITHMS.HS256):
+
+def sign(payload: TPayload, key: tp.Union[str, tp.Dict[str, tp.Any]], headers=None, algorithm=ALGORITHMS.HS256):
     """Signs a claims set and returns a JWS string.
 
     Args:
@@ -45,7 +48,7 @@ def sign(payload, key, headers=None, algorithm=ALGORITHMS.HS256):
     return signed_output
 
 
-def verify(token, key, algorithms, verify=True):
+def verify(token: tp.Union[bytes, str], key, algorithms, verify: bool = True) -> bytes:
     """Verifies a JWS string's signature.
 
     Args:
@@ -63,7 +66,7 @@ def verify(token, key, algorithms, verify=True):
     Examples:
 
         >>> token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
-        >>> jws.verify(token, 'secret', algorithms='HS256')
+        >>> jws.verify(token, 'secret', algorithms='HS256')  # b'{"a":"b"}'
 
     """
 
@@ -75,7 +78,7 @@ def verify(token, key, algorithms, verify=True):
     return payload
 
 
-def get_unverified_header(token):
+def get_unverified_header(token: str):
     """Returns the decoded headers without verification of any kind.
 
     Args:
@@ -91,7 +94,7 @@ def get_unverified_header(token):
     return header
 
 
-def get_unverified_headers(token):
+def get_unverified_headers(token: str):
     """Returns the decoded headers without verification of any kind.
 
     This is simply a wrapper of get_unverified_header() for backwards
@@ -109,7 +112,7 @@ def get_unverified_headers(token):
     return get_unverified_header(token)
 
 
-def get_unverified_claims(token):
+def get_unverified_claims(token: str):
     """Returns the decoded claims without verification of any kind.
 
     Args:
@@ -140,8 +143,8 @@ def _encode_header(algorithm, additional_headers=None):
     return base64url_encode(json_header)
 
 
-def _encode_payload(payload):
-    if isinstance(payload, Mapping):
+def _encode_payload(payload: TPayload) -> bytes:
+    if isinstance(payload, dict):
         try:
             payload = json.dumps(
                 payload,
@@ -188,7 +191,7 @@ def _load(jwt):
     except ValueError as e:
         raise JWSError("Invalid header string: %s" % e)
 
-    if not isinstance(header, Mapping):
+    if not isinstance(header, dict):
         raise JWSError("Invalid header string: must be a json object")
 
     try:
@@ -201,7 +204,7 @@ def _load(jwt):
     except (TypeError, binascii.Error):
         raise JWSError("Invalid crypto padding")
 
-    return (header, payload, signing_input, signature)
+    return header, payload, signing_input, signature
 
 
 def _sig_matches_keys(keys, signing_input, signature, alg):
@@ -226,7 +229,7 @@ def _get_keys(key):
     except Exception:
         pass
 
-    if isinstance(key, Mapping):
+    if isinstance(key, dict):
         if "keys" in key:
             # JWK Set per RFC 7517
             return key["keys"]
