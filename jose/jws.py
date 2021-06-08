@@ -149,6 +149,8 @@ def _encode_payload(payload):
             ).encode("utf-8")
         except ValueError:
             pass
+    elif isinstance(payload, str):
+        payload = payload.encode("utf-8")
 
     return base64url_encode(payload)
 

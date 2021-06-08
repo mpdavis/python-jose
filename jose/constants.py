@@ -1,4 +1,7 @@
 import hashlib
+import typing as tp
+
+from .backends.base import Key
 
 
 class Algorithms:
@@ -83,7 +86,7 @@ class Algorithms:
         ES512: hashlib.sha512,
     }
 
-    KEYS = {}
+    KEYS: tp.Dict[str, tp.Type[Key]] = {}
 
 
 ALGORITHMS = Algorithms()
