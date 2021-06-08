@@ -10,12 +10,10 @@ from .constants import ALGORITHMS, ZIPS
 from .exceptions import JWEError, JWEParseError
 from .utils import base64url_decode, base64url_encode, ensure_binary
 
-TKey = tp.Union[str, tp.Dict[str, tp.Any]]
-
 
 def encrypt(
     plaintext: tp.Union[bytes, str],
-    key: TKey,
+    key: tp.Union[str, tp.Dict[str, tp.Any]],
     encryption: tp.Optional[str] = ALGORITHMS.A256GCM,
     algorithm: tp.Optional[str] = ALGORITHMS.DIR,
     zip: tp.Optional[str] = None,
@@ -25,7 +23,7 @@ def encrypt(
     """Encrypts plaintext and returns a JWE cmpact serialization string.
 
     Args:
-        plaintext (bytes): A bytes object to encrypt
+        plaintext (bytes or str): A bytes object to encrypt
         key (str or dict): The key(s) to use for encrypting the content. Can be
             individual JWK or JWK set.
         encryption (str, optional): The content encryption algorithm used to
@@ -65,15 +63,15 @@ def encrypt(
         key_obj, algorithm, encryption, zip, plaintext, encoded_header
     )
 
-    jwe_string = _jwe_compact_serialize(encoded_header, enc_cek, iv, cipher_text, auth_tag)
-    return jwe_string
+    jwe_bytes_string = _jwe_compact_serialize(encoded_header, enc_cek, iv, cipher_text, auth_tag)
+    return jwe_bytes_string
 
 
-def decrypt(jwe_str: tp.Union[bytes, str], key: TKey) -> tp.Optional[bytes]:
+def decrypt(jwe_str: tp.Union[bytes, str], key: tp.Union[str, tp.Dict[str, tp.Any]]) -> tp.Optional[bytes]:
     """Decrypts a JWE compact serialized string and returns the plaintext.
 
     Args:
-        jwe_str (str): A JWE to be decrypt.
+        jwe_str (bytes or str): A JWE to be decrypt.
         key (str or dict): A key to attempt to decrypt the payload with. Can be
             individual JWK or JWK set.
 

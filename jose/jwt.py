@@ -9,12 +9,10 @@ from .constants import ALGORITHMS
 from .exceptions import ExpiredSignatureError, JWSError, JWTClaimsError, JWTError
 from .utils import calculate_at_hash, timedelta_total_seconds
 
-TKey = tp.Union[str, tp.Dict[str, tp.Any]]
-
 
 def encode(
     claims: tp.Dict[str, tp.Any],
-    key: TKey,
+    key: tp.Union[str, tp.Dict[str, tp.Any]],
     algorithm: str = ALGORITHMS.HS256,
     headers: tp.Optional[tp.Dict[str, str]] = None,
     access_token: tp.Optional[str] = None,
@@ -24,7 +22,7 @@ def encode(
     JWTs are JWS signed objects with a few reserved claims.
 
     Args:
-        claims (dict): A claims set to sign
+        claims (dict or str): A claims set to sign
         key (str or dict): The key to use for signing the claim set. Can be
             individual JWK or JWK set.
         algorithm (str, optional): The algorithm to use for signing the
@@ -63,7 +61,7 @@ def encode(
 
 def decode(
     token: str,
-    key: TKey,
+    key: tp.Union[str, tp.Dict[str, tp.Any]],
     algorithms: tp.Optional[tp.Union[str, tp.List[str]]] = None,
     options: tp.Optional[tp.Dict[str, tp.Union[bool, int]]] = None,
     audience: tp.Optional[str] = None,

@@ -48,14 +48,20 @@ def sign(payload: TPayload, key: tp.Union[str, tp.Dict[str, tp.Any]], headers=No
     return signed_output
 
 
-def verify(token: tp.Union[bytes, str], key, algorithms, verify: bool = True) -> bytes:
+def verify(
+    token: tp.Union[bytes, str],
+    key: tp.Union[str, tp.Dict[str, tp.Any]],
+    algorithms: tp.Optional[tp.Union[str, tp.Iterable[str]]],
+    verify: bool = True,
+) -> bytes:
     """Verifies a JWS string's signature.
 
     Args:
-        token (str): A signed JWS to be verified.
+        token (str or bytes): A signed JWS to be verified.
         key (str or dict): A key to attempt to verify the payload with. Can be
             individual JWK or JWK set.
         algorithms (str or list): Valid algorithms that should be used to verify the JWS.
+        verify (bool): Verify signature or not
 
     Returns:
         str: The str representation of the payload, assuming the signature is valid.
