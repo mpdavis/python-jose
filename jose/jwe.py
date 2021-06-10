@@ -1,8 +1,8 @@
 import binascii
 import json
-import typing as tp
 import zlib
 from struct import pack
+from typing import Any, Dict, Optional, Union
 
 from . import jwk
 from .backends import get_random_bytes
@@ -12,13 +12,13 @@ from .utils import base64url_decode, base64url_encode, ensure_binary
 
 
 def encrypt(
-    plaintext: tp.Union[bytes, str],
-    key: tp.Union[str, tp.Dict[str, tp.Any]],
-    encryption: tp.Optional[str] = ALGORITHMS.A256GCM,
-    algorithm: tp.Optional[str] = ALGORITHMS.DIR,
-    zip: tp.Optional[str] = None,
-    cty: tp.Optional[str] = None,
-    kid: tp.Optional[str] = None,
+    plaintext: Union[bytes, str],
+    key: Union[str, Dict[str, Any]],
+    encryption: Optional[str] = ALGORITHMS.A256GCM,
+    algorithm: Optional[str] = ALGORITHMS.DIR,
+    zip: Optional[str] = None,
+    cty: Optional[str] = None,
+    kid: Optional[str] = None,
 ) -> bytes:
     """Encrypts plaintext and returns a JWE cmpact serialization string.
 
@@ -67,7 +67,7 @@ def encrypt(
     return jwe_bytes_string
 
 
-def decrypt(jwe_str: tp.Union[bytes, str], key: tp.Union[str, tp.Dict[str, tp.Any]]) -> tp.Optional[bytes]:
+def decrypt(jwe_str: Union[bytes, str], key: Union[str, Dict[str, Any]]) -> Optional[bytes]:
     """Decrypts a JWE compact serialized string and returns the plaintext.
 
     Args:
@@ -199,7 +199,7 @@ def decrypt(jwe_str: tp.Union[bytes, str], key: tp.Union[str, tp.Dict[str, tp.An
     return plain_text if cek_valid else None
 
 
-def get_unverified_header(jwe_str: str):
+def get_unverified_header(jwe_str: str) -> Dict[str, Any]:
     """Returns the decoded headers without verification of any kind.
 
     Args:

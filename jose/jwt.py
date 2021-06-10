@@ -1,7 +1,8 @@
 import json
-import typing as tp
+import sys
 from calendar import timegm
 from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional, Union
 
 from jose import jws
 
@@ -9,13 +10,39 @@ from .constants import ALGORITHMS
 from .exceptions import ExpiredSignatureError, JWSError, JWTClaimsError, JWTError
 from .utils import calculate_at_hash, timedelta_total_seconds
 
+if sys.version_info >= (3, 8):
+    from typing import TypedDict
+else:
+    from typing_extensions import TypedDict
+
+
+class DecodeOptions(TypedDict, total=False):
+    verify_signature: bool
+    verify_aud: bool
+    verify_iat: bool
+    verify_exp: bool
+    verify_nbf: bool
+    verify_iss: bool
+    verify_sub: bool
+    verify_jti: bool
+    verify_at_hash: bool
+    require_aud: bool
+    require_iat: bool
+    require_exp: bool
+    require_nbf: bool
+    require_iss: bool
+    require_sub: bool
+    require_jti: bool
+    require_at_hash: bool
+    leeway: int
+
 
 def encode(
-    claims: tp.Dict[str, tp.Any],
-    key: tp.Union[str, tp.Dict[str, tp.Any]],
+    claims: Dict[str, Any],
+    key: Union[str, Dict[str, Any]],
     algorithm: str = ALGORITHMS.HS256,
-    headers: tp.Optional[tp.Dict[str, str]] = None,
-    access_token: tp.Optional[str] = None,
+    headers: Optional[Dict[str, str]] = None,
+    access_token: Optional[str] = None,
 ) -> str:
     """Encodes a claims set and returns a JWT string.
 
@@ -61,14 +88,14 @@ def encode(
 
 def decode(
     token: str,
-    key: tp.Union[str, tp.Dict[str, tp.Any]],
-    algorithms: tp.Optional[tp.Union[str, tp.List[str]]] = None,
-    options: tp.Optional[tp.Dict[str, tp.Union[bool, int]]] = None,
-    audience: tp.Optional[str] = None,
-    issuer: tp.Optional[str] = None,
-    subject: tp.Optional[str] = None,
-    access_token: tp.Optional[str] = None,
-) -> tp.Dict[str, tp.Any]:
+    key: Union[str, Dict[str, Any]],
+    algorithms: Optional[Union[str, List[str]]] = None,
+    options: Optional[DecodeOptions] = None,
+    audience: Optional[str] = None,
+    issuer: Optional[str] = None,
+    subject: Optional[str] = None,
+    access_token: Optional[str] = None,
+) -> Dict[str, Any]:
     """Verifies a JWT string's signature and validates reserved claims.
 
     Args:
@@ -127,26 +154,26 @@ def decode(
 
     """
 
-    defaults = {
-        "verify_signature": True,
-        "verify_aud": True,
-        "verify_iat": True,
-        "verify_exp": True,
-        "verify_nbf": True,
-        "verify_iss": True,
-        "verify_sub": True,
-        "verify_jti": True,
-        "verify_at_hash": True,
-        "require_aud": False,
-        "require_iat": False,
-        "require_exp": False,
-        "require_nbf": False,
-        "require_iss": False,
-        "require_sub": False,
-        "require_jti": False,
-        "require_at_hash": False,
-        "leeway": 0,
-    }
+    defaults = DecodeOptions(
+        verify_signature=True,
+        verify_aud=True,
+        verify_iat=True,
+        verify_exp=True,
+        verify_nbf=True,
+        verify_iss=True,
+        verify_sub=True,
+        verify_jti=True,
+        verify_at_hash=True,
+        require_aud=False,
+        require_iat=False,
+        require_exp=False,
+        require_nbf=False,
+        require_iss=False,
+        require_sub=False,
+        require_jti=False,
+        require_at_hash=False,
+        leeway=0,
+    )
 
     if options:
         defaults.update(options)
@@ -182,7 +209,7 @@ def decode(
     return claims
 
 
-def get_unverified_header(token: str):
+def get_unverified_header(token: str) -> Dict[str, Any]:
     """Returns the decoded headers without verification of any kind.
 
     Args:
@@ -202,7 +229,7 @@ def get_unverified_header(token: str):
     return headers
 
 
-def get_unverified_headers(token: str):
+def get_unverified_headers(token: str) -> Dict[str, Any]:
     """Returns the decoded headers without verification of any kind.
 
     This is simply a wrapper of get_unverified_header() for backwards
@@ -220,7 +247,7 @@ def get_unverified_headers(token: str):
     return get_unverified_header(token)
 
 
-def get_unverified_claims(token: str):
+def get_unverified_claims(token: str) -> Dict[str, Any]:
     """Returns the decoded claims without verification of any kind.
 
     Args:

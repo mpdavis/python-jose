@@ -1,4 +1,4 @@
-import typing as tp
+from typing import Any, Dict, Optional, Type, Union
 
 from jose.backends.base import Key
 from jose.constants import ALGORITHMS
@@ -30,7 +30,7 @@ except ImportError:
     pass
 
 
-def get_key(algorithm: str) -> tp.Optional[tp.Type[Key]]:
+def get_key(algorithm: str) -> Optional[Type[Key]]:
     if algorithm in ALGORITHMS.KEYS:
         return ALGORITHMS.KEYS[algorithm]
     elif algorithm in ALGORITHMS.HMAC:  # noqa: F811
@@ -54,7 +54,7 @@ def get_key(algorithm: str) -> tp.Optional[tp.Type[Key]]:
     return None
 
 
-def register_key(algorithm: str, key_class: tp.Type[Key]):
+def register_key(algorithm: str, key_class: Type[Key]) -> bool:
     if not issubclass(key_class, Key):
         raise TypeError("Key class is not a subclass of jwk.Key")
     ALGORITHMS.KEYS[algorithm] = key_class
@@ -62,7 +62,7 @@ def register_key(algorithm: str, key_class: tp.Type[Key]):
     return True
 
 
-def construct(key_data: tp.Union[str, tp.Dict[str, tp.Any]], algorithm: tp.Optional[str] = None):
+def construct(key_data: Union[str, Dict[str, Any]], algorithm: Optional[str] = None) -> Key:
     """
     Construct a Key object for the given algorithm with the given
     key_data.

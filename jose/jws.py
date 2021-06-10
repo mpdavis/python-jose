@@ -1,7 +1,7 @@
 import binascii
 import json
-import typing as tp
 from collections.abc import Iterable
+from typing import Any, Dict, Optional, Union
 
 from jose import jwk
 from jose.backends.base import Key
@@ -9,10 +9,10 @@ from jose.constants import ALGORITHMS
 from jose.exceptions import JWSError, JWSSignatureError
 from jose.utils import base64url_decode, base64url_encode
 
-TPayload = tp.Union[str, bytes, tp.Dict[str, tp.Any]]
+TPayload = Union[str, bytes, Dict[str, Any]]
 
 
-def sign(payload: TPayload, key: tp.Union[str, tp.Dict[str, tp.Any]], headers=None, algorithm=ALGORITHMS.HS256):
+def sign(payload: TPayload, key: Union[str, Dict[str, Any]], headers=None, algorithm=ALGORITHMS.HS256):
     """Signs a claims set and returns a JWS string.
 
     Args:
@@ -49,9 +49,9 @@ def sign(payload: TPayload, key: tp.Union[str, tp.Dict[str, tp.Any]], headers=No
 
 
 def verify(
-    token: tp.Union[bytes, str],
-    key: tp.Union[str, tp.Dict[str, tp.Any]],
-    algorithms: tp.Optional[tp.Union[str, tp.Iterable[str]]],
+    token: Union[bytes, str],
+    key: Union[str, Dict[str, Any]],
+    algorithms: Optional[Union[str, Iterable[str]]],
     verify: bool = True,
 ) -> bytes:
     """Verifies a JWS string's signature.
@@ -84,7 +84,7 @@ def verify(
     return payload
 
 
-def get_unverified_header(token: str):
+def get_unverified_header(token: str) -> Dict[str, Any]:
     """Returns the decoded headers without verification of any kind.
 
     Args:
@@ -100,7 +100,7 @@ def get_unverified_header(token: str):
     return header
 
 
-def get_unverified_headers(token: str):
+def get_unverified_headers(token: str) -> Dict[str, Any]:
     """Returns the decoded headers without verification of any kind.
 
     This is simply a wrapper of get_unverified_header() for backwards
@@ -118,7 +118,7 @@ def get_unverified_headers(token: str):
     return get_unverified_header(token)
 
 
-def get_unverified_claims(token: str):
+def get_unverified_claims(token: str) -> bytes:
     """Returns the decoded claims without verification of any kind.
 
     Args:
