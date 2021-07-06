@@ -1,7 +1,9 @@
 import binascii
 import json
 from collections.abc import Iterable
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict
+from typing import Iterable as TIterable
+from typing import Optional, Union
 
 from jose import jwk
 from jose.backends.base import Key
@@ -51,7 +53,7 @@ def sign(payload: TPayload, key: Union[str, Dict[str, Any]], headers=None, algor
 def verify(
     token: Union[bytes, str],
     key: Union[str, Dict[str, Any]],
-    algorithms: Optional[Union[str, Iterable[str]]],
+    algorithms: Optional[Union[str, TIterable[str]]],
     verify: bool = True,
 ) -> bytes:
     """Verifies a JWS string's signature.
