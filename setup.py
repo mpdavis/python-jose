@@ -39,6 +39,7 @@ setup(
     keywords="jose jws jwe jwt json web token security signing",
     url="http://github.com/mpdavis/python-jose",
     packages=get_packages("jose"),
+    package_data={"jose": ["py.typed"]},
     long_description=long_description,
     project_urls={
         "Documentation": "https://python-jose.readthedocs.io/en/latest/",
