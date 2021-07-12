@@ -67,7 +67,7 @@ def base64url_decode(input):
     """Helper method to base64url_decode a string.
 
     Args:
-        input (str): A base64url_encoded string to decode.
+        input (bytes): A base64url_encoded string (bytes) to decode.
 
     """
     rem = len(input) % 4
@@ -82,7 +82,7 @@ def base64url_encode(input):
     """Helper method to base64url_encode a string.
 
     Args:
-        input (str): A base64url_encoded string to encode.
+        input (bytes): A base64url_encoded string (bytes) to encode.
 
     """
     return base64.urlsafe_b64encode(input).replace(b"=", b"")
