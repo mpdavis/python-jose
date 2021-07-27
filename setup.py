@@ -66,6 +66,7 @@ setup(
         "pytest-runner",
         "setuptools>=39.2.0",
     ],
+    python_requires=">=3.6",
     tests_require=[
         "ecdsa != 0.15",
         "pytest",
