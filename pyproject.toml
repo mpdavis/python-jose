@@ -15,13 +15,6 @@ use_parentheses = true
 ensure_newline_before_comments = true
 line_length = 120
 
-
 [tool.black]
 line-length = 120
 target-version = ["py38"]
-
-
-[tool.mypy]
-python_version = "3.8"
-warn_unused_ignores = false
-ignore_missing_imports = true
