@@ -23,23 +23,22 @@ def encrypt(
     """Encrypts plaintext and returns a JWE cmpact serialization string.
 
     Args:
-        plaintext (bytes or str): A bytes object to encrypt
-        key (str or dict): The key(s) to use for encrypting the content. Can be
-            individual JWK or JWK set.
-        encryption (str, optional): The content encryption algorithm used to
+        plaintext: A bytes object to encrypt
+        key: The key(s) to use for encrypting the content. Can be individual JWK or JWK set.
+        encryption: The content encryption algorithm used to
             perform authenticated encryption on the plaintext to produce the
             ciphertext and the Authentication Tag.  Defaults to A256GCM.
-        algorithm (str, optional): The cryptographic algorithm used
-            to encrypt or determine the value of the CEK.  Defaults to dir.
-        zip (str, optional): The compression algorithm) applied to the
+        algorithm: The cryptographic algorithm used to encrypt or determine the value of the CEK.
+            Defaults to dir.
+        zip: The compression algorithm) applied to the
             plaintext before encryption. Defaults to None.
-        cty (str, optional): The media type for the secured content.
+        cty: The media type for the secured content.
             See http://www.iana.org/assignments/media-types/media-types.xhtml
-        kid (str, optional): Key ID for the provided key
+        kid: Key ID for the provided key
 
     Returns:
-        bytes: The string representation of the header, encrypted key,
-            initialization vector, ciphertext, and authentication tag.
+        The string representation of the header, encrypted key, initialization vector,
+        ciphertext, and authentication tag.
 
     Raises:
         JWEError: If there is an error signing the token.
@@ -74,12 +73,11 @@ def decrypt(
     """Decrypts a JWE compact serialized string and returns the plaintext.
 
     Args:
-        jwe_str (bytes or str): A JWE to be decrypt.
-        key (str or dict): A key to attempt to decrypt the payload with. Can be
-            individual JWK or JWK set.
+        jwe_str: A JWE to be decrypt.
+        key: A key to attempt to decrypt the payload with. Can be individual JWK or JWK set.
 
     Returns:
-        bytes: The plaintext bytes, assuming the authentication tag is valid.
+        The plaintext bytes, assuming the authentication tag is valid.
 
     Raises:
         JWEError: If there is an exception verifying the token.
@@ -206,10 +204,10 @@ def get_unverified_header(jwe_str: str) -> Dict[str, Any]:
     """Returns the decoded headers without verification of any kind.
 
     Args:
-        jwe_str (str): A compact serialized JWE to decode the headers from.
+        jwe_str: A compact serialized JWE to decode the headers from.
 
     Returns:
-        dict: The dict representation of the JWE headers.
+        The dict representation of the JWE headers.
 
     Raises:
         JWEError: If there is an exception decoding the JWE.
@@ -600,7 +598,7 @@ def _jwe_compact_serialize(encoded_header, encrypted_cek, iv, cipher_text, auth_
         auth_tag (bytes): JWE Auth Tag
 
     Returns:
-        (str): JWE compact serialized string
+        (bytes): JWE compact serialized string
     """
     cipher_text = ensure_binary(cipher_text)
     encoded_encrypted_cek = base64url_encode(encrypted_cek)

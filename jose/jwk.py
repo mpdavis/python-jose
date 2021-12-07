@@ -67,8 +67,7 @@ def construct(
     algorithm: Optional[str] = None
 ) -> Key:
     """
-    Construct a Key object for the given algorithm with the given
-    key_data.
+    Construct a Key object for the given algorithm with the given key_data.
     """
 
     # Allow for pulling the algorithm off of the passed in jwk.

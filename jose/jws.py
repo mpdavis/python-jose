@@ -59,14 +59,13 @@ def verify(
     """Verifies a JWS string's signature.
 
     Args:
-        token (str or bytes): A signed JWS to be verified.
-        key (str or dict): A key to attempt to verify the payload with. Can be
-            individual JWK or JWK set.
-        algorithms (str or list): Valid algorithms that should be used to verify the JWS.
-        verify (bool): Verify signature or not
+        token: A signed JWS to be verified.
+        key: A key to attempt to verify the payload with. Can be individual JWK or JWK set.
+        algorithms: Valid algorithms that should be used to verify the JWS.
+        verify: Verify signature or not
 
     Returns:
-        str: The str representation of the payload, assuming the signature is valid.
+        The str representation of the payload, assuming the signature is valid.
 
     Raises:
         JWSError: If there is an exception verifying a token.
@@ -90,10 +89,10 @@ def get_unverified_header(token: str) -> Dict[str, Any]:
     """Returns the decoded headers without verification of any kind.
 
     Args:
-        token (str): A signed JWS to decode the headers from.
+        token: A signed JWS to decode the headers from.
 
     Returns:
-        dict: The dict representation of the token headers.
+        The dict representation of the token headers.
 
     Raises:
         JWSError: If there is an exception decoding the token.
@@ -109,10 +108,10 @@ def get_unverified_headers(token: str) -> Dict[str, Any]:
     compatibility.
 
     Args:
-        token (str): A signed JWS to decode the headers from.
+        token: A signed JWS to decode the headers from.
 
     Returns:
-        dict: The dict representation of the token headers.
+        The dict representation of the token headers.
 
     Raises:
         JWSError: If there is an exception decoding the token.
@@ -124,10 +123,10 @@ def get_unverified_claims(token: str) -> bytes:
     """Returns the decoded claims without verification of any kind.
 
     Args:
-        token (str): A signed JWS to decode the headers from.
+        token: A signed JWS to decode the headers from.
 
     Returns:
-        str: The str representation of the token claims.
+        The str representation of the token claims.
 
     Raises:
         JWSError: If there is an exception decoding the token.
