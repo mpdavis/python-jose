@@ -2,7 +2,7 @@ import json
 import sys
 from calendar import timegm
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, Iterable
 
 from jose import jws
 
@@ -39,7 +39,7 @@ class DecodeOptions(TypedDict, total=False):
 
 def encode(
     claims: Dict[str, Any],
-    key: Union[str, Dict[str, Any]],
+    key: Union[str, Dict[str, Any], bytes, Iterable],
     algorithm: str = ALGORITHMS.HS256,
     headers: Optional[Dict[str, str]] = None,
     access_token: Optional[str] = None,
@@ -88,7 +88,7 @@ def encode(
 
 def decode(
     token: str,
-    key: Union[str, Dict[str, Any]],
+    key: Union[str, Dict[str, Any], bytes, Iterable],
     algorithms: Optional[Union[str, List[str]]] = None,
     options: Optional[DecodeOptions] = None,
     audience: Optional[str] = None,

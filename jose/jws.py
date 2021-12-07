@@ -14,7 +14,7 @@ from jose.utils import base64url_decode, base64url_encode
 TPayload = Union[str, bytes, Dict[str, Any]]
 
 
-def sign(payload: TPayload, key: Union[str, Dict[str, Any]], headers=None, algorithm=ALGORITHMS.HS256):
+def sign(payload: TPayload, key: Union[str, Dict[str, Any], bytes, Iterable], headers=None, algorithm=ALGORITHMS.HS256):
     """Signs a claims set and returns a JWS string.
 
     Args:
@@ -52,7 +52,7 @@ def sign(payload: TPayload, key: Union[str, Dict[str, Any]], headers=None, algor
 
 def verify(
     token: Union[bytes, str],
-    key: Union[str, Dict[str, Any]],
+    key: Union[str, Dict[str, Any], bytes, Iterable],
     algorithms: Optional[Union[str, TIterable[str]]],
     verify: bool = True,
 ) -> bytes:

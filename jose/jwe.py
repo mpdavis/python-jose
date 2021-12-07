@@ -2,7 +2,7 @@ import binascii
 import json
 import zlib
 from struct import pack
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional, Union, Iterable
 
 from . import jwk
 from .backends import get_random_bytes
@@ -13,7 +13,7 @@ from .utils import base64url_decode, base64url_encode, ensure_binary
 
 def encrypt(
     plaintext: Union[bytes, str],
-    key: Union[str, Dict[str, Any]],
+    key: Union[str, Dict[str, Any], bytes, Iterable],
     encryption: Optional[str] = ALGORITHMS.A256GCM,
     algorithm: Optional[str] = ALGORITHMS.DIR,
     zip: Optional[str] = None,
@@ -67,7 +67,10 @@ def encrypt(
     return jwe_bytes_string
 
 
-def decrypt(jwe_str: Union[bytes, str], key: Union[str, Dict[str, Any]]) -> Optional[bytes]:
+def decrypt(
+    jwe_str: Union[bytes, str],
+    key: Union[str, Dict[str, Any], bytes, Iterable]
+) -> Optional[bytes]:
     """Decrypts a JWE compact serialized string and returns the plaintext.
 
     Args:

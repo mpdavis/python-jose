@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Type, Union
+from typing import Any, Dict, Optional, Type, Union, Iterable
 
 from jose.backends.base import Key
 from jose.constants import ALGORITHMS
@@ -62,7 +62,10 @@ def register_key(algorithm: str, key_class: Type[Key]) -> bool:
     return True
 
 
-def construct(key_data: Union[str, Dict[str, Any]], algorithm: Optional[str] = None) -> Key:
+def construct(
+    key_data: Union[str, Dict[str, Any], bytes, Iterable],
+    algorithm: Optional[str] = None
+) -> Key:
     """
     Construct a Key object for the given algorithm with the given
     key_data.
@@ -73,9 +76,9 @@ def construct(key_data: Union[str, Dict[str, Any]], algorithm: Optional[str] = N
         algorithm = key_data.get("alg", None)
 
     if not algorithm:
-        raise JWKError("Unable to find an algorithm for key: %s" % key_data)
+        raise JWKError("Unable to find an algorithm for key: %r" % key_data)
 
     key_class = get_key(algorithm)
     if not key_class:
-        raise JWKError("Unable to find an algorithm for key: %s" % key_data)
+        raise JWKError("Unable to find an algorithm for key: %r" % key_data)
     return key_class(key_data, algorithm)
