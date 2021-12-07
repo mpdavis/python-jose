@@ -1,3 +1,12 @@
+[build-system]
+requires = [
+    "setuptools >= 39.2.0",
+    "wheel >= 0.29.0",
+]
+build-backend = 'setuptools.build_meta'
+
+
+# TODO: move configuration to setup.cfg when available
 [tool.isort]
 multi_line_output = 3
 include_trailing_comma = true
