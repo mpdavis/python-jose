@@ -1,4 +1,5 @@
 import json
+import typing
 import warnings
 
 import pytest
@@ -75,6 +76,19 @@ class TestJWS:
         with pytest.raises(JWSError):
             jws.sign(payload, "secret", algorithm="RS256")
 
+    def test_custom_json_encoder(self):
+        class MyEncoder(json.JSONEncoder):
+            def default(self, o):
+                if isinstance(o, MySet):
+                    return list(o)
+                return json.JSONEncoder.default(self, o)
+
+        class MySet(typing.Set):
+            pass
+
+        payload = {"custom": MySet({1, 2, 3})}
+        jws.sign(payload, "secret", algorithm="HS256", encoder_cls=MyEncoder)
+
     @pytest.mark.parametrize(
         "key",
         [
@@ -126,7 +140,6 @@ class TestHMAC:
             jws.sign(payload, "secret", algorithm="SOMETHING")
 
     def test_add_headers(self, payload):
-
         additional_headers = {"test": "header"}
 
         expected_headers = {
