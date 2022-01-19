@@ -1,6 +1,7 @@
 from jose.backends.base import Key
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWKError
+from jose.utils import base64url_decode
 
 try:
     from jose.backends import RSAKey  # noqa: F401
@@ -76,4 +77,9 @@ def construct(key_data, algorithm=None):
     key_class = get_key(algorithm)
     if not key_class:
         raise JWKError("Unable to find an algorithm for key: %s" % key_data)
-    return key_class(key_data, algorithm)
+
+    try:
+        rv = key_class(key_data, algorithm)
+    except JWKError:
+        rv = key_class(base64url_decode(key_data), algorithm)
+    return rv
