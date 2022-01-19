@@ -87,8 +87,15 @@ class CryptographyECKey(Key):
                     key = load_pem_public_key(key, self.cryptography_backend())
                 except ValueError:
                     key = load_pem_private_key(key, password=None, backend=self.cryptography_backend())
-            except Exception as e:
-                raise JWKError(e)
+            except Exception:
+                try:
+                    key = base64url_decode(key)
+                    try:
+                        key = load_pem_public_key(key, self.cryptography_backend())
+                    except ValueError:
+                        key = load_pem_private_key(key, password=None, backend=self.cryptography_backend())
+                except Exception as e:
+                    raise JWKError(e)
 
             self.prepared_key = key
             return

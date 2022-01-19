@@ -5,7 +5,7 @@ import ecdsa
 from jose.backends.base import Key
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWKError
-from jose.utils import base64_to_long, long_to_base64
+from jose.utils import base64_to_long, long_to_base64, base64url_decode
 
 
 class ECDSAECKey(Key):
@@ -62,11 +62,19 @@ class ECDSAECKey(Key):
             # a Signing Key or a Verifying Key, so we try
             # the Verifying Key first.
             try:
-                key = ecdsa.VerifyingKey.from_pem(key)
-            except ecdsa.der.UnexpectedDER:
-                key = ecdsa.SigningKey.from_pem(key)
+                try:
+                    key = ecdsa.VerifyingKey.from_pem(key)
+                except ecdsa.der.UnexpectedDER:
+                    key = ecdsa.SigningKey.from_pem(key)
             except Exception as e:
-                raise JWKError(e)
+                key = base64url_decode(key)
+                try:
+                    try:
+                        key = ecdsa.VerifyingKey.from_pem(key)
+                    except ecdsa.der.UnexpectedDER:
+                        key = ecdsa.SigningKey.from_pem(key)
+                except Exception as e:
+                    raise JWKError(e)
 
             self.prepared_key = key
             return
