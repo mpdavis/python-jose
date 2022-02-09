@@ -1,7 +1,8 @@
 import json
+import sys
 from calendar import timegm
-from collections.abc import Mapping
 from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional, Union, Iterable
 
 from jose import jws
 
@@ -9,27 +10,55 @@ from .constants import ALGORITHMS
 from .exceptions import ExpiredSignatureError, JWSError, JWTClaimsError, JWTError
 from .utils import calculate_at_hash, timedelta_total_seconds
 
+if sys.version_info >= (3, 8):
+    from typing import TypedDict
+else:
+    from typing_extensions import TypedDict
 
-def encode(claims, key, algorithm=ALGORITHMS.HS256, headers=None, access_token=None):
+
+class DecodeOptions(TypedDict, total=False):
+    verify_signature: bool
+    verify_aud: bool
+    verify_iat: bool
+    verify_exp: bool
+    verify_nbf: bool
+    verify_iss: bool
+    verify_sub: bool
+    verify_jti: bool
+    verify_at_hash: bool
+    require_aud: bool
+    require_iat: bool
+    require_exp: bool
+    require_nbf: bool
+    require_iss: bool
+    require_sub: bool
+    require_jti: bool
+    require_at_hash: bool
+    leeway: int
+
+
+def encode(
+    claims: Dict[str, Any],
+    key: Union[str, Dict[str, Any], bytes, Iterable],
+    algorithm: str = ALGORITHMS.HS256,
+    headers: Optional[Dict[str, str]] = None,
+    access_token: Optional[str] = None,
+) -> str:
     """Encodes a claims set and returns a JWT string.
 
     JWTs are JWS signed objects with a few reserved claims.
 
     Args:
-        claims (dict): A claims set to sign
-        key (str or dict): The key to use for signing the claim set. Can be
-            individual JWK or JWK set.
-        algorithm (str, optional): The algorithm to use for signing the
-            the claims.  Defaults to HS256.
-        headers (dict, optional): A set of headers that will be added to
-            the default headers.  Any headers that are added as additional
-            headers will override the default headers.
-        access_token (str, optional): If present, the 'at_hash' claim will
-            be calculated and added to the claims present in the 'claims'
-            parameter.
+        claims: A claims set to sign
+        key: The key to use for signing the claim set. Can be individual JWK or JWK set.
+        algorithm: The algorithm to use for signing the claims. Defaults to HS256.
+        headers: A set of headers that will be added to the default headers.
+            Any headers that are added as additional headers will override the default headers.
+        access_token: If present, the 'at_hash' claim will be calculated
+            and added to the claims present in the 'claims' parameter.
 
     Returns:
-        str: The string representation of the header, claims, and signature.
+        The string representation of the header, claims, and signature.
 
     Raises:
         JWTError: If there is an error encoding the claims.
@@ -53,27 +82,34 @@ def encode(claims, key, algorithm=ALGORITHMS.HS256, headers=None, access_token=N
     return jws.sign(claims, key, headers=headers, algorithm=algorithm)
 
 
-def decode(token, key, algorithms=None, options=None, audience=None, issuer=None, subject=None, access_token=None):
+def decode(
+    token: str,
+    key: Union[str, Dict[str, Any], bytes, Iterable],
+    algorithms: Optional[Union[str, List[str]]] = None,
+    options: Optional[DecodeOptions] = None,
+    audience: Optional[str] = None,
+    issuer: Optional[str] = None,
+    subject: Optional[str] = None,
+    access_token: Optional[str] = None,
+) -> Dict[str, Any]:
     """Verifies a JWT string's signature and validates reserved claims.
 
     Args:
-        token (str): A signed JWS to be verified.
-        key (str or dict): A key to attempt to verify the payload with. Can be
-            individual JWK or JWK set.
-        algorithms (str or list): Valid algorithms that should be used to verify the JWS.
-        audience (str): The intended audience of the token.  If the "aud" claim is
-            included in the claim set, then the audience must be included and must equal
-            the provided claim.
-        issuer (str or iterable): Acceptable value(s) for the issuer of the token.
+        token: A signed JWS to be verified.
+        key: A key to attempt to verify the payload with. Can be individual JWK or JWK set.
+        algorithms: Valid algorithms that should be used to verify the JWS.
+        audience: The intended audience of the token.
+            If the "aud" claim is included in the claim set,
+            then the audience must be included and must equal the provided claim.
+        issuer: Acceptable value(s) for the issuer of the token.
             If the "iss" claim is included in the claim set, then the issuer must be
             given and the claim in the token must be among the acceptable values.
-        subject (str): The subject of the token.  If the "sub" claim is
+        subject: The subject of the token.  If the "sub" claim is
             included in the claim set, then the subject must be included and must equal
             the provided claim.
-        access_token (str): An access token string. If the "at_hash" claim is included in the
-            claim set, then the access_token must be included, and it must match
-            the "at_hash" claim.
-        options (dict): A dictionary of options for skipping validation steps.
+        access_token: An access token string. If the "at_hash" claim is included in the claim set,
+            then the access_token must be included, and it must match the "at_hash" claim.
+        options: A dictionary of options for skipping validation steps.
 
             defaults = {
                 'verify_signature': True,
@@ -97,7 +133,7 @@ def decode(token, key, algorithms=None, options=None, audience=None, issuer=None
             }
 
     Returns:
-        dict: The dict representation of the claims set, assuming the signature is valid
+        The dict representation of the claims set, assuming the signature is valid
             and all requested data validation passes.
 
     Raises:
@@ -112,31 +148,31 @@ def decode(token, key, algorithms=None, options=None, audience=None, issuer=None
 
     """
 
-    defaults = {
-        "verify_signature": True,
-        "verify_aud": True,
-        "verify_iat": True,
-        "verify_exp": True,
-        "verify_nbf": True,
-        "verify_iss": True,
-        "verify_sub": True,
-        "verify_jti": True,
-        "verify_at_hash": True,
-        "require_aud": False,
-        "require_iat": False,
-        "require_exp": False,
-        "require_nbf": False,
-        "require_iss": False,
-        "require_sub": False,
-        "require_jti": False,
-        "require_at_hash": False,
-        "leeway": 0,
-    }
+    defaults = DecodeOptions(
+        verify_signature=True,
+        verify_aud=True,
+        verify_iat=True,
+        verify_exp=True,
+        verify_nbf=True,
+        verify_iss=True,
+        verify_sub=True,
+        verify_jti=True,
+        verify_at_hash=True,
+        require_aud=False,
+        require_iat=False,
+        require_exp=False,
+        require_nbf=False,
+        require_iss=False,
+        require_sub=False,
+        require_jti=False,
+        require_at_hash=False,
+        leeway=0,
+    )
 
     if options:
         defaults.update(options)
 
-    verify_signature = defaults.get("verify_signature", True)
+    verify_signature = bool(defaults.get("verify_signature", True))
 
     try:
         payload = jws.verify(token, key, algorithms, verify=verify_signature)
@@ -151,7 +187,7 @@ def decode(token, key, algorithms=None, options=None, audience=None, issuer=None
     except ValueError as e:
         raise JWTError("Invalid payload string: %s" % e)
 
-    if not isinstance(claims, Mapping):
+    if not isinstance(claims, dict):
         raise JWTError("Invalid payload string: must be a json object")
 
     _validate_claims(
@@ -167,14 +203,14 @@ def decode(token, key, algorithms=None, options=None, audience=None, issuer=None
     return claims
 
 
-def get_unverified_header(token):
+def get_unverified_header(token: str) -> Dict[str, Any]:
     """Returns the decoded headers without verification of any kind.
 
     Args:
-        token (str): A signed JWT to decode the headers from.
+        token: A signed JWT to decode the headers from.
 
     Returns:
-        dict: The dict representation of the token headers.
+        The dict representation of the token headers.
 
     Raises:
         JWTError: If there is an exception decoding the token.
@@ -187,14 +223,14 @@ def get_unverified_header(token):
     return headers
 
 
-def get_unverified_headers(token):
+def get_unverified_headers(token: str) -> Dict[str, Any]:
     """Returns the decoded headers without verification of any kind.
 
     This is simply a wrapper of get_unverified_header() for backwards
     compatibility.
 
     Args:
-        token (str): A signed JWT to decode the headers from.
+        token: A signed JWT to decode the headers from.
 
     Returns:
         dict: The dict representation of the token headers.
@@ -205,14 +241,14 @@ def get_unverified_headers(token):
     return get_unverified_header(token)
 
 
-def get_unverified_claims(token):
+def get_unverified_claims(token: str) -> Dict[str, Any]:
     """Returns the decoded claims without verification of any kind.
 
     Args:
-        token (str): A signed JWT to decode the headers from.
+        token: A signed JWT to decode the headers from.
 
     Returns:
-        dict: The dict representation of the token claims.
+        The dict representation of the token claims.
 
     Raises:
         JWTError: If there is an exception decoding the token.
@@ -227,7 +263,7 @@ def get_unverified_claims(token):
     except ValueError as e:
         raise JWTError("Invalid claims string: %s" % e)
 
-    if not isinstance(claims, Mapping):
+    if not isinstance(claims, dict):
         raise JWTError("Invalid claims string: must be a json object")
 
     return claims

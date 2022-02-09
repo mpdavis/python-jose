@@ -1,4 +1,7 @@
 import hashlib
+from typing import Dict, Type
+
+from .backends.base import Key
 
 
 class Algorithms:
@@ -83,7 +86,7 @@ class Algorithms:
         ES512: hashlib.sha512,
     }
 
-    KEYS = {}
+    KEYS: Dict[str, Type[Key]] = {}
 
 
 ALGORITHMS = Algorithms()

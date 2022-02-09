@@ -1,6 +1,9 @@
 import binascii
 import json
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable
+from typing import Any, Dict
+from typing import Iterable as TIterable
+from typing import Optional, Union
 
 from jose import jwk
 from jose.backends.base import Key
@@ -8,8 +11,10 @@ from jose.constants import ALGORITHMS
 from jose.exceptions import JWSError, JWSSignatureError
 from jose.utils import base64url_decode, base64url_encode
 
+TPayload = Union[str, bytes, Dict[str, Any]]
 
-def sign(payload, key, headers=None, algorithm=ALGORITHMS.HS256):
+
+def sign(payload: TPayload, key: Union[str, Dict[str, Any], bytes, Iterable], headers=None, algorithm=ALGORITHMS.HS256):
     """Signs a claims set and returns a JWS string.
 
     Args:
@@ -45,17 +50,22 @@ def sign(payload, key, headers=None, algorithm=ALGORITHMS.HS256):
     return signed_output
 
 
-def verify(token, key, algorithms, verify=True):
+def verify(
+    token: Union[bytes, str],
+    key: Union[str, Dict[str, Any], bytes, Iterable],
+    algorithms: Optional[Union[str, TIterable[str]]],
+    verify: bool = True,
+) -> bytes:
     """Verifies a JWS string's signature.
 
     Args:
-        token (str): A signed JWS to be verified.
-        key (str or dict): A key to attempt to verify the payload with. Can be
-            individual JWK or JWK set.
-        algorithms (str or list): Valid algorithms that should be used to verify the JWS.
+        token: A signed JWS to be verified.
+        key: A key to attempt to verify the payload with. Can be individual JWK or JWK set.
+        algorithms: Valid algorithms that should be used to verify the JWS.
+        verify: Verify signature or not
 
     Returns:
-        str: The str representation of the payload, assuming the signature is valid.
+        The str representation of the payload, assuming the signature is valid.
 
     Raises:
         JWSError: If there is an exception verifying a token.
@@ -63,7 +73,7 @@ def verify(token, key, algorithms, verify=True):
     Examples:
 
         >>> token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
-        >>> jws.verify(token, 'secret', algorithms='HS256')
+        >>> jws.verify(token, 'secret', algorithms='HS256')  # b'{"a":"b"}'
 
     """
 
@@ -75,14 +85,14 @@ def verify(token, key, algorithms, verify=True):
     return payload
 
 
-def get_unverified_header(token):
+def get_unverified_header(token: str) -> Dict[str, Any]:
     """Returns the decoded headers without verification of any kind.
 
     Args:
-        token (str): A signed JWS to decode the headers from.
+        token: A signed JWS to decode the headers from.
 
     Returns:
-        dict: The dict representation of the token headers.
+        The dict representation of the token headers.
 
     Raises:
         JWSError: If there is an exception decoding the token.
@@ -91,17 +101,17 @@ def get_unverified_header(token):
     return header
 
 
-def get_unverified_headers(token):
+def get_unverified_headers(token: str) -> Dict[str, Any]:
     """Returns the decoded headers without verification of any kind.
 
     This is simply a wrapper of get_unverified_header() for backwards
     compatibility.
 
     Args:
-        token (str): A signed JWS to decode the headers from.
+        token: A signed JWS to decode the headers from.
 
     Returns:
-        dict: The dict representation of the token headers.
+        The dict representation of the token headers.
 
     Raises:
         JWSError: If there is an exception decoding the token.
@@ -109,14 +119,14 @@ def get_unverified_headers(token):
     return get_unverified_header(token)
 
 
-def get_unverified_claims(token):
+def get_unverified_claims(token: str) -> bytes:
     """Returns the decoded claims without verification of any kind.
 
     Args:
-        token (str): A signed JWS to decode the headers from.
+        token: A signed JWS to decode the headers from.
 
     Returns:
-        str: The str representation of the token claims.
+        The str representation of the token claims.
 
     Raises:
         JWSError: If there is an exception decoding the token.
@@ -140,8 +150,8 @@ def _encode_header(algorithm, additional_headers=None):
     return base64url_encode(json_header)
 
 
-def _encode_payload(payload):
-    if isinstance(payload, Mapping):
+def _encode_payload(payload: TPayload) -> bytes:
+    if isinstance(payload, dict):
         try:
             payload = json.dumps(
                 payload,
@@ -149,6 +159,8 @@ def _encode_payload(payload):
             ).encode("utf-8")
         except ValueError:
             pass
+    elif isinstance(payload, str):
+        payload = payload.encode("utf-8")
 
     return base64url_encode(payload)
 
@@ -186,7 +198,7 @@ def _load(jwt):
     except ValueError as e:
         raise JWSError("Invalid header string: %s" % e)
 
-    if not isinstance(header, Mapping):
+    if not isinstance(header, dict):
         raise JWSError("Invalid header string: must be a json object")
 
     try:
@@ -199,7 +211,7 @@ def _load(jwt):
     except (TypeError, binascii.Error):
         raise JWSError("Invalid crypto padding")
 
-    return (header, payload, signing_input, signature)
+    return header, payload, signing_input, signature
 
 
 def _sig_matches_keys(keys, signing_input, signature, alg):
@@ -224,7 +236,7 @@ def _get_keys(key):
     except Exception:
         pass
 
-    if isinstance(key, Mapping):
+    if isinstance(key, dict):
         if "keys" in key:
             # JWK Set per RFC 7517
             return key["keys"]

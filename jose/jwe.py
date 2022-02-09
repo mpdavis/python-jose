@@ -1,8 +1,8 @@
 import binascii
 import json
 import zlib
-from collections.abc import Mapping
 from struct import pack
+from typing import Any, Dict, Optional, Union, Iterable
 
 from . import jwk
 from .backends import get_random_bytes
@@ -11,27 +11,34 @@ from .exceptions import JWEError, JWEParseError
 from .utils import base64url_decode, base64url_encode, ensure_binary
 
 
-def encrypt(plaintext, key, encryption=ALGORITHMS.A256GCM, algorithm=ALGORITHMS.DIR, zip=None, cty=None, kid=None):
+def encrypt(
+    plaintext: Union[bytes, str],
+    key: Union[str, Dict[str, Any], bytes, Iterable],
+    encryption: Optional[str] = ALGORITHMS.A256GCM,
+    algorithm: Optional[str] = ALGORITHMS.DIR,
+    zip: Optional[str] = None,
+    cty: Optional[str] = None,
+    kid: Optional[str] = None,
+) -> bytes:
     """Encrypts plaintext and returns a JWE cmpact serialization string.
 
     Args:
-        plaintext (bytes): A bytes object to encrypt
-        key (str or dict): The key(s) to use for encrypting the content. Can be
-            individual JWK or JWK set.
-        encryption (str, optional): The content encryption algorithm used to
+        plaintext: A bytes object to encrypt
+        key: The key(s) to use for encrypting the content. Can be individual JWK or JWK set.
+        encryption: The content encryption algorithm used to
             perform authenticated encryption on the plaintext to produce the
             ciphertext and the Authentication Tag.  Defaults to A256GCM.
-        algorithm (str, optional): The cryptographic algorithm used
-            to encrypt or determine the value of the CEK.  Defaults to dir.
-        zip (str, optional): The compression algorithm) applied to the
+        algorithm: The cryptographic algorithm used to encrypt or determine the value of the CEK.
+            Defaults to dir.
+        zip: The compression algorithm) applied to the
             plaintext before encryption. Defaults to None.
-        cty (str, optional): The media type for the secured content.
+        cty: The media type for the secured content.
             See http://www.iana.org/assignments/media-types/media-types.xhtml
-        kid (str, optional): Key ID for the provided key
+        kid: Key ID for the provided key
 
     Returns:
-        bytes: The string representation of the header, encrypted key,
-            initialization vector, ciphertext, and authentication tag.
+        The string representation of the header, encrypted key, initialization vector,
+        ciphertext, and authentication tag.
 
     Raises:
         JWEError: If there is an error signing the token.
@@ -39,7 +46,7 @@ def encrypt(plaintext, key, encryption=ALGORITHMS.A256GCM, algorithm=ALGORITHMS.
     Examples:
         >>> from jose import jwe
         >>> jwe.encrypt('Hello, World!', 'asecret128bitkey', algorithm='dir', encryption='A128GCM')
-        'eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..McILMB3dYsNJSuhcDzQshA.OfX9H_mcUpHDeRM4IA.CcnTWqaqxNsjT4eCaUABSg'
+        b'eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..McILMB3dYsNJSuhcDzQshA.OfX9H_mcUpHDeRM4IA.CcnTWqaqxNsjT4eCaUABSg'
 
     """
     plaintext = ensure_binary(plaintext)  # Make sure it's bytes
@@ -47,26 +54,30 @@ def encrypt(plaintext, key, encryption=ALGORITHMS.A256GCM, algorithm=ALGORITHMS.
         raise JWEError("Algorithm %s not supported." % algorithm)
     if encryption not in ALGORITHMS.SUPPORTED:
         raise JWEError("Algorithm %s not supported." % encryption)
-    key = jwk.construct(key, algorithm)
+    key_obj = jwk.construct(key, algorithm)
     encoded_header = _encoded_header(algorithm, encryption, zip, cty, kid)
 
     plaintext = _compress(zip, plaintext)
-    enc_cek, iv, cipher_text, auth_tag = _encrypt_and_auth(key, algorithm, encryption, zip, plaintext, encoded_header)
+    enc_cek, iv, cipher_text, auth_tag = _encrypt_and_auth(
+        key_obj, algorithm, encryption, zip, plaintext, encoded_header
+    )
 
-    jwe_string = _jwe_compact_serialize(encoded_header, enc_cek, iv, cipher_text, auth_tag)
-    return jwe_string
+    jwe_bytes_string = _jwe_compact_serialize(encoded_header, enc_cek, iv, cipher_text, auth_tag)
+    return jwe_bytes_string
 
 
-def decrypt(jwe_str, key):
+def decrypt(
+    jwe_str: Union[bytes, str],
+    key: Union[str, Dict[str, Any], bytes, Iterable]
+) -> Optional[bytes]:
     """Decrypts a JWE compact serialized string and returns the plaintext.
 
     Args:
-        jwe_str (str): A JWE to be decrypt.
-        key (str or dict): A key to attempt to decrypt the payload with. Can be
-            individual JWK or JWK set.
+        jwe_str: A JWE to be decrypt.
+        key: A key to attempt to decrypt the payload with. Can be individual JWK or JWK set.
 
     Returns:
-        bytes: The plaintext bytes, assuming the authentication tag is valid.
+        The plaintext bytes, assuming the authentication tag is valid.
 
     Raises:
         JWEError: If there is an exception verifying the token.
@@ -74,7 +85,7 @@ def decrypt(jwe_str, key):
     Examples:
         >>> from jose import jwe
         >>> jwe.decrypt(jwe_string, 'asecret128bitkey')
-        'Hello, World!'
+        b'Hello, World!'
     """
     header, encoded_header, encrypted_key, iv, cipher_text, auth_tag = _jwe_compact_deserialize(jwe_str)
 
@@ -98,7 +109,7 @@ def decrypt(jwe_str, key):
         raise JWEParseError("alg and enc headers are required!")
 
     # Verify that the JWE uses a key known to the recipient.
-    key = jwk.construct(key, alg)
+    key_obj = jwk.construct(key, alg)
 
     # When Direct Key Agreement or Key Agreement with Key Wrapping are
     # employed, use the key agreement algorithm to compute the value
@@ -128,10 +139,10 @@ def decrypt(jwe_str, key):
 
         # When Direct Encryption is employed, let the CEK be the shared
         # symmetric key.
-        cek_bytes = _get_key_bytes_from_key(key)
+        cek_bytes = _get_key_bytes_from_key(key_obj)
     else:
         try:
-            cek_bytes = key.unwrap_key(encrypted_key)
+            cek_bytes = key_obj.unwrap_key(encrypted_key)
 
             # Record whether the CEK could be successfully determined for this
             # recipient or not.
@@ -184,19 +195,19 @@ def decrypt(jwe_str, key):
     # If a "zip" parameter was included, uncompress the decrypted
     # plaintext using the specified compression algorithm.
     if plain_text is not None:
-        plain_text = _decompress(header.get("zip"), plain_text)
+        plain_text = _decompress(header.get("zip", None), plain_text)
 
     return plain_text if cek_valid else None
 
 
-def get_unverified_header(jwe_str):
+def get_unverified_header(jwe_str: str) -> Dict[str, Any]:
     """Returns the decoded headers without verification of any kind.
 
     Args:
-        jwe_str (str): A compact serialized JWE to decode the headers from.
+        jwe_str: A compact serialized JWE to decode the headers from.
 
     Returns:
-        dict: The dict representation of the JWE headers.
+        The dict representation of the JWE headers.
 
     Raises:
         JWEError: If there is an exception decoding the JWE.
@@ -301,7 +312,7 @@ def _jwe_compact_deserialize(jwe_bytes):
     except ValueError as e:
         raise JWEParseError(f"Invalid header string: {e}")
 
-    if not isinstance(header, Mapping):
+    if not isinstance(header, dict):
         raise JWEParseError("Invalid header string: must be a json object")
 
     try:
@@ -440,7 +451,7 @@ def _decompress(zip, compressed):
 
     Args:
         zip (str): Compression Algorithm
-        plaintext (bytes): plaintext to decompress
+        compressed (bytes): plaintext to decompress
 
     Returns:
         (bytes): Compressed plaintext
@@ -530,7 +541,7 @@ def _get_key_wrap_cek(enc, key):
 
 def _get_random_cek_bytes_for_enc(enc):
     """
-    Get the random cek bytes based on the encryptionn algorithm
+    Get the random cek bytes based on the encryption algorithm
 
     Args:
         enc (str): Encryption algorithm
@@ -556,7 +567,7 @@ def _get_random_cek_bytes_for_enc(enc):
 
 def _auth_tag(ciphertext, iv, aad, mac_key, tag_length):
     """
-    Get ann auth tag from the provided data
+    Get an auth tag from the provided data
 
     Args:
         ciphertext (bytes): Encrypted value
@@ -587,7 +598,7 @@ def _jwe_compact_serialize(encoded_header, encrypted_cek, iv, cipher_text, auth_
         auth_tag (bytes): JWE Auth Tag
 
     Returns:
-        (str): JWE compact serialized string
+        (bytes): JWE compact serialized string
     """
     cipher_text = ensure_binary(cipher_text)
     encoded_encrypted_cek = base64url_encode(encrypted_cek)
