@@ -12,11 +12,11 @@ The following algorithms are currently supported.
 +------------------+------------------------------------------------+
 | Encryption Value | Encryption Algorithm, Mode, and Auth Tag       |
 +==================+================================================+
-| A128CBC_HS256    | AES w/128 bit key in CBC mode w/SHA256 HMAC    |
+| A128CBC-HS256    | AES w/128 bit key in CBC mode w/SHA256 HMAC    |
 +------------------+------------------------------------------------+
-| A192CBC_HS384    | AES w/128 bit key in CBC mode w/SHA256 HMAC    |
+| A192CBC-HS384    | AES w/128 bit key in CBC mode w/SHA256 HMAC    |
 +------------------+------------------------------------------------+
-| A256CBC_HS512    | AES w/128 bit key in CBC mode w/SHA256 HMAC    |
+| A256CBC-HS512    | AES w/128 bit key in CBC mode w/SHA256 HMAC    |
 +------------------+------------------------------------------------+
 | A128GCM          | AES w/128 bit key in GCM mode and GCM auth tag |
 +------------------+------------------------------------------------+
@@ -35,11 +35,11 @@ The following algorithms are currently supported.
 +=================+================================================+
 | DIR             | Direct (no key wrap)                           |
 +-----------------+------------------------------------------------+
-| RSA1_5          | RSAES with PKCS1 v1.5                          |
+| RSA1-5          | RSAES with PKCS1 v1.5                          |
 +-----------------+------------------------------------------------+
-| RSA_OAEP        | RSAES OAEP using default parameters            |
+| RSA-OAEP        | RSAES OAEP using default parameters            |
 +-----------------+------------------------------------------------+
-| RSA_OAEP_256    | RSAES OAEP using SHA-256 and MGF1 with SHA-256 |
+| RSA-OAEP-256    | RSAES OAEP using SHA-256 and MGF1 with SHA-256 |
 +-----------------+------------------------------------------------+
 | A128KW          | AES Key Wrap with default IV using 128-bit key |
 +-----------------+------------------------------------------------+
