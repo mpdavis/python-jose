@@ -468,7 +468,7 @@ class CryptographyAESKey(Key):
     def encrypt(self, plain_text, aad=None):
         plain_text = ensure_binary(plain_text)
         try:
-            iv = get_random_bytes(algorithms.AES.block_size // 8)
+            iv = get_random_bytes(16 if self._mode == modes.CBC else 12)
             mode = self._mode(iv)
             if mode.name == "GCM":
                 cipher = aead.AESGCM(self._key)
