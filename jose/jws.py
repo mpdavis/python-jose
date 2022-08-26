@@ -98,7 +98,7 @@ def get_unverified_headers(token):
     compatibility.
 
     Args:
-        token (str): A signed JWS to decode the headers from.
+        token (str): A signed JWS to decode the claiams from.
 
     Returns:
         dict: The dict representation of the token headers.
