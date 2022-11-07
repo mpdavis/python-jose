@@ -13,7 +13,7 @@ from jose.backends._asn1 import (
 )
 from jose.backends.base import Key
 from jose.constants import ALGORITHMS
-from jose.exceptions import JWEError, JWKError
+from jose.exceptions import JWEError, JWKError, JWKAlgMismatchError
 from jose.utils import base64_to_long, long_to_base64
 
 ALGORITHMS.SUPPORTED.remove(ALGORITHMS.RSA_OAEP)  # RSA OAEP not supported
@@ -124,7 +124,7 @@ class RSAKey(Key):
 
     def __init__(self, key, algorithm):
         if algorithm not in ALGORITHMS.RSA:
-            raise JWKError("hash_alg: %s is not a valid hash algorithm" % algorithm)
+            raise JWKAlgMismatchError("%s is not a valid RSA algorithm" % algorithm)
 
         if algorithm in ALGORITHMS.RSA_KW and algorithm != ALGORITHMS.RSA1_5:
             raise JWKError("alg: %s is not supported by the RSA backend" % algorithm)
@@ -174,7 +174,7 @@ class RSAKey(Key):
 
     def _process_jwk(self, jwk_dict):
         if not jwk_dict.get("kty") == "RSA":
-            raise JWKError("Incorrect key type. Expected: 'RSA', Received: %s" % jwk_dict.get("kty"))
+            raise JWKAlgMismatchError("Incorrect key type. Expected: 'RSA', Received: %s" % jwk_dict.get("kty"))
 
         e = base64_to_long(jwk_dict.get("e"))
         n = base64_to_long(jwk_dict.get("n"))

@@ -4,7 +4,7 @@ import ecdsa
 
 from jose.backends.base import Key
 from jose.constants import ALGORITHMS
-from jose.exceptions import JWKError
+from jose.exceptions import JWKError, JWKAlgMismatchError
 from jose.utils import base64_to_long, long_to_base64
 
 
@@ -35,7 +35,7 @@ class ECDSAECKey(Key):
 
     def __init__(self, key, algorithm):
         if algorithm not in ALGORITHMS.EC:
-            raise JWKError("hash_alg: %s is not a valid hash algorithm" % algorithm)
+            raise JWKAlgMismatchError("%s is not a valid EC algorithm" % algorithm)
 
         self.hash_alg = {
             ALGORITHMS.ES256: self.SHA256,
@@ -75,7 +75,7 @@ class ECDSAECKey(Key):
 
     def _process_jwk(self, jwk_dict):
         if not jwk_dict.get("kty") == "EC":
-            raise JWKError("Incorrect key type. Expected: 'EC', Received: %s" % jwk_dict.get("kty"))
+            raise JWKAlgMismatchError("Incorrect key type. Expected: 'EC', Received: %s" % jwk_dict.get("kty"))
 
         if not all(k in jwk_dict for k in ["x", "y", "crv"]):
             raise JWKError("Mandatory parameters are missing")

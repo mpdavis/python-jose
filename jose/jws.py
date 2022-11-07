@@ -5,7 +5,7 @@ from collections.abc import Iterable, Mapping
 from jose import jwk
 from jose.backends.base import Key
 from jose.constants import ALGORITHMS
-from jose.exceptions import JWSError, JWSSignatureError
+from jose.exceptions import JWSError, JWSSignatureError, JWKAlgMismatchError
 from jose.utils import base64url_decode, base64url_encode
 
 
@@ -205,7 +205,10 @@ def _load(jwt):
 def _sig_matches_keys(keys, signing_input, signature, alg):
     for key in keys:
         if not isinstance(key, Key):
-            key = jwk.construct(key, alg)
+            try:
+                key = jwk.construct(key, alg)
+            except JWKAlgMismatchError:
+                continue
         try:
             if key.verify(signing_input, signature):
                 return True
