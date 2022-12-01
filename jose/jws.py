@@ -98,7 +98,7 @@ def get_unverified_headers(token):
     compatibility.
 
     Args:
-        token (str): A signed JWS to decode the claiams from.
+        token (str): A signed JWS to decode the headers from.
 
     Returns:
         dict: The dict representation of the token headers.
@@ -113,7 +113,7 @@ def get_unverified_claims(token):
     """Returns the decoded claims without verification of any kind.
 
     Args:
-        token (str): A signed JWS to decode the headers from.
+        token (str): A signed JWS to decode the claims from.
 
     Returns:
         str: The str representation of the token claims.
