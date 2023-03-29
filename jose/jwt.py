@@ -1,6 +1,9 @@
 import json
 from calendar import timegm
-from collections.abc import Mapping
+try:
+    from collections.abc import Mapping
+except ImportError:
+    from collections import Mapping
 from datetime import datetime, timedelta
 
 from jose import jws
