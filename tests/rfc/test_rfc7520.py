@@ -6,7 +6,6 @@ import pytest
 from jose.backends import RSAKey
 from jose.jws import verify
 
-
 expected_payload = b"It\xe2\x80\x99s a dangerous business, Frodo, going out your door. You step onto the road, and if you don't keep your feet, there\xe2\x80\x99s no knowing where you might be swept off to."
 
 
