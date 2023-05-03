@@ -1,6 +1,10 @@
 import binascii
 import json
-from collections.abc import Iterable, Mapping
+
+try:
+    from collections.abc import Iterable, Mapping
+except ImportError:
+    from collections import Mapping, Iterable
 
 from jose import jwk
 from jose.backends.base import Key
