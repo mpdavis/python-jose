@@ -39,10 +39,10 @@ jobs:
         pip --version
     - name: Run unit tests
       run: tox
-    - name: "Coverage report"
+    - name: Coverage report
       run:  coverage xml
-    - name: "Upload coverage to Codecov"
-      uses: "codecov/codecov-action@v3"
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
       with:
         fail_ci_if_error: true
   linting:
@@ -58,20 +58,20 @@ jobs:
         pip install -U "tox>=4.5.1,<5"
     - run: tox -e lint
   package:
-    name: "Build & verify package"
+    name: Build & verify package
     runs-on: "ubuntu-latest"
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
           python-version: "3.9"
-      - name: "Install build, check-wheel-content, and twine"
+      - name: Install build, check-wheel-content, and twine
         run: "python -m pip install build twine check-wheel-contents"
-      - name: "Build package"
+      - name: Build package
         run: "python -m build --sdist --wheel ."
-      - name: "List result"
+      - name: List result
         run: "ls -l dist"
-      - name: "Check wheel contents"
+      - name: Check wheel contents
         run: "check-wheel-contents dist/*.whl"
-      - name: "Check long_description"
+      - name: Check long_description
         run: "python -m twine check dist/*"
