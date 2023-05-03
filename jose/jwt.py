@@ -1,5 +1,6 @@
 import json
 from calendar import timegm
+
 try:
     from collections.abc import Mapping
 except ImportError:

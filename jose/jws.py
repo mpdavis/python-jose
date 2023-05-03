@@ -1,9 +1,11 @@
 import binascii
 import json
+
 try:
-    from collections.abc import Mapping, Iterable
+    from collections.abc import Iterable, Mapping
 except ImportError:
     from collections import Mapping, Iterable
+
 from jose import jwk
 from jose.backends.base import Key
 from jose.constants import ALGORITHMS
