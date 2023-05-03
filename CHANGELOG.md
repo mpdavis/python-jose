@@ -6,6 +6,13 @@
 
 * Remove support for python 3.6
 
+### Housekeeping ###
+
+* Updated Github Actions Workflows
+* Updated to use tox 4.x
+* Revise codecov integration
+
+
 ## 3.3.0 -- 2021-06-04 ##
 
 ### News ###
