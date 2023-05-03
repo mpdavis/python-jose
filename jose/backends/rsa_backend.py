@@ -221,7 +221,6 @@ class RSAKey(Key):
         return self.__class__(pyrsa.PublicKey(n=self._prepared_key.n, e=self._prepared_key.e), self._algorithm)
 
     def to_pem(self, pem_format="PKCS8"):
-
         if isinstance(self._prepared_key, pyrsa.PrivateKey):
             der = self._prepared_key.save_pkcs1(format="DER")
             if pem_format == "PKCS8":

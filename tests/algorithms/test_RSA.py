@@ -223,7 +223,6 @@ class TestPurePythonRsa:
     None in (default_backend, pyca_rsa, CryptographyRSAKey), reason="Cryptography backend not available"
 )
 def test_cryptography_RSA_key_instance():
-
     key = pyca_rsa.RSAPublicNumbers(
         int(65537),
         int(
