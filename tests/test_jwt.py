@@ -147,7 +147,6 @@ class TestJWT:
         assert decoded_headers1 == b"""{"alg":"HS256","another_key":"another_value","kid":"my-key-id","typ":"JWT"}"""
 
     def test_encode(self, claims, key):
-
         expected = (
             ("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9" ".eyJhIjoiYiJ9" ".xNtk2S0CNbCBZX_f67pFgGRugaP1xi2ICfet3nwOSxw"),
             ("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9" ".eyJhIjoiYiJ9" ".jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8"),
@@ -158,7 +157,6 @@ class TestJWT:
         assert encoded in expected
 
     def test_decode(self, claims, key):
-
         token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9" ".eyJhIjoiYiJ9" ".jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8"
 
         decoded = jwt.decode(token, key)
@@ -182,7 +180,6 @@ class TestJWT:
         pass
 
     def test_leeway_is_timedelta(self, claims, key):
-
         nbf = datetime.utcnow() + timedelta(seconds=5)
         leeway = timedelta(seconds=10)
 
@@ -196,7 +193,6 @@ class TestJWT:
         jwt.decode(token, key, options=options)
 
     def test_iat_not_int(self, key):
-
         claims = {"iat": "test"}
 
         token = jwt.encode(claims, key)
@@ -205,7 +201,6 @@ class TestJWT:
             jwt.decode(token, key)
 
     def test_nbf_not_int(self, key):
-
         claims = {"nbf": "test"}
 
         token = jwt.encode(claims, key)
@@ -214,7 +209,6 @@ class TestJWT:
             jwt.decode(token, key)
 
     def test_nbf_datetime(self, key):
-
         nbf = datetime.utcnow() - timedelta(seconds=5)
 
         claims = {"nbf": nbf}
@@ -223,7 +217,6 @@ class TestJWT:
         jwt.decode(token, key)
 
     def test_nbf_with_leeway(self, key):
-
         nbf = datetime.utcnow() + timedelta(seconds=5)
 
         claims = {
@@ -236,7 +229,6 @@ class TestJWT:
         jwt.decode(token, key, options=options)
 
     def test_nbf_in_future(self, key):
-
         nbf = datetime.utcnow() + timedelta(seconds=5)
 
         claims = {"nbf": nbf}
@@ -247,7 +239,6 @@ class TestJWT:
             jwt.decode(token, key)
 
     def test_nbf_skip(self, key):
-
         nbf = datetime.utcnow() + timedelta(seconds=5)
 
         claims = {"nbf": nbf}
@@ -262,7 +253,6 @@ class TestJWT:
         jwt.decode(token, key, options=options)
 
     def test_exp_not_int(self, key):
-
         claims = {"exp": "test"}
 
         token = jwt.encode(claims, key)
@@ -271,7 +261,6 @@ class TestJWT:
             jwt.decode(token, key)
 
     def test_exp_datetime(self, key):
-
         exp = datetime.utcnow() + timedelta(seconds=5)
 
         claims = {"exp": exp}
@@ -280,7 +269,6 @@ class TestJWT:
         jwt.decode(token, key)
 
     def test_exp_with_leeway(self, key):
-
         exp = datetime.utcnow() - timedelta(seconds=5)
 
         claims = {
@@ -293,7 +281,6 @@ class TestJWT:
         jwt.decode(token, key, options=options)
 
     def test_exp_in_past(self, key):
-
         exp = datetime.utcnow() - timedelta(seconds=5)
 
         claims = {"exp": exp}
@@ -304,7 +291,6 @@ class TestJWT:
             jwt.decode(token, key)
 
     def test_exp_skip(self, key):
-
         exp = datetime.utcnow() - timedelta(seconds=5)
 
         claims = {"exp": exp}
@@ -319,7 +305,6 @@ class TestJWT:
         jwt.decode(token, key, options=options)
 
     def test_aud_string(self, key):
-
         aud = "audience"
 
         claims = {"aud": aud}
@@ -328,7 +313,6 @@ class TestJWT:
         jwt.decode(token, key, audience=aud)
 
     def test_aud_list(self, key):
-
         aud = "audience"
 
         claims = {"aud": [aud]}
@@ -337,7 +321,6 @@ class TestJWT:
         jwt.decode(token, key, audience=aud)
 
     def test_aud_list_multiple(self, key):
-
         aud = "audience"
 
         claims = {"aud": [aud, "another"]}
@@ -346,7 +329,6 @@ class TestJWT:
         jwt.decode(token, key, audience=aud)
 
     def test_aud_list_is_strings(self, key):
-
         aud = "audience"
 
         claims = {"aud": [aud, 1]}
@@ -356,7 +338,6 @@ class TestJWT:
             jwt.decode(token, key, audience=aud)
 
     def test_aud_case_sensitive(self, key):
-
         aud = "audience"
 
         claims = {"aud": [aud]}
@@ -366,14 +347,12 @@ class TestJWT:
             jwt.decode(token, key, audience="AUDIENCE")
 
     def test_aud_empty_claim(self, claims, key):
-
         aud = "audience"
 
         token = jwt.encode(claims, key)
         jwt.decode(token, key, audience=aud)
 
     def test_aud_not_string_or_list(self, key):
-
         aud = 1
 
         claims = {"aud": aud}
@@ -383,7 +362,6 @@ class TestJWT:
             jwt.decode(token, key)
 
     def test_aud_given_number(self, key):
-
         aud = "audience"
 
         claims = {"aud": aud}
@@ -393,7 +371,6 @@ class TestJWT:
             jwt.decode(token, key, audience=1)
 
     def test_iss_string(self, key):
-
         iss = "issuer"
 
         claims = {"iss": iss}
@@ -402,7 +379,6 @@ class TestJWT:
         jwt.decode(token, key, issuer=iss)
 
     def test_iss_list(self, key):
-
         iss = "issuer"
 
         claims = {"iss": iss}
@@ -411,7 +387,6 @@ class TestJWT:
         jwt.decode(token, key, issuer=["https://issuer", "issuer"])
 
     def test_iss_tuple(self, key):
-
         iss = "issuer"
 
         claims = {"iss": iss}
@@ -420,7 +395,6 @@ class TestJWT:
         jwt.decode(token, key, issuer=("https://issuer", "issuer"))
 
     def test_iss_invalid(self, key):
-
         iss = "issuer"
 
         claims = {"iss": iss}
@@ -430,7 +404,6 @@ class TestJWT:
             jwt.decode(token, key, issuer="another")
 
     def test_sub_string(self, key):
-
         sub = "subject"
 
         claims = {"sub": sub}
@@ -439,7 +412,6 @@ class TestJWT:
         jwt.decode(token, key)
 
     def test_sub_invalid(self, key):
-
         sub = 1
 
         claims = {"sub": sub}
@@ -449,7 +421,6 @@ class TestJWT:
             jwt.decode(token, key)
 
     def test_sub_correct(self, key):
-
         sub = "subject"
 
         claims = {"sub": sub}
@@ -458,7 +429,6 @@ class TestJWT:
         jwt.decode(token, key, subject=sub)
 
     def test_sub_incorrect(self, key):
-
         sub = "subject"
 
         claims = {"sub": sub}
@@ -468,7 +438,6 @@ class TestJWT:
             jwt.decode(token, key, subject="another")
 
     def test_jti_string(self, key):
-
         jti = "JWT ID"
 
         claims = {"jti": jti}
@@ -477,7 +446,6 @@ class TestJWT:
         jwt.decode(token, key)
 
     def test_jti_invalid(self, key):
-
         jti = 1
 
         claims = {"jti": jti}

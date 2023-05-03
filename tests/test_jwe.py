@@ -136,7 +136,6 @@ class TestGetUnverifiedHeader:
 @pytest.mark.skipif(AESKey is None, reason="Test requires AES Backend")
 @pytest.mark.skipif(RSAKey is RSABackendRSAKey, reason="RSA Backend does not support all modes")
 class TestDecrypt:
-
     JWE_RSA_PACKAGES = (
         pytest.param(
             b"eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.qHxZy-MfqRjCDAieY5AoU75XRGS7S-Xx4NytHgNa5dmGh9R8q1riHyPw5Hec_D395fKqV75u1hKke5r-jgiDTaCicQjOuxM2cSaiFlUid7dk5zIucaKH84N8jMzq3PwBePmGftePM2NMCzs6RvWBFP5SnDHh95NU2Xd-rIUICA7zIBXTwNRsB2LM9c_TZv1qh59DYoiSHWy94WXJBNFqViuVLmjVz5250J6Q4uRiYKGJKEGkfLDUp18N97aw5RQ35jJF6QyO5JkeLFTA0L10QAEtM8RjBRrKYgJ6fJLCVbHHTf7EKdn6Z-4cIZKtYe2d7PPKa0ZWZvtYTuU1S6DgmA.gdSr6lSIci4GjzMsdLaK6g.4ynh6gGG4dzxpmNfZHo6o8Eqp1eXRhKzI2Tmde-IulU.cFUhLtodRUqZ1GfSO6e3pw",
