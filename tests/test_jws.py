@@ -6,7 +6,7 @@ import pytest
 from jose import jwk, jws
 from jose.backends import RSAKey
 from jose.constants import ALGORITHMS
-from jose.exceptions import JWSError
+from jose.exceptions import JWSError, JWKAlgMismatchError
 
 try:
     from jose.backends.cryptography_backend import CryptographyRSAKey
@@ -24,6 +24,16 @@ class TestJWS:
     def test_unicode_token(self):
         token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8"
         jws.verify(token, "secret", ["HS256"])
+
+    def test_hetero_keys(self):
+        class BadKey(jwk.Key):
+            def __init__(self, key, algorithm):
+                if key != "xyzw":
+                    raise JWKAlgMismatchError("%s is not a valid XYZW algorithm" % algorithm)
+
+        token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8"
+        jwk.register_key("XYZW", BadKey)
+        jws.verify(token, {"keys": [{"alg": "XYZW"}, "secret"]}, ["XYZW", "HS256"])
 
     def test_multiple_keys(self):
         old_jwk_verify = jwk.HMACKey.verify

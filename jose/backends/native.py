@@ -4,7 +4,7 @@ import os
 
 from jose.backends.base import Key
 from jose.constants import ALGORITHMS
-from jose.exceptions import JWKError
+from jose.exceptions import JWKError, JWKAlgMismatchError
 from jose.utils import base64url_decode, base64url_encode
 
 
@@ -22,7 +22,7 @@ class HMACKey(Key):
 
     def __init__(self, key, algorithm):
         if algorithm not in ALGORITHMS.HMAC:
-            raise JWKError("hash_alg: %s is not a valid hash algorithm" % algorithm)
+            raise JWKAlgMismatchError("hash_alg: %s is not a valid hash algorithm" % algorithm)
         self._algorithm = algorithm
         self._hash_alg = self.HASHES.get(algorithm)
 
@@ -53,7 +53,7 @@ class HMACKey(Key):
 
     def _process_jwk(self, jwk_dict):
         if not jwk_dict.get("kty") == "oct":
-            raise JWKError("Incorrect key type. Expected: 'oct', Received: %s" % jwk_dict.get("kty"))
+            raise JWKAlgMismatchError("Incorrect key type. Expected: 'oct', Received: %s" % jwk_dict.get("kty"))
 
         k = jwk_dict.get("k")
         k = k.encode("utf-8")
