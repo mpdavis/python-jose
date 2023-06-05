@@ -126,7 +126,6 @@ class TestHMAC:
             jws.sign(payload, "secret", algorithm="SOMETHING")
 
     def test_add_headers(self, payload):
-
         additional_headers = {"test": "header"}
 
         expected_headers = {

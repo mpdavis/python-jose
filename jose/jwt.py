@@ -1,6 +1,10 @@
 import json
 from calendar import timegm
-from collections.abc import Mapping
+
+try:
+    from collections.abc import Mapping
+except ImportError:
+    from collections import Mapping
 from datetime import datetime, timedelta
 
 from jose import jws
@@ -42,7 +46,6 @@ def encode(claims, key, algorithm=ALGORITHMS.HS256, headers=None, access_token=N
     """
 
     for time_claim in ["exp", "iat", "nbf"]:
-
         # Convert datetime to a intDate value in known time-format claims
         if isinstance(claims.get(time_claim), datetime):
             claims[time_claim] = timegm(claims[time_claim].utctimetuple())
@@ -456,7 +459,6 @@ def _validate_at_hash(claims, access_token, algorithm):
 
 
 def _validate_claims(claims, audience=None, issuer=None, subject=None, algorithm=None, access_token=None, options=None):
-
     leeway = options.get("leeway", 0)
 
     if isinstance(leeway, timedelta):

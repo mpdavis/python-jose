@@ -1,5 +1,18 @@
 # Changelog #
 
+## 3.4.0 -- UNPUBLISHED ##
+
+### News ###
+
+* Remove support for python 3.6
+
+### Housekeeping ###
+
+* Updated Github Actions Workflows
+* Updated to use tox 4.x
+* Revise codecov integration
+
+
 ## 3.3.0 -- 2021-06-04 ##
 
 ### News ###
@@ -16,7 +29,6 @@
 * Run CI Tests under Mac OS & Windows.
 * Updated Syntax to use Python 3.6+
 * Upgrade to latest pytest, remove used dev requirements.
-
 
 ## 3.2.0 -- 2020-07-29 ##
 
@@ -38,8 +50,6 @@
 ### Housekeeping ###
 
 * Fixed some typos #160, #162, and #164
-
-
 
 ## 3.1.0 -- 2019-12-10 ##
 

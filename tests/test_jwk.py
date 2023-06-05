@@ -33,7 +33,6 @@ ec_key = {
 
 class TestJWK:
     def test_interface(self):
-
         key = jwk.Key("key", "ALG")
 
         with pytest.raises(NotImplementedError):
@@ -55,7 +54,6 @@ class TestJWK:
 
     @pytest.mark.skipif(RSAKey is None, reason="RSA is not available")
     def test_invalid_jwk(self):
-
         with pytest.raises(JWKError):
             key = HMACKey(rsa_key, "HS256")
 
@@ -67,7 +65,6 @@ class TestJWK:
 
     @pytest.mark.skipif(RSAKey is None, reason="RSA is not available")
     def test_RSAKey_errors(self):
-
         rsa_key = {
             "kty": "RSA",
             "kid": "bilbo.baggins@hobbiton.example",
@@ -91,7 +88,6 @@ class TestJWK:
             key = RSAKey(rsa_key, "RS256")  # noqa: F841
 
     def test_construct_from_jwk(self):
-
         hmac_key = {
             "kty": "oct",
             "kid": "018c0ae5-4d9b-471b-bfd6-eef314bc7037",
@@ -108,7 +104,6 @@ class TestJWK:
         assert isinstance(key, jwk.Key)
 
     def test_construct_from_jwk_missing_alg(self):
-
         hmac_key = {
             "kty": "oct",
             "kid": "018c0ae5-4d9b-471b-bfd6-eef314bc7037",

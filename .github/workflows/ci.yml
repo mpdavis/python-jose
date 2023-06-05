@@ -6,73 +6,75 @@ on:
   pull_request:
     branches:
       - master
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
 jobs:
   test:
     timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "pypy3"]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "pypy3.9"]
         os: [ubuntu-latest, macos-latest, windows-latest]
         exclude:
           - os: macos-latest
-            python-version:  "pypy3"
+            python-version:  "pypy3.9"
           - os: windows-latest
-            python-version:  "pypy3"
+            python-version:  "pypy3.9"
     runs-on: ${{ matrix.os }}
     name: "${{ matrix.os }} Python: ${{ matrix.python-version }}"
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 0
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        pip install -U "pip>=21.1"
-        pip install -U setuptools
-        pip install -U "tox>=3.23.0,<4" codecov tox-gh-actions coverage
+        pip install -U "pip>=23.1.2"
+        pip install -U "tox-gh-actions==3.1.0" coverage
     - name: Log python & pip versions
       run: |
         python --version
         pip --version
     - name: Run unit tests
       run: tox
-    - name: "Coverage report"
+    - name: Coverage report
       run:  coverage xml
-    - name: "Upload coverage to Codecov"
-      uses: "codecov/codecov-action@v1"
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
       with:
-        fail_ci_if_error: true
+        fail_ci_if_error: false
   linting:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
       with:
-        python-version: 3.8
+        python-version: 3.9
     - name: Install dependencies
       run: |
         pip install -U setuptools 
-        pip install -U "tox>=3.23.0,<4"
+        pip install -U "tox>=4.5.1,<5"
     - run: tox -e lint
   package:
-    name: "Build & verify package"
+    name: Build & verify package
     runs-on: "ubuntu-latest"
     steps:
-      - uses: "actions/checkout@v2"
-      - uses: "actions/setup-python@v2"
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
         with:
-          python-version: "3.8"
-      - name: "Install build, check-wheel-content, and twine"
+          python-version: "3.9"
+      - name: Install build, check-wheel-content, and twine
         run: "python -m pip install build twine check-wheel-contents"
-      - name: "Build package"
+      - name: Build package
         run: "python -m build --sdist --wheel ."
-      - name: "List result"
+      - name: List result
         run: "ls -l dist"
-      - name: "Check wheel contents"
+      - name: Check wheel contents
         run: "check-wheel-contents dist/*.whl"
-      - name: "Check long_description"
+      - name: Check long_description
         run: "python -m twine check dist/*"
