@@ -5,6 +5,7 @@
 ### News ###
 
 * Remove support for python 3.6
+* Add support for additional headers in JWE encryption.
 
 ### Housekeeping ###
 

@@ -11,7 +11,10 @@ from .exceptions import JWEError, JWEParseError
 from .utils import base64url_decode, base64url_encode, ensure_binary
 
 
-def encrypt(plaintext, key, encryption=ALGORITHMS.A256GCM, algorithm=ALGORITHMS.DIR, zip=None, cty=None, kid=None):
+def encrypt(
+    plaintext, key, encryption=ALGORITHMS.A256GCM, algorithm=ALGORITHMS.DIR, zip=None, cty=None, kid=None,
+    additional_headers=None
+):
     """Encrypts plaintext and returns a JWE cmpact serialization string.
 
     Args:
@@ -28,6 +31,10 @@ def encrypt(plaintext, key, encryption=ALGORITHMS.A256GCM, algorithm=ALGORITHMS.
         cty (str, optional): The media type for the secured content.
             See http://www.iana.org/assignments/media-types/media-types.xhtml
         kid (str, optional): Key ID for the provided key
+        additional_headers (dict, optional): Additional JWE protected headers.
+            These headers will be added to the default headers. Any headers
+            that are added as additional headers will override the default
+            headers.
 
     Returns:
         bytes: The string representation of the header, encrypted key,
@@ -48,7 +55,7 @@ def encrypt(plaintext, key, encryption=ALGORITHMS.A256GCM, algorithm=ALGORITHMS.
     if encryption not in ALGORITHMS.SUPPORTED:
         raise JWEError("Algorithm %s not supported." % encryption)
     key = jwk.construct(key, algorithm)
-    encoded_header = _encoded_header(algorithm, encryption, zip, cty, kid)
+    encoded_header = _encoded_header(algorithm, encryption, zip, cty, kid, additional_headers)
 
     plaintext = _compress(zip, plaintext)
     enc_cek, iv, cipher_text, auth_tag = _encrypt_and_auth(key, algorithm, encryption, zip, plaintext, encoded_header)
@@ -327,7 +334,7 @@ def _jwe_compact_deserialize(jwe_bytes):
     return header, header_segment, encrypted_key, iv, ciphertext, auth_tag
 
 
-def _encoded_header(alg, enc, zip, cty, kid):
+def _encoded_header(alg, enc, zip, cty, kid, additional_headers):
     """
     Generate an appropriate JOSE header based on the values provided
     Args:
@@ -347,6 +354,9 @@ def _encoded_header(alg, enc, zip, cty, kid):
         header["cty"] = cty
     if kid:
         header["kid"] = kid
+
+    header.update(additional_headers or {})
+
     json_header = json.dumps(
         header,
         separators=(",", ":"),
