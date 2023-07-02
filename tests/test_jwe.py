@@ -173,6 +173,10 @@ class TestDecrypt:
             b"eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZDQkMtSFM1MTIifQ.Kbd5rSN1afyre2DbkXOmGKkCNZ09TfAwNpDn1Ic7_HJNS42VDx584ReiEzpyIoWek8l87h1oZL0OC0f1ceEuuTR-_rZzKNqq6t44EvXvRusSHg_mTm8qYwyJIkJsD_Zgh0HUza20X6Ypu4ZheTzw70krFYhFnBKNXzhdrf4Bbz8e7IEeR7Po2VqOzx6JPNFsJ1tRSb9r4w60-1qq0MSdl2VItvHVY4fg-bts2k2sJ_Ub8VtRLY1MzPc1rFcI10x_AD52ntW-8T_BvY8R7Ci0cLfEycGlOM-pJOtJVY4bQisx-PvLgPoKlfTMX251m_np9ImSov9edy57-jy427l28g.w5rYu_XKzUCwTScFQ3fGOA.6zntLreCPN2Eo6aLmuqYrkyF2hOBXzNlArOOJ0iZ9TA.xiF5HLIBmIE8FCog-CZwXpIUjP6XgpncwXjw--dM57I",
             id="alg: RSA-OAEP, enc: A256CBC-HS512",
         ),
+        pytest.param(  # JWE with custom headers.
+            b"eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwidGVzdC1oZWFkZXIxIjoidmFsMSIsInRlc3QtaGVhZGVyMiI6InZhbDEifQ.tZpAFnpWe-Kump0E16wE0k-7VSjY-Sdzmj3TrnuoVgaEz4dvFs8jTknUNHgsu4USzf6JrNoTB3mK8rM30z3lgsMqJ5zs4QPOvR7CuXAXdRf5Mje9cyeiJKebqumgR5P1d1D6GWrqoO9oDHBBOXcvRAkzS_siv0SAXLue7sV4e1F5re50oD2i9-FW9L-DLnFIHc_iUKjuOW00xyjxyDAw62thb2iV_ZBD8m-oz9tRxR3NQbGOvKdBOM_29lcxhVZq4Wspv3117hoyyni6KJBg8DLVuk9Rkt4DZQdZa7PcaoeHH5AIC_wsWJTI3yIuZVYri2pX3KVbrSsAz3zB9dbj8A.vyNmAMvzl7OiaPCVVfapsg.vIJcOra4VqL1MnXGjFJEtdwYEF-YW73DPAbvN7mEtso.NiXr0iwQehLqvAUUPkqfWL_N56Nu3b7rCVY7FDyuRYM",
+            id="alg: RSA-OAEP, enc: A256CBC-HS512",
+        ),
         pytest.param(
             b"eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExMjhHQ00ifQ.SUDoqix7_PhGaNeCxYEgmvZt-Bhj-EoPfnTbJpxgvdUSVk6cn2XjAJxiVHTaeM8_DPmxxeKqt-JEVljc7lUmHQpAW1Cule7ySw498OgG6q4ddpBZEPXqAHpqlfATrhGpEq0WPRZJwvbyKUd08rND1r4SePZg8sag6cvbiPbMHIzQSjGPkDwWt1P5ue7n1ySmxqGenjPlzl4g_n5wwPGG5e3RGmoiVQh2Stybp9j2fiLNzHKcO5_9BJxMR4DEB0DE3NGhszXFQneP009j4wxm5kKzuja0ks9tEdNAJ3NLWnQhU-w0_xeePj8SGxJXuGIQT0ox9yQlD-HnmlEqMWYplg.5XuF3e3g7ck1RRy8.VSph3xlmrPI3z6jcLdh862GaDq6_-g.3WcUUUcy1NZ-aFYU8u9KHA",
             id="alg: RSA-OAEP, enc: A128GCM",
@@ -525,3 +529,12 @@ class TestEncrypt:
         encrypted = jwe.encrypt("Text", PUBLIC_KEY_PEM, enc, alg)
         header = json.loads(base64url_decode(encrypted.split(b".")[0]))
         assert "kid" not in header
+
+    @pytest.mark.skipif(AESKey is None, reason="No AES backend")
+    def test_additional_headers_present_when_provided(self):
+        enc = ALGORITHMS.A256CBC_HS512
+        alg = ALGORITHMS.RSA_OAEP_256
+        additional_headers = {"test-header1": "val1", "test-header2": "val1"}
+        encrypted = jwe.encrypt("Test", PUBLIC_KEY_PEM, enc, alg, additional_headers=additional_headers.copy())
+        header = json.loads(base64url_decode(encrypted.split(b".")[0]))
+        assert set(header.items()).issuperset(set(additional_headers.items()))
