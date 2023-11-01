@@ -1,4 +1,5 @@
 import base64
+import datetime
 import struct
 
 # Piggyback of the backends implementation of the function that converts a long
@@ -105,3 +106,15 @@ def ensure_binary(s):
     if isinstance(s, str):
         return s.encode("utf-8", "strict")
     raise TypeError(f"not expecting type '{type(s)}'")
+
+
+
+def utcnow():
+    try:
+        from datetime import UTC
+    except ImportError:
+        # datetime.datetime.utcnow was deprecated in favor of
+        # datetime.datetime.now(datetime.UTC) in python 3.12
+        return datetime.datetime.utcnow()
+    else:
+        return datetime.datetime.now(datetime.UTC)
