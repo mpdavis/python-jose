@@ -450,7 +450,7 @@ def _decompress(zip, compressed):
     if zip is None:
         decompressed = compressed
     elif zip == ZIPS.DEF:
-        decompressed = zlib.decompress(compressed)
+        decompressed = zlib.decompress(compressed,-zlib.MAX_WBITS)
     else:
         raise NotImplementedError("ZIP {} is not implemented!")
     return decompressed
