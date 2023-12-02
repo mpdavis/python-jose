@@ -26,7 +26,7 @@ Verifying token signatures
     >>> key = jwk.construct(hmac_key)
     >>>
     >>> message, encoded_sig = token.rsplit('.', 1)
-    >>> decoded_sig = base64url_decode(encoded_sig)
+    >>> decoded_sig = base64url_decode(encoded_sig.encode())
     >>> key.verify(message, decoded_sig)
 
 
