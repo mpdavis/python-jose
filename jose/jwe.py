@@ -76,6 +76,11 @@ def decrypt(jwe_str, key):
         >>> jwe.decrypt(jwe_string, 'asecret128bitkey')
         'Hello, World!'
     """
+    
+    # limit the token size to 250 KB
+    if len(jwe_str) > 250 * 1024:
+        raise JWEError("JWE string exceeds 250 KB")
+    
     header, encoded_header, encrypted_key, iv, cipher_text, auth_tag = _jwe_compact_deserialize(jwe_str)
 
     # Verify that the implementation understands and can process all
