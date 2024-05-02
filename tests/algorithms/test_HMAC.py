@@ -14,14 +14,17 @@ class TestHMACAlgorithm:
 
     def test_RSA_key(self):
         key = "-----BEGIN PUBLIC KEY-----"
+        key += "\n\n\n-----END PUBLIC KEY-----"
         with pytest.raises(JOSEError):
             HMACKey(key, ALGORITHMS.HS256)
 
         key = "-----BEGIN RSA PUBLIC KEY-----"
+        key += "\n\n\n-----END RSA PUBLIC KEY-----"
         with pytest.raises(JOSEError):
             HMACKey(key, ALGORITHMS.HS256)
 
         key = "-----BEGIN CERTIFICATE-----"
+        key += "\n\n\n-----END CERTIFICATE-----"
         with pytest.raises(JOSEError):
             HMACKey(key, ALGORITHMS.HS256)
 
