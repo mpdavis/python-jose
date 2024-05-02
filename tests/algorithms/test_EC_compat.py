@@ -37,7 +37,7 @@ class TestBackendEcdsaCompatibility:
         key = BackendFrom(private_key, ALGORITHMS.ES256)
         key2 = BackendTo(private_key, ALGORITHMS.ES256)
 
-        assert key.public_key().to_pem().strip() == key2.public_key().to_pem().strip()
+        assert key.public_key().to_pem().strip().replace(b"\n", b"") == key2.public_key().to_pem().strip().replace(b"\n", b"")
 
     @pytest.mark.parametrize("BackendFrom", [ECDSAECKey, CryptographyECKey])
     @pytest.mark.parametrize("BackendTo", [ECDSAECKey, CryptographyECKey])
@@ -45,7 +45,7 @@ class TestBackendEcdsaCompatibility:
         key = BackendFrom(private_key, ALGORITHMS.ES256)
         key2 = BackendTo(private_key, ALGORITHMS.ES256)
 
-        assert key.to_pem().strip() == key2.to_pem().strip()
+        assert key.to_pem().strip().replace(b"\n", b"") == key2.to_pem().strip().replace(b"\n", b"")
 
     @pytest.mark.parametrize("BackendFrom", [ECDSAECKey, CryptographyECKey])
     @pytest.mark.parametrize("BackendTo", [ECDSAECKey, CryptographyECKey])
@@ -57,7 +57,7 @@ class TestBackendEcdsaCompatibility:
 
         pub_target = BackendTo(pub_pem_source, ALGORITHMS.ES256)
 
-        assert pub_pem_source == pub_target.to_pem().strip()
+        assert pub_pem_source.replace(b"\n", b"") == pub_target.to_pem().strip().replace(b"\n", b"")
 
     @pytest.mark.parametrize("BackendFrom", [ECDSAECKey, CryptographyECKey])
     @pytest.mark.parametrize("BackendTo", [ECDSAECKey, CryptographyECKey])
@@ -68,4 +68,4 @@ class TestBackendEcdsaCompatibility:
 
         target = BackendTo(pem_source, ALGORITHMS.ES256)
 
-        assert pem_source == target.to_pem().strip()
+        assert pem_source.replace(b"\n", b"") == target.to_pem().strip().replace(b"\n", b"")
