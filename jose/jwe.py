@@ -6,7 +6,7 @@ from struct import pack
 
 from . import jwk
 from .backends import get_random_bytes
-from .constants import ALGORITHMS, ZIPS
+from .constants import ALGORITHMS, ZIPS, JWE_SIZE_LIMIT
 from .exceptions import JWEError, JWEParseError
 from .utils import base64url_decode, base64url_encode, ensure_binary
 
@@ -77,6 +77,10 @@ def decrypt(jwe_str, key):
         'Hello, World!'
     """
     header, encoded_header, encrypted_key, iv, cipher_text, auth_tag = _jwe_compact_deserialize(jwe_str)
+
+    # Addresses CWE-2024-33664
+    if len(jwe_str) > JWE_SIZE_LIMIT:
+        raise JWEError(f"JWE size exceeds {JWE_SIZE_LIMIT} bytes")
 
     # Verify that the implementation understands and can process all
     # fields that it is required to support, whether required by this
@@ -424,13 +428,13 @@ def _compress(zip, plaintext):
         (bytes): Compressed plaintext
     """
     if zip not in ZIPS.SUPPORTED:
-        raise NotImplementedError("ZIP {} is not supported!")
+        raise NotImplementedError(f"ZIP {zip} is not supported!")
     if zip is None:
         compressed = plaintext
     elif zip == ZIPS.DEF:
         compressed = zlib.compress(plaintext)
     else:
-        raise NotImplementedError("ZIP {} is not implemented!")
+        raise NotImplementedError(f"ZIP {zip} is not implemented!")
     return compressed
 
 
@@ -446,13 +450,17 @@ def _decompress(zip, compressed):
         (bytes): Compressed plaintext
     """
     if zip not in ZIPS.SUPPORTED:
-        raise NotImplementedError("ZIP {} is not supported!")
+        raise NotImplementedError(f"ZIP {zip} is not supported!")
     if zip is None:
         decompressed = compressed
     elif zip == ZIPS.DEF:
-        decompressed = zlib.decompress(compressed)
+        # Addresses CWE-2024-33664
+        decompressor = zlib.decompressobj()
+        decompressed = decompressor.decompress(compressed, max_length=JWE_SIZE_LIMIT)
+        if decompressor.unconsumed_tail:
+            raise JWEError(f"Decompressed data exceeds {JWE_SIZE_LIMIT} bytes")
     else:
-        raise NotImplementedError("ZIP {} is not implemented!")
+        raise NotImplementedError(f"ZIP {zip} is not implemented!")
     return decompressed
 
 

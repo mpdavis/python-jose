@@ -4,8 +4,8 @@ import pytest
 
 import jose.backends
 from jose import jwe
-from jose.constants import ALGORITHMS, ZIPS
-from jose.exceptions import JWEParseError
+from jose.constants import ALGORITHMS, ZIPS, JWE_SIZE_LIMIT
+from jose.exceptions import JWEParseError, JWEError
 from jose.jwk import AESKey, RSAKey
 from jose.utils import base64url_decode
 
@@ -525,3 +525,34 @@ class TestEncrypt:
         encrypted = jwe.encrypt("Text", PUBLIC_KEY_PEM, enc, alg)
         header = json.loads(base64url_decode(encrypted.split(b".")[0]))
         assert "kid" not in header
+
+    @pytest.mark.skipif(AESKey is None, reason="No AES backend")
+    def test_jwe_with_excessive_data(self):
+        enc = ALGORITHMS.A256CBC_HS512
+        alg = ALGORITHMS.RSA_OAEP_256
+        import jose.constants
+        old_limit = jose.constants.JWE_SIZE_LIMIT
+        try:
+            jose.constants.JWE_SIZE_LIMIT = 1024
+            encrypted = jwe.encrypt(b"Text"*64*1024, PUBLIC_KEY_PEM, enc, alg)
+            header = json.loads(base64url_decode(encrypted.split(b".")[0]))
+            with pytest.raises(JWEError):
+                actual = jwe.decrypt(encrypted, PRIVATE_KEY_PEM)
+        finally:
+            jose.constants.JWE_SIZE_LIMIT = old_limit
+
+    @pytest.mark.skipif(AESKey is None, reason="No AES backend")
+    def test_jwe_zip_with_excessive_data(self):
+        enc = ALGORITHMS.A256CBC_HS512
+        alg = ALGORITHMS.RSA_OAEP_256
+        import jose.constants
+        old_limit = jose.constants.JWE_SIZE_LIMIT
+        try:
+            jose.constants.JWE_SIZE_LIMIT = 1024
+            encrypted = jwe.encrypt(b"Text"*64*1024, PUBLIC_KEY_PEM, enc, alg, zip=ZIPS.DEF)
+            assert len(encrypted) < jose.constants.JWE_SIZE_LIMIT
+            header = json.loads(base64url_decode(encrypted.split(b".")[0]))
+            with pytest.raises(JWEError):
+                actual = jwe.decrypt(encrypted, PRIVATE_KEY_PEM)
+        finally:
+            jose.constants.JWE_SIZE_LIMIT = old_limit
