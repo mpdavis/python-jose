@@ -1,4 +1,5 @@
 """Test the default import handling."""
+
 try:
     from jose.backends.rsa_backend import RSAKey as PurePythonRSAKey
 except ImportError:
