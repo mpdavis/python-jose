@@ -439,6 +439,8 @@ class CryptographyAESKey(Key):
         ALGORITHMS.A256KW: None,
     }
 
+    IV_BYTE_LENGTH_MODE_MAP = {"CBC": algorithms.AES.block_size // 8, "GCM": 96 // 8}
+
     def __init__(self, key, algorithm):
         if algorithm not in ALGORITHMS.AES:
             raise JWKError("%s is not a valid AES algorithm" % algorithm)
@@ -468,7 +470,8 @@ class CryptographyAESKey(Key):
     def encrypt(self, plain_text, aad=None):
         plain_text = ensure_binary(plain_text)
         try:
-            iv = get_random_bytes(algorithms.AES.block_size // 8)
+            iv_byte_length = self.IV_BYTE_LENGTH_MODE_MAP.get(self._mode.name, algorithms.AES.block_size)
+            iv = get_random_bytes(iv_byte_length)
             mode = self._mode(iv)
             if mode.name == "GCM":
                 cipher = aead.AESGCM(self._key)

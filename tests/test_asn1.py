@@ -1,4 +1,5 @@
 """Tests for ``jose.backends._asn1``."""
+
 import base64
 
 import pytest
