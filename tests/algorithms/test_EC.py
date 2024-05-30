@@ -1,4 +1,5 @@
 import json
+import re
 
 from jose.backends import ECKey
 from jose.constants import ALGORITHMS
@@ -47,6 +48,31 @@ RAW_SIGNATURE = (
     b"\xd1\xbc\xedK\x01\x87:}\xf2\xb2shTA\x00\x1a\x13~\xbaJ\xdb\xeem\x12\x1e"
     b"\xfeMO\x04\xb2[\x86A\xbd\xc6hu\x953X\x1e"
 )
+
+# Define the regex pattern to capture the header, body, and footer of the PEM file
+PEM_REGEX = re.compile(r"(-----BEGIN [A-Z ]+-----)(.*?)(-----END [A-Z ]+-----)", re.DOTALL)
+WHITE_SPACE_REGEX = re.compile(r"\s+")
+
+
+def get_pem_for_key(key):
+    return key.to_pem().strip().decode("utf-8")
+
+
+def normalize_pem(key_pem_str):
+    # Search for the PEM sections
+    pem_match = PEM_REGEX.search(key_pem_str)
+    if not pem_match:
+        raise ValueError("The provided string does not contain a valid PEM formatted data.")
+
+    header = pem_match.group(1)
+    body = pem_match.group(2)
+    footer = pem_match.group(3)
+
+    # Remove all newlines and spaces from the body
+    clean_body = WHITE_SPACE_REGEX.sub("", body)
+
+    # Reassemble the PEM string
+    return f"{header}\n{clean_body}\n{footer}"
 
 
 def _backend_exception_types():
@@ -104,7 +130,7 @@ class TestECAlgorithm:
     def test_to_pem(self):
         key = ECKey(private_key, ALGORITHMS.ES256)
         assert not key.is_public()
-        assert key.to_pem().strip() == private_key.strip().encode("utf-8")
+        assert normalize_pem(get_pem_for_key(key)) == normalize_pem(private_key.strip())
 
         public_pem = key.public_key().to_pem()
         assert ECKey(public_pem, ALGORITHMS.ES256).is_public()
