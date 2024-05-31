@@ -141,6 +141,14 @@ def decode(token, key, algorithms=None, options=None, audience=None, issuer=None
 
     verify_signature = defaults.get("verify_signature", True)
 
+    # Forbid the usage of the jwt.decode without alogrightms parameter
+    # See https://github.com/mpdavis/python-jose/issues/346 for more
+    # information CVE-2024-33663
+    if verify_signature and algorithms is None:
+        raise JWTError("It is required that you pass in a value for "
+                       'the "algorithms" argument when calling '
+                       "decode().")
+
     try:
         payload = jws.verify(token, key, algorithms, verify=verify_signature)
     except JWSError as e:
