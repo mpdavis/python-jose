@@ -1,5 +1,6 @@
 import base64
 import struct
+from datetime import datetime, timezone
 
 # Piggyback of the backends implementation of the function that converts a long
 # to a bytes stream. Some plumbing is necessary to have the signatures match.
@@ -105,3 +106,8 @@ def ensure_binary(s):
     if isinstance(s, str):
         return s.encode("utf-8", "strict")
     raise TypeError(f"not expecting type '{type(s)}'")
+
+
+def utcnow():
+     # datetime.utcnow() is deprecated since Python 3.12
+    return datetime.now(timezone.utc)
