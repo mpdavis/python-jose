@@ -30,6 +30,11 @@ class JWKError(JOSEError):
     pass
 
 
+class JWKAlgMismatchError(JWKError):
+    '''JWK Key type doesn't support the given algorithm.'''
+    pass
+
+
 class JWEError(JOSEError):
     """Base error for all JWE errors"""
 

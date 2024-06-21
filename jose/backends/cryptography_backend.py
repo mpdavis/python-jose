@@ -15,7 +15,7 @@ from cryptography.utils import int_to_bytes
 from cryptography.x509 import load_pem_x509_certificate
 
 from ..constants import ALGORITHMS
-from ..exceptions import JWEError, JWKError
+from ..exceptions import JWEError, JWKError, JWKAlgMismatchError
 from ..utils import base64_to_long, base64url_decode, base64url_encode, ensure_binary, long_to_base64
 from .base import Key
 
@@ -52,7 +52,7 @@ class CryptographyECKey(Key):
 
     def __init__(self, key, algorithm, cryptography_backend=default_backend):
         if algorithm not in ALGORITHMS.EC:
-            raise JWKError("hash_alg: %s is not a valid hash algorithm" % algorithm)
+            raise JWKAlgMismatchError("%s is not a valid EC algorithm" % algorithm)
 
         self.hash_alg = {
             ALGORITHMS.ES256: self.SHA256,
@@ -97,7 +97,7 @@ class CryptographyECKey(Key):
 
     def _process_jwk(self, jwk_dict):
         if not jwk_dict.get("kty") == "EC":
-            raise JWKError("Incorrect key type. Expected: 'EC', Received: %s" % jwk_dict.get("kty"))
+            raise JWKAlgMismatchError("Incorrect key type. Expected: 'EC', Received: %s" % jwk_dict.get("kty"))
 
         if not all(k in jwk_dict for k in ["x", "y", "crv"]):
             raise JWKError("Mandatory parameters are missing")
@@ -226,7 +226,7 @@ class CryptographyRSAKey(Key):
 
     def __init__(self, key, algorithm, cryptography_backend=default_backend):
         if algorithm not in ALGORITHMS.RSA:
-            raise JWKError("hash_alg: %s is not a valid hash algorithm" % algorithm)
+            raise JWKAlgMismatchError("%s is not a valid RSA algorithm" % algorithm)
 
         self.hash_alg = {
             ALGORITHMS.RS256: self.SHA256,
@@ -273,7 +273,7 @@ class CryptographyRSAKey(Key):
 
     def _process_jwk(self, jwk_dict):
         if not jwk_dict.get("kty") == "RSA":
-            raise JWKError("Incorrect key type. Expected: 'RSA', Received: %s" % jwk_dict.get("kty"))
+            raise JWKAlgMismatchError("Incorrect key type. Expected: 'RSA', Received: %s" % jwk_dict.get("kty"))
 
         e = base64_to_long(jwk_dict.get("e", 256))
         n = base64_to_long(jwk_dict.get("n"))
@@ -443,9 +443,9 @@ class CryptographyAESKey(Key):
 
     def __init__(self, key, algorithm):
         if algorithm not in ALGORITHMS.AES:
-            raise JWKError("%s is not a valid AES algorithm" % algorithm)
+            raise JWKAlgMismatchError("%s is not a valid AES algorithm" % algorithm)
         if algorithm not in ALGORITHMS.SUPPORTED.union(ALGORITHMS.AES_PSEUDO):
-            raise JWKError("%s is not a supported algorithm" % algorithm)
+            raise JWKAlgMismatchError("%s is not a supported algorithm" % algorithm)
 
         self._algorithm = algorithm
         self._mode = self.MODES.get(self._algorithm)
@@ -541,7 +541,7 @@ class CryptographyHMACKey(Key):
 
     def __init__(self, key, algorithm):
         if algorithm not in ALGORITHMS.HMAC:
-            raise JWKError("hash_alg: %s is not a valid hash algorithm" % algorithm)
+            raise JWKAlgMismatchError("hash_alg: %s is not a valid hash algorithm" % algorithm)
         self._algorithm = algorithm
         self._hash_alg = self.ALG_MAP.get(algorithm)
 
@@ -572,7 +572,7 @@ class CryptographyHMACKey(Key):
 
     def _process_jwk(self, jwk_dict):
         if not jwk_dict.get("kty") == "oct":
-            raise JWKError("Incorrect key type. Expected: 'oct', Received: %s" % jwk_dict.get("kty"))
+            raise JWKAlgMismatchError("Incorrect key type. Expected: 'oct', Received: %s" % jwk_dict.get("kty"))
 
         k = jwk_dict.get("k")
         k = k.encode("utf-8")
