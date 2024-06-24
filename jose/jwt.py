@@ -5,7 +5,7 @@ try:
     from collections.abc import Mapping
 except ImportError:
     from collections import Mapping
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 
 from jose import jws
 
@@ -281,7 +281,7 @@ def _validate_nbf(claims, leeway=0):
     except ValueError:
         raise JWTClaimsError("Not Before claim (nbf) must be an integer.")
 
-    now = timegm(datetime.utcnow().utctimetuple())
+    now = timegm(datetime.now(UTC)().utctimetuple())
 
     if nbf > (now + leeway):
         raise JWTClaimsError("The token is not yet valid (nbf)")
@@ -311,7 +311,7 @@ def _validate_exp(claims, leeway=0):
     except ValueError:
         raise JWTClaimsError("Expiration Time claim (exp) must be an integer.")
 
-    now = timegm(datetime.utcnow().utctimetuple())
+    now = timegm(datetime.now(UTC)().utctimetuple())
 
     if exp < (now - leeway):
         raise ExpiredSignatureError("Signature has expired.")
