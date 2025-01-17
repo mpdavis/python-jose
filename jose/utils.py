@@ -1,4 +1,5 @@
 import base64
+from datetime import datetime, timezone
 import struct
 
 # Piggyback of the backends implementation of the function that converts a long
@@ -105,3 +106,8 @@ def ensure_binary(s):
     if isinstance(s, str):
         return s.encode("utf-8", "strict")
     raise TypeError(f"not expecting type '{type(s)}'")
+
+
+def get_utc_now():
+    """Returns a timezone-aware datetime, used in favor of deprecated datetime.utcnow"""
+    return datetime.now(timezone.utc)
