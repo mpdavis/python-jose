@@ -6,6 +6,7 @@ import pytest
 
 from jose import jws, jwt
 from jose.exceptions import JWTError
+from jose.utils import utcnow
 
 
 @pytest.fixture
@@ -180,7 +181,7 @@ class TestJWT:
         pass
 
     def test_leeway_is_timedelta(self, claims, key):
-        nbf = datetime.utcnow() + timedelta(seconds=5)
+        nbf = utcnow() + timedelta(seconds=5)
         leeway = timedelta(seconds=10)
 
         claims = {
@@ -209,7 +210,7 @@ class TestJWT:
             jwt.decode(token, key)
 
     def test_nbf_datetime(self, key):
-        nbf = datetime.utcnow() - timedelta(seconds=5)
+        nbf = utcnow() - timedelta(seconds=5)
 
         claims = {"nbf": nbf}
 
@@ -217,7 +218,7 @@ class TestJWT:
         jwt.decode(token, key)
 
     def test_nbf_with_leeway(self, key):
-        nbf = datetime.utcnow() + timedelta(seconds=5)
+        nbf = utcnow() + timedelta(seconds=5)
 
         claims = {
             "nbf": nbf,
@@ -229,7 +230,7 @@ class TestJWT:
         jwt.decode(token, key, options=options)
 
     def test_nbf_in_future(self, key):
-        nbf = datetime.utcnow() + timedelta(seconds=5)
+        nbf = utcnow() + timedelta(seconds=5)
 
         claims = {"nbf": nbf}
 
@@ -239,7 +240,7 @@ class TestJWT:
             jwt.decode(token, key)
 
     def test_nbf_skip(self, key):
-        nbf = datetime.utcnow() + timedelta(seconds=5)
+        nbf = utcnow() + timedelta(seconds=5)
 
         claims = {"nbf": nbf}
 
@@ -261,7 +262,7 @@ class TestJWT:
             jwt.decode(token, key)
 
     def test_exp_datetime(self, key):
-        exp = datetime.utcnow() + timedelta(seconds=5)
+        exp = utcnow() + timedelta(seconds=5)
 
         claims = {"exp": exp}
 
@@ -269,7 +270,7 @@ class TestJWT:
         jwt.decode(token, key)
 
     def test_exp_with_leeway(self, key):
-        exp = datetime.utcnow() - timedelta(seconds=5)
+        exp = utcnow() - timedelta(seconds=5)
 
         claims = {
             "exp": exp,
@@ -281,7 +282,7 @@ class TestJWT:
         jwt.decode(token, key, options=options)
 
     def test_exp_in_past(self, key):
-        exp = datetime.utcnow() - timedelta(seconds=5)
+        exp = utcnow() - timedelta(seconds=5)
 
         claims = {"exp": exp}
 
@@ -291,7 +292,7 @@ class TestJWT:
             jwt.decode(token, key)
 
     def test_exp_skip(self, key):
-        exp = datetime.utcnow() - timedelta(seconds=5)
+        exp = utcnow() - timedelta(seconds=5)
 
         claims = {"exp": exp}
 
@@ -504,8 +505,8 @@ class TestJWT:
         [
             ("aud", "aud"),
             ("ait", "ait"),
-            ("exp", datetime.utcnow() + timedelta(seconds=3600)),
-            ("nbf", datetime.utcnow() - timedelta(seconds=5)),
+            ("exp", utcnow() + timedelta(seconds=3600)),
+            ("nbf", utcnow() - timedelta(seconds=5)),
             ("iss", "iss"),
             ("sub", "sub"),
             ("jti", "jti"),

@@ -11,7 +11,7 @@ from jose import jws
 
 from .constants import ALGORITHMS
 from .exceptions import ExpiredSignatureError, JWSError, JWTClaimsError, JWTError
-from .utils import calculate_at_hash, timedelta_total_seconds
+from .utils import calculate_at_hash, timedelta_total_seconds, utcnow
 
 
 def encode(claims, key, algorithm=ALGORITHMS.HS256, headers=None, access_token=None):
@@ -281,7 +281,7 @@ def _validate_nbf(claims, leeway=0):
     except ValueError:
         raise JWTClaimsError("Not Before claim (nbf) must be an integer.")
 
-    now = timegm(datetime.utcnow().utctimetuple())
+    now = timegm(utcnow().utctimetuple())
 
     if nbf > (now + leeway):
         raise JWTClaimsError("The token is not yet valid (nbf)")
@@ -311,7 +311,7 @@ def _validate_exp(claims, leeway=0):
     except ValueError:
         raise JWTClaimsError("Expiration Time claim (exp) must be an integer.")
 
-    now = timegm(datetime.utcnow().utctimetuple())
+    now = timegm(utcnow().utctimetuple())
 
     if exp < (now - leeway):
         raise ExpiredSignatureError("Signature has expired.")
