@@ -5,7 +5,7 @@ import pytest
 import jose.backends
 from jose import jwe
 from jose.constants import ALGORITHMS, ZIPS
-from jose.exceptions import JWEParseError, JWEError
+from jose.exceptions import JWEError, JWEParseError
 from jose.jwk import AESKey, RSAKey
 from jose.utils import base64url_decode
 
