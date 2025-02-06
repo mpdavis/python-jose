@@ -81,7 +81,7 @@ def decrypt(jwe_str, key):
     # data could lead to large memory usage. This helps address This addresses
     # CVE-2024-33664. Also see _decompress()
     if len(jwe_str) > JWE_SIZE_LIMIT:
-        raise JWEError(f"JWE string exceeds {JWE_SIZE_LIMIT} bytes")
+        raise JWEError(f"JWE string {len(jwe_str)} bytes exceeds {JWE_SIZE_LIMIT} bytes")
 
     header, encoded_header, encrypted_key, iv, cipher_text, auth_tag = _jwe_compact_deserialize(jwe_str)
 
