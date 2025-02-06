@@ -527,33 +527,26 @@ class TestEncrypt:
         assert "kid" not in header
 
     @pytest.mark.skipif(AESKey is None, reason="No AES backend")
-    def test_jwe_with_excessive_data(self):
+    def test_jwe_with_excessive_data(self, monkeypatch):
         enc = ALGORITHMS.A256CBC_HS512
         alg = ALGORITHMS.RSA_OAEP_256
-        import jose.constants
-        old_limit = jose.constants.JWE_SIZE_LIMIT
-        try:
-            jose.constants.JWE_SIZE_LIMIT = 1024
-            encrypted = jwe.encrypt(b"Text"*64*1024, PUBLIC_KEY_PEM, enc, alg)
-            header = json.loads(base64url_decode(encrypted.split(b".")[0]))
-            with pytest.raises(JWEError):
-                actual = jwe.decrypt(encrypted, PRIVATE_KEY_PEM)
-        finally:
-            jose.constants.JWE_SIZE_LIMIT = old_limit
+        monkeypatch.setattr('jose.constants.JWE_SIZE_LIMIT', 1024)
+        encrypted = jwe.encrypt(b"Text"*64*1024, PUBLIC_KEY_PEM, enc, alg)
+        header = json.loads(base64url_decode(encrypted.split(b".")[0]))
+        with pytest.raises(JWEError) as excinfo:
+            actual = jwe.decrypt(encrypted, PRIVATE_KEY_PEM)
+        assert 'JWE string' in str(excinfo.value)
+        assert 'bytes exceeds' in str(excinfo.value)
 
     @pytest.mark.skipif(AESKey is None, reason="No AES backend")
-    def test_jwe_zip_with_excessive_data(self):
+    def test_jwe_zip_with_excessive_data(self, monkeypatch):
         # Test that a fix for CVE-2024-33664 is in place.
         enc = ALGORITHMS.A256CBC_HS512
         alg = ALGORITHMS.RSA_OAEP_256
-        import jose.constants
-        old_limit = jose.constants.JWE_SIZE_LIMIT
-        try:
-            jose.constants.JWE_SIZE_LIMIT = 1024
-            encrypted = jwe.encrypt(b"Text"*64*1024, PUBLIC_KEY_PEM, enc, alg, zip=ZIPS.DEF)
-            assert len(encrypted) < jose.constants.JWE_SIZE_LIMIT
-            header = json.loads(base64url_decode(encrypted.split(b".")[0]))
-            with pytest.raises(JWEError):
-                actual = jwe.decrypt(encrypted, PRIVATE_KEY_PEM)
-        finally:
-            jose.constants.JWE_SIZE_LIMIT = old_limit
+        monkeypatch.setattr('jose.constants.JWE_SIZE_LIMIT', 1024)
+        encrypted = jwe.encrypt(b"Text"*64*1024, PUBLIC_KEY_PEM, enc, alg, zip=ZIPS.DEF)
+        assert len(encrypted) < jose.constants.JWE_SIZE_LIMIT
+        header = json.loads(base64url_decode(encrypted.split(b".")[0]))
+        with pytest.raises(JWEError) as excinfo:
+            actual = jwe.decrypt(encrypted, PRIVATE_KEY_PEM)
+        assert 'Decompressed JWE string exceeds' in str(excinfo.value)
