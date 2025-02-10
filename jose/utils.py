@@ -110,7 +110,8 @@ def ensure_binary(s):
 
 # The following was copied from PyJWT:
 #   https://github.com/jpadilla/pyjwt/commit/9c528670c455b8d948aff95ed50e22940d1ad3fc
-# Based on https://github.com/hynek/pem/blob/7ad94db26b0bc21d10953f5dbad3acfdfacf57aa/src/pem/_core.py#L224-L252
+# Based on:
+#   https://github.com/hynek/pem/blob/7ad94db26b0bc21d10953f5dbad3acfdfacf57aa/src/pem/_core.py#L224-L252
 _PEMS = {
     b"CERTIFICATE",
     b"TRUSTED CERTIFICATE",
@@ -130,15 +131,19 @@ _PEMS = {
     b"X509 CRL",
 }
 _PEM_RE = re.compile(
-    b"----[- ]BEGIN ("
-    + b"|".join(re.escape(pem) for pem in _PEMS)
-    + b")[- ]----",
+    b"----[- ]BEGIN (" + b"|".join(re.escape(pem) for pem in _PEMS) + b")[- ]----",
 )
+
+
 def is_pem_format(key: bytes) -> bool:
     return bool(_PEM_RE.search(key))
-# Based on https://github.com/pyca/cryptography/blob/bcb70852d577b3f490f015378c75cba74986297b/src/cryptography/hazmat/primitives/serialization/ssh.py#L40-L46
+
+
+# Based on
+# https://github.com/pyca/cryptography/blob/bcb70852d577b3f490f015378c75cba74986297b
+#   /src/cryptography/hazmat/primitives/serialization/ssh.py#L40-L46
 _CERT_SUFFIX = b"-cert-v01@openssh.com"
-_SSH_PUBKEY_RC = re.compile(br"\A(\S+)[ \t]+(\S+)")
+_SSH_PUBKEY_RC = re.compile(rb"\A(\S+)[ \t]+(\S+)")
 _SSH_KEY_FORMATS = [
     b"ssh-ed25519",
     b"ssh-rsa",
@@ -147,6 +152,8 @@ _SSH_KEY_FORMATS = [
     b"ecdsa-sha2-nistp384",
     b"ecdsa-sha2-nistp521",
 ]
+
+
 def is_ssh_key(key: bytes) -> bool:
     if any(string_value in key for string_value in _SSH_KEY_FORMATS):
         return True

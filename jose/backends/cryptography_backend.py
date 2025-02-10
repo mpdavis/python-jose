@@ -16,7 +16,15 @@ from cryptography.x509 import load_pem_x509_certificate
 
 from ..constants import ALGORITHMS
 from ..exceptions import JWEError, JWKError
-from ..utils import base64_to_long, base64url_decode, base64url_encode, ensure_binary, long_to_base64, is_pem_format, is_ssh_key
+from ..utils import (
+    base64_to_long,
+    base64url_decode,
+    base64url_encode,
+    ensure_binary,
+    is_pem_format,
+    is_ssh_key,
+    long_to_base64,
+)
 from .base import Key
 
 _binding = None
