@@ -223,3 +223,34 @@ class TestECAlgorithm:
         key = ECKey(private_key, ALGORITHMS.ES256)
         self.assert_parameters(key.to_dict(), private=True)
         self.assert_parameters(key.public_key().to_dict(), private=False)
+
+
+@pytest.mark.cryptography
+@pytest.mark.skipif(CryptographyECKey is None, reason="pyca/cryptography backend not available")
+def test_incorrect_public_key_hmac_signing():
+    import base64
+    from cryptography.hazmat.primitives import hashes, hmac, serialization
+
+    from jose import jwt
+
+    def b64(x):
+        return base64.urlsafe_b64encode(x).replace(b'=', b'')
+
+    KEY = CryptographyEc.generate_private_key(CryptographyEc.SECP256R1)
+    PUBKEY = KEY.public_key().public_bytes(
+        encoding=serialization.Encoding.OpenSSH,
+        format=serialization.PublicFormat.OpenSSH
+    )
+
+    # Create and sign the payload using a public key, but specify the "alg" in
+    # the claims that a symmetric key was used.
+    payload = b64(b'{"alg":"HS256"}') + b'.' + b64(b'{"pwned":true}')
+    hasher = hmac.HMAC(PUBKEY, hashes.SHA256())
+    hasher.update(payload)
+    evil_token = payload + b'.' + b64(hasher.finalize())
+
+    # Verify and decode the token using the public key. The custom algorithm
+    # field is left unspecified. Decoding using a public key should be
+    # rejected raising a JWKError.
+    with pytest.raises(JWKError):
+        jwt.decode(evil_token, PUBKEY)
