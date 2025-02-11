@@ -5,7 +5,8 @@ try:
     from collections.abc import Mapping
 except ImportError:
     from collections import Mapping
-from datetime import datetime, timedelta, UTC
+
+from datetime import UTC, datetime, timedelta
 
 from jose import jws
 

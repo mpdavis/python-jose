@@ -1,6 +1,6 @@
 import base64
 import json
-from datetime import datetime, timedelta, UTC
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
