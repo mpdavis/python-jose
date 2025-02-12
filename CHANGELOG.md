@@ -4,14 +4,22 @@
 
 ### News ###
 
-* Remove support for python 3.6
+* Remove support for Python 3.6 and 3.7
+* Added support for Python 3.10 and 3.11
+
+### Bug fixes and Improvements ###
+* Updating `CryptographyAESKey::encrypt` to generate 96 bit IVs for GCM block
+  cipher mode
+* Fix for PEM key comparisons caused by line lengths and new lines
+* Fix for CVE-2024-33664 - JWE limited to 250KiB
+* Fix for CVE-2024-33663 - signing JWT with public key is now forbidden
 
 ### Housekeeping ###
 
 * Updated Github Actions Workflows
 * Updated to use tox 4.x
 * Revise codecov integration
-
+* Fixed DeprecationWarnings
 
 ## 3.3.0 -- 2021-06-04 ##
 
