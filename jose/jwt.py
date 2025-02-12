@@ -6,7 +6,13 @@ try:
 except ImportError:
     from collections import Mapping
 
-from datetime import UTC, datetime, timedelta
+try:
+    from datetime import UTC, datetime, timedelta
+    utc_now = datetime.now(UTC)  # Preferred in Python 3.13+
+except ImportError:
+    from datetime import datetime, timedelta, timezone
+    utc_now = datetime.now(timezone.utc)  # Preferred in Python 3.12 and below
+    UTC = timezone.utc
 
 from jose import jws
 
@@ -386,7 +392,7 @@ def _validate_sub(claims, subject=None):
     "sub" value is a case-sensitive string containing a StringOrURI
     value.  Use of this claim is OPTIONAL.
 
-    Args:
+    Arg
         claims (dict): The claims dictionary to validate.
         subject (str): The subject of the token.
     """
