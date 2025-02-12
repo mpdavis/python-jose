@@ -282,7 +282,7 @@ def _validate_nbf(claims, leeway=0):
     except ValueError:
         raise JWTClaimsError("Not Before claim (nbf) must be an integer.")
 
-    now = timegm(datetime.now(UTC)().utctimetuple())
+    now = timegm(datetime.now(UTC).utctimetuple())
 
     if nbf > (now + leeway):
         raise JWTClaimsError("The token is not yet valid (nbf)")
@@ -312,7 +312,7 @@ def _validate_exp(claims, leeway=0):
     except ValueError:
         raise JWTClaimsError("Expiration Time claim (exp) must be an integer.")
 
-    now = timegm(datetime.now(UTC)().utctimetuple())
+    now = timegm(datetime.now(UTC).utctimetuple())
 
     if exp < (now - leeway):
         raise ExpiredSignatureError("Signature has expired.")
