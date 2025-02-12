@@ -8,9 +8,11 @@ except ImportError:
 
 try:
     from datetime import UTC, datetime, timedelta
+
     utc_now = datetime.now(UTC)  # Preferred in Python 3.13+
 except ImportError:
     from datetime import datetime, timedelta, timezone
+
     utc_now = datetime.now(timezone.utc)  # Preferred in Python 3.12 and below
     UTC = timezone.utc
 

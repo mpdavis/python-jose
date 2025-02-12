@@ -3,9 +3,11 @@ import json
 
 try:
     from datetime import UTC, datetime, timedelta
+
     utc_now = datetime.now(UTC)  # Preferred in Python 3.13+
 except ImportError:
     from datetime import datetime, timedelta, timezone
+
     utc_now = datetime.now(timezone.utc)  # Preferred in Python 3.12 and below
     UTC = timezone.utc
 
@@ -92,9 +94,7 @@ class TestJWT:
 
             jws.verify = return_encoded_array
 
-            with pytest.raises(
-                JWTError, match="Invalid payload string: must be a json object"
-            ):
+            with pytest.raises(JWTError, match="Invalid payload string: must be a json object"):
                 jwt.decode(token, "secret", ["HS256"])
         finally:
             jws.verify = old_jws_verify
@@ -154,23 +154,12 @@ class TestJWT:
 
         # manually decode header to compare it to known good
         decoded_headers1 = base64url_decode(encoded_headers1.encode("utf-8"))
-        assert (
-            decoded_headers1
-            == b"""{"alg":"HS256","another_key":"another_value","kid":"my-key-id","typ":"JWT"}"""
-        )
+        assert decoded_headers1 == b"""{"alg":"HS256","another_key":"another_value","kid":"my-key-id","typ":"JWT"}"""
 
     def test_encode(self, claims, key):
         expected = (
-            (
-                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9"
-                ".eyJhIjoiYiJ9"
-                ".xNtk2S0CNbCBZX_f67pFgGRugaP1xi2ICfet3nwOSxw"
-            ),
-            (
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
-                ".eyJhIjoiYiJ9"
-                ".jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8"
-            ),
+            ("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9" ".eyJhIjoiYiJ9" ".xNtk2S0CNbCBZX_f67pFgGRugaP1xi2ICfet3nwOSxw"),
+            ("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9" ".eyJhIjoiYiJ9" ".jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8"),
         )
 
         encoded = jwt.encode(claims, key)
@@ -178,11 +167,7 @@ class TestJWT:
         assert encoded in expected
 
     def test_decode(self, claims, key):
-        token = (
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
-            ".eyJhIjoiYiJ9"
-            ".jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8"
-        )
+        token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9" ".eyJhIjoiYiJ9" ".jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8"
 
         decoded = jwt.decode(token, key)
 
