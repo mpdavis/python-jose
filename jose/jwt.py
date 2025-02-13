@@ -5,7 +5,16 @@ try:
     from collections.abc import Mapping
 except ImportError:
     from collections import Mapping
-from datetime import datetime, timedelta
+
+try:
+    from datetime import UTC, datetime, timedelta
+
+    utc_now = datetime.now(UTC)  # Preferred in Python 3.13+
+except ImportError:
+    from datetime import datetime, timedelta, timezone
+
+    utc_now = datetime.now(timezone.utc)  # Preferred in Python 3.12 and below
+    UTC = timezone.utc
 
 from jose import jws
 
@@ -281,7 +290,7 @@ def _validate_nbf(claims, leeway=0):
     except ValueError:
         raise JWTClaimsError("Not Before claim (nbf) must be an integer.")
 
-    now = timegm(datetime.utcnow().utctimetuple())
+    now = timegm(datetime.now(UTC).utctimetuple())
 
     if nbf > (now + leeway):
         raise JWTClaimsError("The token is not yet valid (nbf)")
@@ -311,7 +320,7 @@ def _validate_exp(claims, leeway=0):
     except ValueError:
         raise JWTClaimsError("Expiration Time claim (exp) must be an integer.")
 
-    now = timegm(datetime.utcnow().utctimetuple())
+    now = timegm(datetime.now(UTC).utctimetuple())
 
     if exp < (now - leeway):
         raise ExpiredSignatureError("Signature has expired.")
@@ -385,7 +394,7 @@ def _validate_sub(claims, subject=None):
     "sub" value is a case-sensitive string containing a StringOrURI
     value.  Use of this claim is OPTIONAL.
 
-    Args:
+    Arg
         claims (dict): The claims dictionary to validate.
         subject (str): The subject of the token.
     """
