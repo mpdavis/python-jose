@@ -13,6 +13,7 @@
 * Fix for PEM key comparisons caused by line lengths and new lines
 * Fix for CVE-2024-33664 - JWE limited to 250KiB
 * Fix for CVE-2024-33663 - signing JWT with public key is now forbidden
+* Replace usage of deprecated datetime.utcnow() with datetime.now(UTC) 
 
 ### Housekeeping ###
 
