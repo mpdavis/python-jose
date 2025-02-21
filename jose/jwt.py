@@ -1,5 +1,6 @@
 import json
 from calendar import timegm
+from datetime import datetime, timedelta
 
 try:
     from collections.abc import Mapping
@@ -7,14 +8,10 @@ except ImportError:
     from collections import Mapping
 
 try:
-    from datetime import UTC, datetime, timedelta
-
-    utc_now = datetime.now(UTC)  # Preferred in Python 3.13+
+    from datetime import UTC  # Preferred in Python 3.13+
 except ImportError:
     from datetime import datetime, timedelta, timezone
-
-    utc_now = datetime.now(timezone.utc)  # Preferred in Python 3.12 and below
-    UTC = timezone.utc
+    UTC = timezone.utc  # Preferred in Python 3.12 and below
 
 from jose import jws
 
