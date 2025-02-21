@@ -8,20 +8,16 @@ except ImportError:
 
 try:
     from datetime import UTC, datetime, timedelta
-
     utc_now = datetime.now(UTC)  # Preferred in Python 3.13+
 except ImportError:
     from datetime import datetime, timedelta, timezone
-
     utc_now = datetime.now(timezone.utc)  # Preferred in Python 3.12 and below
     UTC = timezone.utc
 
 from jose import jws
-
 from .constants import ALGORITHMS
 from .exceptions import ExpiredSignatureError, JWSError, JWTClaimsError, JWTError
 from .utils import calculate_at_hash, timedelta_total_seconds
-
 
 def encode(claims, key, algorithm=ALGORITHMS.HS256, headers=None, access_token=None):
     """Encodes a claims set and returns a JWT string.
@@ -63,7 +59,6 @@ def encode(claims, key, algorithm=ALGORITHMS.HS256, headers=None, access_token=N
         claims["at_hash"] = calculate_at_hash(access_token, ALGORITHMS.HASHES[algorithm])
 
     return jws.sign(claims, key, headers=headers, algorithm=algorithm)
-
 
 def decode(token, key, algorithms=None, options=None, audience=None, issuer=None, subject=None, access_token=None):
     """Verifies a JWT string's signature and validates reserved claims.
@@ -124,6 +119,9 @@ def decode(token, key, algorithms=None, options=None, audience=None, issuer=None
 
     """
 
+    if algorithms is None:
+        raise ValueError("The 'algorithms' parameter is required and cannot be None.")
+
     defaults = {
         "verify_signature": True,
         "verify_aud": True,
@@ -178,7 +176,6 @@ def decode(token, key, algorithms=None, options=None, audience=None, issuer=None
 
     return claims
 
-
 def get_unverified_header(token):
     """Returns the decoded headers without verification of any kind.
 
@@ -198,7 +195,6 @@ def get_unverified_header(token):
 
     return headers
 
-
 def get_unverified_headers(token):
     """Returns the decoded headers without verification of any kind.
 
@@ -215,7 +211,6 @@ def get_unverified_headers(token):
         JWTError: If there is an exception decoding the token.
     """
     return get_unverified_header(token)
-
 
 def get_unverified_claims(token):
     """Returns the decoded claims without verification of any kind.
@@ -244,7 +239,6 @@ def get_unverified_claims(token):
 
     return claims
 
-
 def _validate_iat(claims):
     """Validates that the 'iat' claim is valid.
 
@@ -264,7 +258,6 @@ def _validate_iat(claims):
         int(claims["iat"])
     except ValueError:
         raise JWTClaimsError("Issued At claim (iat) must be an integer.")
-
 
 def _validate_nbf(claims, leeway=0):
     """Validates that the 'nbf' claim is valid.
@@ -295,7 +288,6 @@ def _validate_nbf(claims, leeway=0):
     if nbf > (now + leeway):
         raise JWTClaimsError("The token is not yet valid (nbf)")
 
-
 def _validate_exp(claims, leeway=0):
     """Validates that the 'exp' claim is valid.
 
@@ -325,7 +317,6 @@ def _validate_exp(claims, leeway=0):
     if exp < (now - leeway):
         raise ExpiredSignatureError("Signature has expired.")
 
-
 def _validate_aud(claims, audience=None):
     """Validates that the 'aud' claim is valid.
 
@@ -347,8 +338,6 @@ def _validate_aud(claims, audience=None):
     """
 
     if "aud" not in claims:
-        # if audience:
-        #     raise JWTError('Audience claim expected, but not in claims')
         return
 
     audience_claims = claims["aud"]
@@ -360,7 +349,6 @@ def _validate_aud(claims, audience=None):
         raise JWTClaimsError("Invalid claim format in token")
     if audience not in audience_claims:
         raise JWTClaimsError("Invalid audience")
-
 
 def _validate_iss(claims, issuer=None):
     """Validates that the 'iss' claim is valid.
@@ -381,7 +369,6 @@ def _validate_iss(claims, issuer=None):
             issuer = (issuer,)
         if claims.get("iss") not in issuer:
             raise JWTClaimsError("Invalid issuer")
-
 
 def _validate_sub(claims, subject=None):
     """Validates that the 'sub' claim is valid.
@@ -409,7 +396,6 @@ def _validate_sub(claims, subject=None):
         if claims.get("sub") != subject:
             raise JWTClaimsError("Invalid subject")
 
-
 def _validate_jti(claims):
     """Validates that the 'jti' claim is valid.
 
@@ -430,7 +416,6 @@ def _validate_jti(claims):
 
     if not isinstance(claims["jti"], str):
         raise JWTClaimsError("JWT ID must be a string.")
-
 
 def _validate_at_hash(claims, access_token, algorithm):
     """
@@ -465,7 +450,6 @@ def _validate_at_hash(claims, access_token, algorithm):
 
     if claims["at_hash"] != expected_hash:
         raise JWTClaimsError("at_hash claim does not match access_token.")
-
 
 def _validate_claims(claims, audience=None, issuer=None, subject=None, algorithm=None, access_token=None, options=None):
     leeway = options.get("leeway", 0)
