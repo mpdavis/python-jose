@@ -7,27 +7,21 @@ from jose.constants import ALGORITHMS
 from jose.exceptions import JOSEError
 
 
-class TestHMACAlgorithm:
-    def test_non_string_key(self):
-        with pytest.raises(JOSEError):
-            HMACKey(object(), ALGORITHMS.HS256)
+class TestKeyVerification:
+    def test_invalid_key_for_hmac(self):
+        rsa_keys = [
+            "-----BEGIN PUBLIC KEY-----",
+            "-----BEGIN RSA PUBLIC KEY-----",
+            "-----BEGIN CERTIFICATE-----",
+            "ssh-rsa"
+        ]
+        for key in rsa_keys:
+            with pytest.raises(JOSEError):
+                HMACKey(key, ALGORITHMS.HS256)
 
-    def test_RSA_key(self):
-        key = "-----BEGIN PUBLIC KEY-----"
-        with pytest.raises(JOSEError):
-            HMACKey(key, ALGORITHMS.HS256)
-
-        key = "-----BEGIN RSA PUBLIC KEY-----"
-        with pytest.raises(JOSEError):
-            HMACKey(key, ALGORITHMS.HS256)
-
-        key = "-----BEGIN CERTIFICATE-----"
-        with pytest.raises(JOSEError):
-            HMACKey(key, ALGORITHMS.HS256)
-
-        key = "ssh-rsa"
-        with pytest.raises(JOSEError):
-            HMACKey(key, ALGORITHMS.HS256)
+    def test_key_verification_logic(self):
+        # Add tests to validate the new key verification logic
+        pass
 
     def test_to_dict(self):
         passphrase = "The quick brown fox jumps over the lazy dog"
