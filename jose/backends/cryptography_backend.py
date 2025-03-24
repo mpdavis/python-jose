@@ -251,8 +251,8 @@ class CryptographyRSAKey(Key):
 
         self.cryptography_backend = cryptography_backend
 
-        # if it conforms to RSAPublicKey interface
-        if hasattr(key, "public_bytes") and hasattr(key, "public_numbers"):
+        # if it conforms to RSAPublicKey or RSAPrivateKey interface
+        if (hasattr(key, "public_bytes") and hasattr(key, "public_numbers")) or hasattr(key, "private_bytes"):
             self.prepared_key = key
             return
 
