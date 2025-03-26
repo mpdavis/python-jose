@@ -71,9 +71,9 @@ def construct(key_data, algorithm=None):
         algorithm = key_data.get("alg", None)
 
     if not algorithm:
-        raise JWKError("Unable to find an algorithm for key: %s" % key_data)
+        raise JWKError("Unable to find an algorithm for key")
 
     key_class = get_key(algorithm)
     if not key_class:
-        raise JWKError("Unable to find an algorithm for key: %s" % key_data)
+        raise JWKError("Unable to find an algorithm for key")
     return key_class(key_data, algorithm)
