@@ -117,7 +117,7 @@ def get_unverified_claims(token):
     """Returns the decoded claims without verification of any kind.
 
     Args:
-        token (str): A signed JWS to decode the headers from.
+        token (str): A signed JWS to decode the claims from.
 
     Returns:
         str: The str representation of the token claims.
