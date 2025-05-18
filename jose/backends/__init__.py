@@ -1,10 +1,4 @@
-try:
-    from jose.backends.cryptography_backend import get_random_bytes  # noqa: F401
-except ImportError:
-    try:
-        from jose.backends.pycrypto_backend import get_random_bytes  # noqa: F401
-    except ImportError:
-        from jose.backends.native import get_random_bytes  # noqa: F401
+from jose.backends.native import get_random_bytes  # noqa: F401
 
 try:
     from jose.backends.cryptography_backend import CryptographyRSAKey as RSAKey  # noqa: F401
