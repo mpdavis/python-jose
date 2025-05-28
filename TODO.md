@@ -14,6 +14,6 @@
 * Refactor Algorithm logic with set Exceptions to return
 * Add HTML documentation
 * Implement ECSDA signing
-* Refactor JWT claims verifcation
+* Refactor JWT claims verification
 * Add actual exceptions instead of using the base exception
 * Audit JWT claims tests and rectify against the spec

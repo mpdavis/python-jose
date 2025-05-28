@@ -12,7 +12,7 @@ from .utils import base64url_decode, base64url_encode, ensure_binary
 
 
 def encrypt(plaintext, key, encryption=ALGORITHMS.A256GCM, algorithm=ALGORITHMS.DIR, zip=None, cty=None, kid=None):
-    """Encrypts plaintext and returns a JWE cmpact serialization string.
+    """Encrypts plaintext and returns a JWE compact serialization string.
 
     Args:
         plaintext (bytes): A bytes object to encrypt
@@ -542,7 +542,7 @@ def _get_key_wrap_cek(enc, key):
 
 def _get_random_cek_bytes_for_enc(enc):
     """
-    Get the random cek bytes based on the encryptionn algorithm
+    Get the random cek bytes based on the encryption algorithm
 
     Args:
         enc (str): Encryption algorithm
