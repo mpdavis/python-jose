@@ -24,8 +24,8 @@ from ..utils import (
     is_ssh_key,
     long_to_base64,
 )
-from .base import Key
 from . import get_random_bytes
+from .base import Key
 
 _binding = None
 
