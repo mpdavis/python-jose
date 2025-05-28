@@ -8,10 +8,11 @@ except ImportError:
     from collections import Mapping
 
 try:
-    from datetime import UTC # Preferred in Python 3.13+
+    from datetime import UTC  # Preferred in Python 3.13+
 except ImportError:
     from datetime import timezone
-    UTC = timezone.utc # Preferred in Python 3.12 and below
+
+    UTC = timezone.utc  # Preferred in Python 3.12 and below
 
 from jose import jws
 

@@ -6,6 +6,7 @@ try:
     from datetime import UTC  # Preferred in Python 3.13+
 except ImportError:
     from datetime import timezone  # Preferred in Python 3.12 and below
+
     UTC = timezone.utc
 
 import pytest
