@@ -1,16 +1,13 @@
 import base64
 import json
+from datetime import datetime, timedelta
 
 try:
-    from datetime import UTC, datetime, timedelta
-
-    utc_now = datetime.now(UTC)  # Preferred in Python 3.13+
+    from datetime import UTC  # Preferred in Python 3.13+
 except ImportError:
-    from datetime import datetime, timedelta, timezone
+    from datetime import timezone  # Preferred in Python 3.12 and below
 
-    utc_now = datetime.now(timezone.utc)  # Preferred in Python 3.12 and below
     UTC = timezone.utc
-
 
 import pytest
 
@@ -514,14 +511,16 @@ class TestJWT:
         [
             ("aud", "aud"),
             ("ait", "ait"),
-            ("exp", utc_now + timedelta(seconds=3600)),
-            ("nbf", utc_now - timedelta(seconds=5)),
+            ("exp", lambda: datetime.now(UTC) + timedelta(seconds=3600)),
+            ("nbf", lambda: datetime.now(UTC) - timedelta(seconds=5)),
             ("iss", "iss"),
             ("sub", "sub"),
             ("jti", "jti"),
         ],
     )
     def test_require(self, claims, key, claim, value):
+        if callable(value):
+            value = value()
         options = {"require_" + claim: True, "verify_" + claim: False}
 
         token = jwt.encode(claims, key)
