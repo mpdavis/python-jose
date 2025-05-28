@@ -7,6 +7,7 @@ from jose import jwk, jws
 from jose.backends import RSAKey
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWSError
+from jose.utils import base64url_decode, base64url_encode
 
 try:
     from jose.backends.cryptography_backend import CryptographyRSAKey
@@ -131,7 +132,7 @@ class TestHMAC:
         expected_headers = {
             "test": "header",
             "alg": "HS256",
-            "typ": "JWT",
+            "typ": "JOSE",
         }
 
         token = jws.sign(payload, "secret", headers=additional_headers)
@@ -305,6 +306,14 @@ class TestRSA:
         del jwk_set["keys"][1]
         with pytest.raises(JWSError):
             payload = jws.verify(google_id_token, jwk_set, ALGORITHMS.RS256)  # noqa: F841
+
+    def test_RSA256_detached(self, payload):
+        token, payload = jws.sign_detached(payload, rsa_private_key, algorithm=ALGORITHMS.RS256)
+        assert jws.verify(token, rsa_public_key, payload=payload) == payload
+
+    def test_RSA256_detached_encoded(self, payload):
+        token, encoded_payload = jws.sign_detached(payload, rsa_private_key, {"b64": True}, algorithm=ALGORITHMS.RS256)
+        assert jws.verify(token, rsa_public_key, payload=payload) == encoded_payload
 
     def test_RSA256(self, payload):
         token = jws.sign(payload, rsa_private_key, algorithm=ALGORITHMS.RS256)
