@@ -12,8 +12,7 @@ from jose.constants import ALGORITHMS
 from jose.exceptions import JWSError, JWSSignatureError
 from jose.utils import base64url_decode, base64url_encode
 
-
-def sign(payload, key, headers=None, algorithm=ALGORITHMS.HS256):
+def sign(payload, key, headers=None, algorithm=ALGORITHMS.HS256, encoder_cls=json.JSONEncoder):
     """Signs a claims set and returns a JWS string.
 
     Args:
@@ -34,7 +33,7 @@ def sign(payload, key, headers=None, algorithm=ALGORITHMS.HS256):
 
     Examples:
 
-        >>> jws.sign({'a': 'b'}, 'secret', algorithm='HS256')
+        >>> jws.sign({'a': 'b'},'secret',algorithm='HS256')
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoiYiJ9.jiMyrsmD8AoHWeQgmxZ5yq8z0lXS67_QGs52AzC8Ru8'
 
     """
@@ -43,7 +42,7 @@ def sign(payload, key, headers=None, algorithm=ALGORITHMS.HS256):
         raise JWSError("Algorithm %s not supported." % algorithm)
 
     encoded_header = _encode_header(algorithm, additional_headers=headers)
-    encoded_payload = _encode_payload(payload)
+    encoded_payload = _encode_payload(payload, encoder_cls=encoder_cls)
     signed_output = _sign_header_and_claims(encoded_header, encoded_payload, algorithm, key)
 
     return signed_output
@@ -144,12 +143,13 @@ def _encode_header(algorithm, additional_headers=None):
     return base64url_encode(json_header)
 
 
-def _encode_payload(payload):
+def _encode_payload(payload, encoder_cls):
     if isinstance(payload, Mapping):
         try:
             payload = json.dumps(
                 payload,
                 separators=(",", ":"),
+                cls=encoder_cls,
             ).encode("utf-8")
         except ValueError:
             pass
