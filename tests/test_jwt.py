@@ -8,7 +8,6 @@ except ImportError:
     from datetime import timezone  # Preferred in Python 3.12 and below
     UTC = timezone.utc
 
-
 import pytest
 
 from jose import jws, jwt
