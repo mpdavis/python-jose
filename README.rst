@@ -87,8 +87,8 @@ This library was originally based heavily on the work of the folks over at PyJWT
 .. |pypi| image:: https://img.shields.io/pypi/v/python-jose?style=flat-square
    :target: https://pypi.org/project/python-jose/
    :alt: PyPI
-.. |Github Actions CI Status| image:: https://github.com/mpdavis/python-jose/workflows/main/badge.svg?branch=master
-   :target: https://github.com/mpdavis/python-jose/actions?workflow=main
+.. |Github Actions CI Status| image:: https://github.com/mpdavis/python-jose/actions/workflows/ci.yml/badge.svg
+   :target: https://github.com/mpdavis/python-jose/actions/workflows/ci.yml
    :alt: Github Actions CI Status
 .. |Coverage Status| image:: http://codecov.io/github/mpdavis/python-jose/coverage.svg?branch=master
    :target: http://codecov.io/github/mpdavis/python-jose?branch=master
