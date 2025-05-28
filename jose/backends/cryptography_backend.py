@@ -3,7 +3,6 @@ import warnings
 
 from cryptography.exceptions import InvalidSignature, InvalidTag
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.bindings.openssl.binding import Binding
 from cryptography.hazmat.primitives import hashes, hmac, serialization
 from cryptography.hazmat.primitives.asymmetric import ec, padding, rsa
 from cryptography.hazmat.primitives.asymmetric.utils import decode_dss_signature, encode_dss_signature
@@ -25,32 +24,10 @@ from ..utils import (
     is_ssh_key,
     long_to_base64,
 )
+from . import get_random_bytes
 from .base import Key
 
 _binding = None
-
-
-def get_random_bytes(num_bytes):
-    """
-    Get random bytes
-
-    Currently, Cryptography returns OS random bytes. If you want OpenSSL
-    generated random bytes, you'll have to switch the RAND engine after
-    initializing the OpenSSL backend
-    Args:
-        num_bytes (int): Number of random bytes to generate and return
-    Returns:
-        bytes: Random bytes
-    """
-    global _binding
-
-    if _binding is None:
-        _binding = Binding()
-
-    buf = _binding.ffi.new("char[]", num_bytes)
-    _binding.lib.RAND_bytes(buf, num_bytes)
-    rand_bytes = _binding.ffi.buffer(buf, num_bytes)[:]
-    return rand_bytes
 
 
 class CryptographyECKey(Key):
