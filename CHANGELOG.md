@@ -1,5 +1,22 @@
 # Changelog #
 
+## 3.5.0 -- 2025-05-28 ##
+
+### News ###
+
+* Remove support for Python 3.8
+* Added support for Python 3.12 & 3.13
+* Upgrade to pyasn1 0.5.1+
+* Upgrade to pytest and other dependencies
+* Add RTD config file to silence emailed deprecation warnings
+
+### Bug fixes and Improvements ###
+
+* Remove get_random_bytes from cryptography backend
+* Do not use `utc_now` on module level
+* Remove key data (sensitive information) from JWKError exceptions
+* Added possibility to call jwk.construct() with a private RSA key
+
 ## 3.4.0 -- 2025-02-14 ##
 
 ### News ###
@@ -8,12 +25,13 @@
 * Added support for Python 3.10 and 3.11
 
 ### Bug fixes and Improvements ###
+
 * Updating `CryptographyAESKey::encrypt` to generate 96 bit IVs for GCM block
   cipher mode
 * Fix for PEM key comparisons caused by line lengths and new lines
 * Fix for CVE-2024-33664 - JWE limited to 250KiB
 * Fix for CVE-2024-33663 - signing JWT with public key is now forbidden
-* Replace usage of deprecated datetime.utcnow() with datetime.now(UTC) 
+* Replace usage of deprecated datetime.utcnow() with datetime.now(UTC)
 
 ### Housekeeping ###
 
@@ -69,14 +87,14 @@ This is a greatly overdue release.
 * Improve `JWT.decode()` #76 (fixes #75)
 * Sort headers when serializing to allow for headless JWT #136 (fixes #80)
 * Adjust dependency handling
-  - Use PyCryptodome instead of PyCrypto #83
-  - Update package dependencies #124 (fixes #158)
+  * Use PyCryptodome instead of PyCrypto #83
+  * Update package dependencies #124 (fixes #158)
 * Avoid using deprecated methods #85
 * Support X509 certificates #107
 * Isolate and flesh out cryptographic backends to enable independent operation #129 (fixes #114)
-  - Remove pyca/cryptography backend's dependency on python-ecdsa #117
-  - Remove pycrypto/dome backends' dependency on python-rsa #121
-  - Make pyca/cryptography backend the preferred backend if multiple backends are present #122
+  * Remove pyca/cryptography backend's dependency on python-ecdsa #117
+  * Remove pycrypto/dome backends' dependency on python-rsa #121
+  * Make pyca/cryptography backend the preferred backend if multiple backends are present #122
 
 ### Bugfixes/Improvements ###
 
