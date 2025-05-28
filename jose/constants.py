@@ -96,3 +96,5 @@ class Zips:
 
 
 ZIPS = Zips()
+
+JWE_SIZE_LIMIT = 250 * 1024

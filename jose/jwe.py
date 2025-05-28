@@ -6,13 +6,13 @@ from struct import pack
 
 from . import jwk
 from .backends import get_random_bytes
-from .constants import ALGORITHMS, ZIPS
+from .constants import ALGORITHMS, JWE_SIZE_LIMIT, ZIPS
 from .exceptions import JWEError, JWEParseError
 from .utils import base64url_decode, base64url_encode, ensure_binary
 
 
 def encrypt(plaintext, key, encryption=ALGORITHMS.A256GCM, algorithm=ALGORITHMS.DIR, zip=None, cty=None, kid=None):
-    """Encrypts plaintext and returns a JWE cmpact serialization string.
+    """Encrypts plaintext and returns a JWE compact serialization string.
 
     Args:
         plaintext (bytes): A bytes object to encrypt
@@ -76,6 +76,13 @@ def decrypt(jwe_str, key):
         >>> jwe.decrypt(jwe_string, 'asecret128bitkey')
         'Hello, World!'
     """
+
+    # Limit the token size - if the data is compressed then decompressing the
+    # data could lead to large memory usage. This helps address This addresses
+    # CVE-2024-33664. Also see _decompress()
+    if len(jwe_str) > JWE_SIZE_LIMIT:
+        raise JWEError(f"JWE string {len(jwe_str)} bytes exceeds {JWE_SIZE_LIMIT} bytes")
+
     header, encoded_header, encrypted_key, iv, cipher_text, auth_tag = _jwe_compact_deserialize(jwe_str)
 
     # Verify that the implementation understands and can process all
@@ -424,13 +431,13 @@ def _compress(zip, plaintext):
         (bytes): Compressed plaintext
     """
     if zip not in ZIPS.SUPPORTED:
-        raise NotImplementedError("ZIP {} is not supported!")
+        raise NotImplementedError(f"ZIP {zip} is not supported!")
     if zip is None:
         compressed = plaintext
     elif zip == ZIPS.DEF:
         compressed = zlib.compress(plaintext)
     else:
-        raise NotImplementedError("ZIP {} is not implemented!")
+        raise NotImplementedError(f"ZIP {zip} is not implemented!")
     return compressed
 
 
@@ -446,13 +453,18 @@ def _decompress(zip, compressed):
         (bytes): Compressed plaintext
     """
     if zip not in ZIPS.SUPPORTED:
-        raise NotImplementedError("ZIP {} is not supported!")
+        raise NotImplementedError(f"ZIP {zip} is not supported!")
     if zip is None:
         decompressed = compressed
     elif zip == ZIPS.DEF:
-        decompressed = zlib.decompress(compressed)
+        # If, during decompression, there is more data than expected, the
+        # decompression halts and raise an error. This addresses CVE-2024-33664
+        decompressor = zlib.decompressobj()
+        decompressed = decompressor.decompress(compressed, max_length=JWE_SIZE_LIMIT)
+        if decompressor.unconsumed_tail:
+            raise JWEError(f"Decompressed JWE string exceeds {JWE_SIZE_LIMIT} bytes")
     else:
-        raise NotImplementedError("ZIP {} is not implemented!")
+        raise NotImplementedError(f"ZIP {zip} is not implemented!")
     return decompressed
 
 
@@ -530,7 +542,7 @@ def _get_key_wrap_cek(enc, key):
 
 def _get_random_cek_bytes_for_enc(enc):
     """
-    Get the random cek bytes based on the encryptionn algorithm
+    Get the random cek bytes based on the encryption algorithm
 
     Args:
         enc (str): Encryption algorithm
