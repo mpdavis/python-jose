@@ -311,6 +311,16 @@ class TestJWT:
 
         jwt.decode(token, key, options=options)
 
+    def test_time_travel(self, key):
+
+        nbf = datetime(2015, 10, 21, 16, 29)
+        now = datetime(2015, 10, 21, 18, 0)
+        exp = datetime(2015, 10, 21, 19, 28)
+        claims = {"exp": exp, "nbf": nbf}
+        token = jwt.encode(claims, key)
+
+        jwt.decode(token, key, now=now)
+
     def test_aud_string(self, key):
         aud = "audience"
 

@@ -63,7 +63,17 @@ def encode(claims, key, algorithm=ALGORITHMS.HS256, headers=None, access_token=N
     return jws.sign(claims, key, headers=headers, algorithm=algorithm)
 
 
-def decode(token, key, algorithms=None, options=None, audience=None, issuer=None, subject=None, access_token=None):
+def decode(
+    token,
+    key,
+    algorithms=None,
+    options=None,
+    audience=None,
+    issuer=None,
+    subject=None,
+    access_token=None,
+    now=None,
+):
     """Verifies a JWT string's signature and validates reserved claims.
 
     Args:
@@ -91,6 +101,7 @@ def decode(token, key, algorithms=None, options=None, audience=None, issuer=None
             claim set, then the access_token must be included, and it must match
             the "at_hash" claim.
         options (dict): A dictionary of options for skipping validation steps.
+        now (datetime): Current time. If not set, defaults to current system time.
 
             defaults = {
                 'verify_signature': True,
@@ -179,6 +190,7 @@ def decode(token, key, algorithms=None, options=None, audience=None, issuer=None
         algorithm=algorithm,
         access_token=access_token,
         options=defaults,
+        now=now,
     )
 
     return claims
@@ -271,7 +283,7 @@ def _validate_iat(claims):
         raise JWTClaimsError("Issued At claim (iat) must be an integer.")
 
 
-def _validate_nbf(claims, leeway=0):
+def _validate_nbf(now, claims, leeway=0):
     """Validates that the 'nbf' claim is valid.
 
     The "nbf" (not before) claim identifies the time before which the JWT
@@ -283,6 +295,7 @@ def _validate_nbf(claims, leeway=0):
     NumericDate value.  Use of this claim is OPTIONAL.
 
     Args:
+        now (datetime): Current time.
         claims (dict): The claims dictionary to validate.
         leeway (int): The number of seconds of skew that is allowed.
     """
@@ -295,13 +308,13 @@ def _validate_nbf(claims, leeway=0):
     except ValueError:
         raise JWTClaimsError("Not Before claim (nbf) must be an integer.")
 
-    now = timegm(datetime.now(UTC).utctimetuple())
+    now = timegm(now.utctimetuple())
 
     if nbf > (now + leeway):
         raise JWTClaimsError("The token is not yet valid (nbf)")
 
 
-def _validate_exp(claims, leeway=0):
+def _validate_exp(now, claims, leeway=0):
     """Validates that the 'exp' claim is valid.
 
     The "exp" (expiration time) claim identifies the expiration time on
@@ -313,6 +326,7 @@ def _validate_exp(claims, leeway=0):
     containing a NumericDate value.  Use of this claim is OPTIONAL.
 
     Args:
+        now (datetime): Current time.
         claims (dict): The claims dictionary to validate.
         leeway (int): The number of seconds of skew that is allowed.
     """
@@ -325,7 +339,7 @@ def _validate_exp(claims, leeway=0):
     except ValueError:
         raise JWTClaimsError("Expiration Time claim (exp) must be an integer.")
 
-    now = timegm(datetime.now(UTC).utctimetuple())
+    now = timegm(now.utctimetuple())
 
     if exp < (now - leeway):
         raise ExpiredSignatureError("Signature has expired.")
@@ -472,7 +486,17 @@ def _validate_at_hash(claims, access_token, algorithm):
         raise JWTClaimsError("at_hash claim does not match access_token.")
 
 
-def _validate_claims(claims, audience=None, issuer=None, subject=None, algorithm=None, access_token=None, options=None):
+def _validate_claims(
+    claims,
+    audience=None,
+    issuer=None,
+    subject=None,
+    algorithm=None,
+    access_token=None,
+    options=None,
+    now=None,
+):
+
     leeway = options.get("leeway", 0)
 
     if isinstance(leeway, timedelta):
@@ -491,10 +515,12 @@ def _validate_claims(claims, audience=None, issuer=None, subject=None, algorithm
         _validate_iat(claims)
 
     if options.get("verify_nbf"):
-        _validate_nbf(claims, leeway=leeway)
+        now = now or datetime.now(UTC)
+        _validate_nbf(now, claims, leeway=leeway)
 
     if options.get("verify_exp"):
-        _validate_exp(claims, leeway=leeway)
+        now = now or datetime.now(UTC)
+        _validate_exp(now, claims, leeway=leeway)
 
     if options.get("verify_aud"):
         _validate_aud(claims, audience=audience)
