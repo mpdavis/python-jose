@@ -235,7 +235,7 @@ def test_incorrect_public_key_hmac_signing():
     def b64(x):
         return base64.urlsafe_b64encode(x).replace(b"=", b"")
 
-    KEY = CryptographyEc.generate_private_key(CryptographyEc.SECP256R1)
+    KEY = CryptographyEc.generate_private_key(CryptographyEc.SECP256R1(), CryptographyEc.SECP256R1)
     PUBKEY = KEY.public_key().public_bytes(
         encoding=serialization.Encoding.OpenSSH,
         format=serialization.PublicFormat.OpenSSH,
