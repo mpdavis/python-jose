@@ -1,4 +1,4 @@
 pycryptodome
 rsa
-ecdsa != 0.15
+cryptography >=3.4.0
 pyasn1
