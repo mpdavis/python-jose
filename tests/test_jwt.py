@@ -359,6 +359,38 @@ class TestJWT:
         token = jwt.encode(claims, key)
         jwt.decode(token, key, audience=aud)
 
+    def test_aud_none_with_aud_claim_present(self, key):
+        # RFC 7519 4.1.3: a principal only has to identify itself in the
+        # "aud" claim when it verifies as an intended recipient. A caller
+        # that passes audience=None is not identifying itself, so a present
+        # "aud" claim must not cause verification to fail. See issue #389.
+        claims = {"aud": "audience"}
+
+        token = jwt.encode(claims, key)
+        jwt.decode(token, key, audience=None)
+
+    def test_aud_none_with_aud_list_claim_present(self, key):
+        claims = {"aud": ["audience", "another"]}
+
+        token = jwt.encode(claims, key)
+        jwt.decode(token, key, audience=None)
+
+    def test_aud_none_default_argument(self, key):
+        # audience defaults to None, so omitting it entirely must also pass
+        # when the token carries an "aud" claim.
+        claims = {"aud": "audience"}
+
+        token = jwt.encode(claims, key)
+        jwt.decode(token, key)
+
+    def test_aud_verify_disabled_with_aud_claim(self, key):
+        # verify_aud=False must still skip the check even when an audience
+        # is supplied and would otherwise mismatch.
+        claims = {"aud": "audience"}
+
+        token = jwt.encode(claims, key)
+        jwt.decode(token, key, audience="other", options={"verify_aud": False})
+
     def test_aud_not_string_or_list(self, key):
         aud = 1
 
