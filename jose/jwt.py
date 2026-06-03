@@ -363,7 +363,7 @@ def _validate_aud(claims, audience=None):
         raise JWTClaimsError("Invalid claim format in token")
     if any(not isinstance(c, str) for c in audience_claims):
         raise JWTClaimsError("Invalid claim format in token")
-    if audience not in audience_claims:
+    if audience is not None and audience not in audience_claims:
         raise JWTClaimsError("Invalid audience")
 
 
