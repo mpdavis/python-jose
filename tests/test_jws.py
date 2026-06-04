@@ -90,6 +90,64 @@ class TestJWS:
         assert verified_data["testkey"] == "testvalue"
 
 
+class TestCrit:
+    """RFC 7515 section 4.1.11 "crit" (Critical) header enforcement."""
+
+    def _make_token(self, secret, headers):
+        import base64
+
+        header = {"alg": "HS256", "typ": "JWT"}
+        header.update(headers)
+        header_segment = base64.urlsafe_b64encode(json.dumps(header, separators=(",", ":")).encode("utf-8")).rstrip(
+            b"="
+        )
+        claims_segment = base64.urlsafe_b64encode(b'{"a":"b"}').rstrip(b"=")
+        signing_input = header_segment + b"." + claims_segment
+
+        from jose import jwk
+
+        key = jwk.construct(secret, "HS256")
+        signature = base64.urlsafe_b64encode(key.sign(signing_input)).rstrip(b"=")
+        return (signing_input + b"." + signature).decode("utf-8")
+
+    def test_unsupported_crit_extension_is_rejected(self):
+        # A correctly signed token whose protected header declares an
+        # unsupported critical extension must fail closed (RFC 7515 4.1.11).
+        token = self._make_token(
+            "secret",
+            {"crit": ["x-custom-policy"], "x-custom-policy": "require-mfa"},
+        )
+        with pytest.raises(JWSError):
+            jws.verify(token, "secret", ["HS256"])
+
+    def test_token_without_crit_still_verifies(self):
+        token = self._make_token("secret", {})
+        assert jws.verify(token, "secret", ["HS256"]) == b'{"a":"b"}'
+
+    def test_crit_not_a_list_is_rejected(self):
+        token = self._make_token("secret", {"crit": "x-custom-policy"})
+        with pytest.raises(JWSError):
+            jws.verify(token, "secret", ["HS256"])
+
+    def test_empty_crit_list_is_rejected(self):
+        token = self._make_token("secret", {"crit": []})
+        with pytest.raises(JWSError):
+            jws.verify(token, "secret", ["HS256"])
+
+    def test_crit_with_non_string_entry_is_rejected(self):
+        token = self._make_token("secret", {"crit": ["x-custom-policy", 1]})
+        with pytest.raises(JWSError):
+            jws.verify(token, "secret", ["HS256"])
+
+    def test_crit_skipped_when_verify_disabled(self):
+        # verify=False should not enforce crit, mirroring signature skipping.
+        token = self._make_token(
+            "secret",
+            {"crit": ["x-custom-policy"], "x-custom-policy": "require-mfa"},
+        )
+        assert jws.verify(token, "secret", ["HS256"], verify=False) == b'{"a":"b"}'
+
+
 class TestJWK:
     def test_jwk(self, payload):
         key_data = "key"
