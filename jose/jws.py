@@ -74,6 +74,7 @@ def verify(token, key, algorithms, verify=True):
     header, payload, signing_input, signature = _load(token)
 
     if verify:
+        _validate_crit(header)
         _verify_signature(signing_input, header, signature, key, algorithms)
 
     return payload
@@ -204,6 +205,40 @@ def _load(jwt):
         raise JWSError("Invalid crypto padding")
 
     return (header, payload, signing_input, signature)
+
+
+# Header parameter names that may legitimately appear in a "crit" list and
+# that this library understands. RFC 7515 forbids the standard header
+# parameters defined by RFC 7515/7518 from being listed in "crit", so this set
+# is intentionally empty: python-jose does not implement any of the optional
+# extensions (for example "b64" from RFC 7797) that "crit" is meant to flag.
+_UNDERSTOOD_CRIT_HEADERS = frozenset()
+
+
+def _validate_crit(header):
+    """Enforce RFC 7515 section 4.1.11 "crit" (Critical) header handling.
+
+    A JWS whose protected header lists a critical extension that the verifier
+    does not understand MUST be rejected (fail closed). python-jose implements
+    none of the optional "crit" extensions, so any well-formed, non-empty
+    "crit" list is unsupported. Malformed "crit" values are also rejected.
+    """
+    if "crit" not in header:
+        return
+
+    crit = header["crit"]
+
+    # Per RFC 7515, "crit" must be an array of non-empty case-sensitive strings.
+    if not isinstance(crit, list) or not crit:
+        raise JWSError("Invalid crit header: must be a non-empty list of strings")
+
+    for name in crit:
+        if not isinstance(name, str) or not name:
+            raise JWSError("Invalid crit header: must be a non-empty list of strings")
+
+    unsupported = [name for name in crit if name not in _UNDERSTOOD_CRIT_HEADERS]
+    if unsupported:
+        raise JWSError("Unsupported crit header parameter(s): %s" % ", ".join(unsupported))
 
 
 def _sig_matches_keys(keys, signing_input, signature, alg):
