@@ -1,3 +1,4 @@
+import hmac
 import json
 from calendar import timegm
 from datetime import datetime, timedelta
@@ -468,7 +469,8 @@ def _validate_at_hash(claims, access_token, algorithm):
         msg = "Unable to calculate at_hash to verify against token claims."
         raise JWTClaimsError(msg)
 
-    if claims["at_hash"] != expected_hash:
+    at_hash = claims["at_hash"]
+    if not isinstance(at_hash, str) or not hmac.compare_digest(at_hash, expected_hash):
         raise JWTClaimsError("at_hash claim does not match access_token.")
 
 

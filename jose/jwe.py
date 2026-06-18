@@ -1,4 +1,5 @@
 import binascii
+import hmac
 import json
 import zlib
 from collections.abc import Mapping
@@ -244,7 +245,7 @@ def _decrypt_and_auth(cek_bytes, enc, cipher_text, iv, aad, auth_tag):
         raise NotImplementedError(f"enc {enc} is not implemented!")
 
     plaintext = encryption_key.decrypt(cipher_text, iv, aad, auth_tag)
-    if auth_tag != auth_tag_check:
+    if not hmac.compare_digest(auth_tag, auth_tag_check):
         raise JWEError("Invalid JWE Auth Tag")
 
     return plaintext
