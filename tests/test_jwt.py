@@ -353,11 +353,17 @@ class TestJWT:
         with pytest.raises(JWTError):
             jwt.decode(token, key, audience="AUDIENCE")
 
-    def test_aud_empty_claim(self, claims, key):
-        aud = "audience"
-
+    def test_aud_missing_claim_no_audience(self, claims, key):
+        # Token without 'aud' and no audience expected: should pass
         token = jwt.encode(claims, key)
-        jwt.decode(token, key, audience=aud)
+        jwt.decode(token, key)
+
+    def test_aud_missing_claim_with_audience(self, claims, key):
+        # Token without 'aud' but caller requires an audience: should be rejected
+        aud = "audience"
+        token = jwt.encode(claims, key)
+        with pytest.raises(JWTError):
+            jwt.decode(token, key, audience=aud)
 
     def test_aud_not_string_or_list(self, key):
         aud = 1
@@ -522,12 +528,15 @@ class TestJWT:
         if callable(value):
             value = value()
         options = {"require_" + claim: True, "verify_" + claim: False}
+        # Only pass audience when the claim under test is actually "aud";
+        # passing audience for other claims would wrongly trigger the missing-aud check.
+        audience = str(value) if claim == "aud" else None
 
         token = jwt.encode(claims, key)
         with pytest.raises(JWTError):
-            jwt.decode(token, key, options=options, audience=str(value))
+            jwt.decode(token, key, options=options, audience=audience)
 
         new_claims = dict(claims)
         new_claims[claim] = value
         token = jwt.encode(new_claims, key)
-        jwt.decode(token, key, options=options, audience=str(value))
+        jwt.decode(token, key, options=options, audience=audience)
