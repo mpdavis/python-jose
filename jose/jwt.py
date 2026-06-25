@@ -352,8 +352,8 @@ def _validate_aud(claims, audience=None):
     """
 
     if "aud" not in claims:
-        # if audience:
-        #     raise JWTError('Audience claim expected, but not in claims')
+        if audience is not None:
+            raise JWTClaimsError("Token is missing the 'aud' claim")
         return
 
     audience_claims = claims["aud"]
