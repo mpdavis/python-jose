@@ -140,6 +140,14 @@ def decrypt(jwe_str, key):
         try:
             cek_bytes = key.unwrap_key(encrypted_key)
 
+            # An unwrap that returns the wrong number of bytes is a padding
+            # failure that did not raise: PKCS1v15 implementations may return
+            # arbitrary bytes from their constant-time path instead of raising.
+            # Treat it exactly like a raised error so that length errors stay
+            # indistinguishable from format and padding errors (RFC 7516 §11.5).
+            if len(cek_bytes) != len(_get_random_cek_bytes_for_enc(enc)):
+                raise JWEError("Invalid CEK length")
+
             # Record whether the CEK could be successfully determined for this
             # recipient or not.
             cek_valid = True
