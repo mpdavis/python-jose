@@ -1,4 +1,5 @@
 import json
+import os
 
 import pytest
 
@@ -7,7 +8,7 @@ from jose import jwe
 from jose.constants import ALGORITHMS, ZIPS
 from jose.exceptions import JWEError, JWEParseError
 from jose.jwk import AESKey, RSAKey
-from jose.utils import base64url_decode
+from jose.utils import base64url_decode, base64url_encode
 
 backends = []
 try:
@@ -356,6 +357,38 @@ class TestDecrypt:
         )
         with pytest.raises(JWEParseError):
             jwe.decrypt(jwe_str, "key")
+
+    @pytest.mark.skipif(RSAKey is None, reason="No RSA backend")
+    def test_rsa1_5_malformed_keys_are_indistinguishable(self):
+        """RFC 7516 §11.5: format, padding and length errors must not be distinguishable.
+
+        PKCS1v15 unwrapping does not raise for every malformed encrypted key —
+        the constant-time path can return arbitrary bytes instead. Those must be
+        rejected the same way a raised error is, or the resulting length-specific
+        message becomes a padding oracle.
+        """
+        header = base64url_encode(json.dumps({"alg": "RSA1_5", "enc": "A256GCM"}).encode())
+
+        def malformed_token():
+            return b".".join(
+                [
+                    header,
+                    base64url_encode(os.urandom(256)),
+                    base64url_encode(os.urandom(12)),
+                    base64url_encode(os.urandom(32)),
+                    base64url_encode(os.urandom(16)),
+                ]
+            ).decode()
+
+        messages = set()
+        for _ in range(50):
+            with pytest.raises(JWEError) as exc:
+                jwe.decrypt(malformed_token(), PRIVATE_KEY_PEM)
+            messages.add(str(exc.value))
+
+        assert messages == {
+            "Invalid JWE Auth Tag"
+        }, f"malformed keys produced distinguishable errors: {sorted(messages)}"
 
 
 class TestEncrypt:
