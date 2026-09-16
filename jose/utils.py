@@ -163,3 +163,70 @@ def is_ssh_key(key: bytes) -> bool:
         if _CERT_SUFFIX == key_type[-len(_CERT_SUFFIX) :]:
             return True
     return False
+
+
+_DER_INTEGER = 0x02
+_DER_SEQUENCE = 0x30
+_DER_CONSTRUCTED = 0x20
+
+
+def _read_der_element(key: bytes, pos: int):
+    """Parse the DER element at ``pos``.
+
+    Returns its ``(tag, content_start, end)`` offsets, or ``None`` if the
+    element is not well-formed DER.
+    """
+    if pos + 2 > len(key):
+        return None
+    tag = key[pos]
+    length = key[pos + 1]
+    content_start = pos + 2
+    if length & 0x80:
+        # Long form: the low bits hold the number of subsequent length bytes.
+        # Zero of them means the indefinite length that DER forbids.
+        length_bytes = length & 0x7F
+        if not 1 <= length_bytes <= 4 or content_start + length_bytes > len(key):
+            return None
+        length = int.from_bytes(key[content_start : content_start + length_bytes], "big")
+        content_start += length_bytes
+    end = content_start + length
+    if end > len(key):
+        return None
+    return tag, content_start, end
+
+
+def _are_der_elements_well_formed(key: bytes, pos: int, end: int) -> bool:
+    """Whether ``key[pos:end]`` is a sequence of DER elements that tile it exactly."""
+    while pos < end:
+        element = _read_der_element(key, pos)
+        if element is None:
+            return False
+        tag, content_start, element_end = element
+        if element_end > end:
+            return False
+        # Only constructed elements hold further elements; the contents of a
+        # primitive one (a BIT STRING wrapping a key, say) are opaque bytes.
+        if tag & _DER_CONSTRUCTED and not _are_der_elements_well_formed(key, content_start, element_end):
+            return False
+        pos = element_end
+    return True
+
+
+def is_der_format(key: bytes) -> bool:
+    """Whether ``key`` is a DER-encoded asymmetric key or x509 certificate.
+
+    DER has no armor or prefix to match on, so it is recognized by its ASN.1
+    structure instead: a single SEQUENCE spanning the whole input, opening with
+    the SEQUENCE (an AlgorithmIdentifier or TBSCertificate) or INTEGER (a
+    version or modulus) that every such encoding starts with.
+    """
+    element = _read_der_element(key, 0)
+    if element is None:
+        return False
+    tag, content_start, end = element
+    if tag != _DER_SEQUENCE or end != len(key):
+        return False
+    first_child = _read_der_element(key, content_start)
+    if first_child is None or first_child[0] not in (_DER_SEQUENCE, _DER_INTEGER):
+        return False
+    return _are_der_elements_well_formed(key, content_start, end)

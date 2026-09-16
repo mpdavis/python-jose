@@ -20,6 +20,7 @@ from ..utils import (
     base64url_decode,
     base64url_encode,
     ensure_binary,
+    is_der_format,
     is_pem_format,
     is_ssh_key,
     long_to_base64,
@@ -540,7 +541,7 @@ class CryptographyHMACKey(Key):
         if isinstance(key, str):
             key = key.encode("utf-8")
 
-        if is_pem_format(key) or is_ssh_key(key):
+        if is_pem_format(key) or is_ssh_key(key) or is_der_format(key):
             raise JWKError(
                 "The specified key is an asymmetric key or x509 certificate and"
                 " should not be used as an HMAC secret."
