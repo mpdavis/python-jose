@@ -1,16 +1,16 @@
 import binascii
 import json
 
-try:
-    from collections.abc import Iterable, Mapping
-except ImportError:
-    from collections import Mapping, Iterable
-
 from jose import jwk
 from jose.backends.base import Key
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWSError, JWSSignatureError
 from jose.utils import base64url_decode, base64url_encode
+
+try:
+    from collections.abc import Iterable, Mapping
+except ImportError:
+    from collections import Iterable, Mapping
 
 
 def sign(payload, key, headers=None, algorithm=ALGORITHMS.HS256):

@@ -1,5 +1,11 @@
 # Changelog #
 
+## 4.0.0 ##
+
+* Remove dependencies on ecdsa, pyasn1, rsa.
+  cryptography is now a required dependency.
+  Remove non-cryptography backends.
+
 ## 3.5.0 -- 2025-05-28 ##
 
 ### News ###

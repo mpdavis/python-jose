@@ -2,29 +2,16 @@ import base64
 import json
 import re
 
+import pytest
+from cryptography.hazmat.backends import default_backend as CryptographyBackend
+from cryptography.hazmat.primitives import hashes, hmac, serialization
+from cryptography.hazmat.primitives.asymmetric import ec as CryptographyEc
+
 from jose import jwt
 from jose.backends import ECKey
+from jose.backends.cryptography_backend import CryptographyECKey
 from jose.constants import ALGORITHMS
 from jose.exceptions import JOSEError, JWKError
-
-try:
-    import ecdsa
-
-    from jose.backends.ecdsa_backend import ECDSAECKey
-except ImportError:
-    ECDSAECKey = ecdsa = None
-
-try:
-    from cryptography.hazmat.backends import default_backend as CryptographyBackend
-    from cryptography.hazmat.primitives import hashes, hmac, serialization
-    from cryptography.hazmat.primitives.asymmetric import ec as CryptographyEc
-
-    from jose.backends.cryptography_backend import CryptographyECKey
-
-except ImportError:
-    CryptographyECKey = CryptographyEc = CryptographyBackend = None
-
-import pytest
 
 private_key = """-----BEGIN EC PRIVATE KEY-----
 MHcCAQEEIOiSs10XnBlfykk5zsJRmzYybKdMlGniSJcssDvUcF6DoAoGCCqGSM49
@@ -81,22 +68,10 @@ def normalize_pem(key_pem_str):
 
 def _backend_exception_types():
     """Build the backend exception types based on available backends."""
-    if None not in (ECDSAECKey, ecdsa):
-        yield ECDSAECKey, ecdsa.BadDigestError
-
-    if CryptographyECKey is not None:
-        yield CryptographyECKey, TypeError
-
-
-@pytest.mark.ecdsa
-@pytest.mark.skipif(None in (ECDSAECKey, ecdsa), reason="python-ecdsa backend not available")
-def test_key_from_ecdsa():
-    key = ecdsa.SigningKey.from_pem(private_key)
-    assert not ECKey(key, ALGORITHMS.ES256).is_public()
+    yield CryptographyECKey, TypeError
 
 
 @pytest.mark.cryptography
-@pytest.mark.skipif(CryptographyECKey is None, reason="pyca/cryptography backend not available")
 @pytest.mark.parametrize(
     "algorithm, expected_length", ((ALGORITHMS.ES256, 32), (ALGORITHMS.ES384, 48), (ALGORITHMS.ES512, 66))
 )
@@ -114,14 +89,12 @@ def test_cryptography_sig_component_length(algorithm, expected_length):
 
 
 @pytest.mark.cryptography
-@pytest.mark.skipif(CryptographyECKey is None, reason="pyca/cryptography backend not available")
 def test_cryptograhy_der_to_raw():
     key = CryptographyECKey(private_key, ALGORITHMS.ES256)
     assert key._der_to_raw(DER_SIGNATURE) == RAW_SIGNATURE
 
 
 @pytest.mark.cryptography
-@pytest.mark.skipif(CryptographyECKey is None, reason="pyca/cryptography backend not available")
 def test_cryptograhy_raw_to_der():
     key = CryptographyECKey(private_key, ALGORITHMS.ES256)
     assert key._raw_to_der(RAW_SIGNATURE) == DER_SIGNATURE
@@ -230,12 +203,11 @@ class TestECAlgorithm:
 
 
 @pytest.mark.cryptography
-@pytest.mark.skipif(CryptographyECKey is None, reason="pyca/cryptography backend not available")
 def test_incorrect_public_key_hmac_signing():
     def b64(x):
         return base64.urlsafe_b64encode(x).replace(b"=", b"")
 
-    KEY = CryptographyEc.generate_private_key(CryptographyEc.SECP256R1)
+    KEY = CryptographyEc.generate_private_key(CryptographyEc.SECP256R1())
     PUBKEY = KEY.public_key().public_bytes(
         encoding=serialization.Encoding.OpenSSH,
         format=serialization.PublicFormat.OpenSSH,

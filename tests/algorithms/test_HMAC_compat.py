@@ -1,17 +1,14 @@
 import pytest
 
+from jose.constants import ALGORITHMS
+
 try:
     from jose.backends.cryptography_backend import CryptographyHMACKey
 except ImportError:
     CryptographyHMACKey = None
 
-from jose.backends.native import HMACKey
-from jose.constants import ALGORITHMS
 
-CRYPTO_BACKENDS = (
-    pytest.param(CryptographyHMACKey, id="pyca/cryptography"),
-    pytest.param(HMACKey, id="native"),
-)
+CRYPTO_BACKENDS = (pytest.param(CryptographyHMACKey, id="pyca/cryptography"),)
 
 SUPPORTED_ALGORITHMS = ALGORITHMS.HMAC
 

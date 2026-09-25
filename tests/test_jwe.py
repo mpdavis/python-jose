@@ -3,6 +3,7 @@ import json
 import pytest
 
 import jose.backends
+import jose.backends.cryptography_backend  # noqa E402
 from jose import jwe
 from jose.constants import ALGORITHMS, ZIPS
 from jose.exceptions import JWEError, JWEParseError
@@ -10,21 +11,8 @@ from jose.jwk import AESKey, RSAKey
 from jose.utils import base64url_decode
 
 backends = []
-try:
-    import jose.backends.cryptography_backend  # noqa E402
 
-    backends.append(jose.backends.cryptography_backend)
-except ImportError:
-    pass
-
-import jose.backends.native  # noqa E402
-
-try:
-    from jose.backends.rsa_backend import RSAKey as RSABackendRSAKey
-except ImportError:
-    RSABackendRSAKey = None
-
-backends.append(jose.backends.native)
+backends.append(jose.backends.cryptography_backend)
 
 PRIVATE_KEY_PEM = """-----BEGIN RSA PRIVATE KEY-----
 MIIEowIBAAKCAQEA3AyQGW/Q8AKJH2Mfjv1c67iYcwIn+Z2tpqHDQQV9CfSx9CMs
@@ -134,7 +122,6 @@ class TestGetUnverifiedHeader:
 
 
 @pytest.mark.skipif(AESKey is None, reason="Test requires AES Backend")
-@pytest.mark.skipif(RSAKey is RSABackendRSAKey, reason="RSA Backend does not support all modes")
 class TestDecrypt:
     JWE_RSA_PACKAGES = (
         pytest.param(

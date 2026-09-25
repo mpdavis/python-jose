@@ -1,30 +1,18 @@
 import base64
 import json
 
-try:
-    from jose.backends import rsa_backend
-    from jose.backends.rsa_backend import RSAKey as PurePythonRSAKey
-except ImportError:
-    PurePythonRSAKey = rsa_backend = None
-
-try:
-    from Crypto.PublicKey import RSA as PyCryptoRSA
-except ImportError:
-    PyCryptoRSA = None
-
-try:
-    from cryptography.hazmat.backends import default_backend
-    from cryptography.hazmat.primitives.asymmetric import rsa as pyca_rsa
-
-    from jose.backends.cryptography_backend import CryptographyRSAKey
-except ImportError:
-    default_backend = pyca_rsa = CryptographyRSAKey = None
-
 import pytest
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.asymmetric import rsa as pyca_rsa
 
 from jose.backends import RSAKey
+from jose.backends.cryptography_backend import CryptographyRSAKey
 from jose.constants import ALGORITHMS
 from jose.exceptions import JOSEError, JWKError
+
+PurePythonRSAKey = rsa_backend = None
+PyCryptoRSA = None
+
 
 private_key_4096_pkcs1 = b"""-----BEGIN RSA PRIVATE KEY-----
 MIIJKwIBAAKCAgEAtSKfSeI0fukRIX38AHlKB1YPpX8PUYN2JdvfM+XjNmLfU1M7

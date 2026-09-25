@@ -2,25 +2,13 @@ import base64
 import re
 import struct
 
-# Piggyback of the backends implementation of the function that converts a long
-# to a bytes stream. Some plumbing is necessary to have the signatures match.
-try:
-    from cryptography.utils import int_to_bytes as _long_to_bytes
+from cryptography.utils import int_to_bytes as _long_to_bytes
 
-    def long_to_bytes(n, blocksize=0):
-        return _long_to_bytes(n, blocksize or None)
 
-except ImportError:
-    from ecdsa.ecdsa import int_to_string as _long_to_bytes
-
-    def long_to_bytes(n, blocksize=0):
-        ret = _long_to_bytes(n)
-        if blocksize == 0:
-            return ret
-        else:
-            assert len(ret) <= blocksize
-            padding = blocksize - len(ret)
-            return b"\x00" * padding + ret
+def long_to_bytes(n, blocksize=0):
+    # Piggyback of the backends implementation of the function that converts a long
+    # to a bytes stream. Some plumbing is necessary to have the signatures match.
+    return _long_to_bytes(n, blocksize or None)
 
 
 def long_to_base64(data, size=0):

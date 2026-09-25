@@ -1,12 +1,13 @@
 import pytest
 
+from jose.constants import ALGORITHMS
+from jose.exceptions import JWEError
+
 try:
     from jose.backends.cryptography_backend import CryptographyAESKey
 except ImportError:
     CryptographyAESKey = None
 
-from jose.constants import ALGORITHMS
-from jose.exceptions import JWEError
 
 CRYPTO_BACKENDS = (pytest.param(CryptographyAESKey, id="pyca/cryptography"),)
 

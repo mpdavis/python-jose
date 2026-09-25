@@ -2,6 +2,12 @@ import json
 from calendar import timegm
 from datetime import datetime, timedelta
 
+from jose import jws
+
+from .constants import ALGORITHMS
+from .exceptions import ExpiredSignatureError, JWSError, JWTClaimsError, JWTError
+from .utils import calculate_at_hash, timedelta_total_seconds
+
 try:
     from collections.abc import Mapping
 except ImportError:
@@ -13,12 +19,6 @@ except ImportError:
     from datetime import timezone
 
     UTC = timezone.utc  # Preferred in Python 3.12 and below
-
-from jose import jws
-
-from .constants import ALGORITHMS
-from .exceptions import ExpiredSignatureError, JWSError, JWTClaimsError, JWTError
-from .utils import calculate_at_hash, timedelta_total_seconds
 
 
 def encode(claims, key, algorithm=ALGORITHMS.HS256, headers=None, access_token=None):
