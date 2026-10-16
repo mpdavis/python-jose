@@ -267,7 +267,7 @@ def _validate_iat(claims):
 
     try:
         int(claims["iat"])
-    except ValueError:
+    except (ValueError, TypeError, OverflowError):
         raise JWTClaimsError("Issued At claim (iat) must be an integer.")
 
 
@@ -292,7 +292,7 @@ def _validate_nbf(claims, leeway=0):
 
     try:
         nbf = int(claims["nbf"])
-    except ValueError:
+    except (ValueError, TypeError, OverflowError):
         raise JWTClaimsError("Not Before claim (nbf) must be an integer.")
 
     now = timegm(datetime.now(UTC).utctimetuple())
@@ -322,7 +322,7 @@ def _validate_exp(claims, leeway=0):
 
     try:
         exp = int(claims["exp"])
-    except ValueError:
+    except (ValueError, TypeError, OverflowError):
         raise JWTClaimsError("Expiration Time claim (exp) must be an integer.")
 
     now = timegm(datetime.now(UTC).utctimetuple())

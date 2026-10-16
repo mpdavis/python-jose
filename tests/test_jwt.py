@@ -12,7 +12,7 @@ except ImportError:
 import pytest
 
 from jose import jws, jwt
-from jose.exceptions import JWTError
+from jose.exceptions import JWTClaimsError, JWTError
 
 
 @pytest.fixture
@@ -531,3 +531,19 @@ class TestJWT:
         new_claims[claim] = value
         token = jwt.encode(new_claims, key)
         jwt.decode(token, key, options=options, audience=str(value))
+
+
+class TestTimeClaimTypeErrors:
+    """Non-numeric time claims must raise JWTClaimsError (#420)."""
+
+    @pytest.mark.parametrize("claim", ["exp", "iat", "nbf"])
+    @pytest.mark.parametrize(
+        "bad",
+        [float("inf"), float("-inf"), 1e999, [1, 2], {"x": 1}],
+    )
+    def test_non_integer_time_claim_raises_jwt_claims_error(self, claim, bad):
+        from jose.jwt import _validate_exp, _validate_iat, _validate_nbf
+
+        validators = {"exp": _validate_exp, "iat": _validate_iat, "nbf": _validate_nbf}
+        with pytest.raises(JWTClaimsError):
+            validators[claim]({claim: bad})
