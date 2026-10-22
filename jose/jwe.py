@@ -150,13 +150,19 @@ def decrypt(jwe_str, key):
             # recipient or not.
             cek_valid = False
 
-            # To mitigate the attacks described in RFC 3218 [RFC3218], the
-            # recipient MUST NOT distinguish between format, padding, and length
-            # errors of encrypted keys.  It is strongly recommended, in the event
-            # of receiving an improperly formatted key, that the recipient
-            # substitute a randomly generated CEK and proceed to the next step, to
-            # mitigate timing attacks.
-            cek_bytes = _get_random_cek_bytes_for_enc(enc)
+        # To mitigate the attacks described in RFC 3218 [RFC3218], the
+        # recipient MUST NOT distinguish between format, padding, and length
+        # errors of encrypted keys.  It is strongly recommended, in the event
+        # of receiving an improperly formatted key, that the recipient
+        # substitute a randomly generated CEK and proceed to the next step, to
+        # mitigate timing attacks.
+        try:
+            random_cek_bytes = _get_random_cek_bytes_for_enc(enc)
+        except NotImplementedError:
+            raise JWEError(f"enc {enc} is not implemented")
+        if not cek_valid or len(cek_bytes) != len(random_cek_bytes):
+            cek_valid = False
+            cek_bytes = random_cek_bytes
 
     # Compute the Encoded Protected Header value BASE64URL(UTF8(JWE
     # Protected Header)).  If the JWE Protected Header is not present

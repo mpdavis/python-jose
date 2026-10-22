@@ -7,7 +7,7 @@ from jose import jwe
 from jose.constants import ALGORITHMS, ZIPS
 from jose.exceptions import JWEError, JWEParseError
 from jose.jwk import AESKey, RSAKey
-from jose.utils import base64url_decode
+from jose.utils import base64url_decode, base64url_encode
 
 backends = []
 try:
@@ -335,6 +335,23 @@ class TestDecrypt:
         key = OCT_256_BIT_KEY
         actual = jwe.decrypt(jwe_package, key)
         assert actual == b"Live long and prosper."
+
+    def test_wrong_length_cek_is_not_distinguishable(self):
+        # A CEK that unwraps fine but has the wrong length for enc must fail
+        # the same way as a bad padding (RFC 7516 section 11.5).
+        encrypted_key = RSAKey(PUBLIC_KEY_PEM, ALGORITHMS.RSA1_5).wrap_key(b"\x00" * 16)
+        header = base64url_encode(json.dumps({"alg": "RSA1_5", "enc": "A256GCM"}).encode("utf-8"))
+        jwe_str = b".".join(
+            [
+                header,
+                base64url_encode(encrypted_key),
+                base64url_encode(b"\x00" * 12),
+                b"AAAA",
+                base64url_encode(b"\x00" * 16),
+            ]
+        )
+        with pytest.raises(JWEError, match="Invalid JWE Auth Tag"):
+            jwe.decrypt(jwe_str, PRIVATE_KEY_PEM)
 
     def test_invalid_jwe_is_parse_error(self):
         with pytest.raises(JWEParseError):
