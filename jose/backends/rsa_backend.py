@@ -207,8 +207,7 @@ class RSAKey(Key):
         if not self.is_public():
             warnings.warn("Attempting to verify a message with a private key. " "This is not recommended.")
         try:
-            pyrsa.verify(msg, sig, self._prepared_key)
-            return True
+            return pyrsa.verify(msg, sig, self._prepared_key) == self.hash_alg
         except pyrsa.pkcs1.VerificationError:
             return False
 

@@ -217,6 +217,14 @@ class TestPurePythonRsa:
 
         excinfo.match("Invalid private key encoding")
 
+    @pytest.mark.parametrize("hash_method", ["MD5", "SHA-1", "SHA-512"])
+    def test_python_rsa_verify_rejects_other_hash(self, hash_method):
+        key = PurePythonRSAKey(private_key_4096_pkcs1, ALGORITHMS.RS256)
+        msg = b"test"
+        sig = rsa_backend.pyrsa.sign(msg, key._prepared_key, hash_method)
+
+        assert not key.public_key().verify(msg, sig)
+
 
 @pytest.mark.cryptography
 @pytest.mark.skipif(
