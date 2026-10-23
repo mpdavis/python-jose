@@ -7,7 +7,7 @@ from jose import jwe
 from jose.constants import ALGORITHMS, ZIPS
 from jose.exceptions import JWEError, JWEParseError
 from jose.jwk import AESKey, RSAKey
-from jose.utils import base64url_decode
+from jose.utils import base64url_decode, base64url_encode
 
 backends = []
 try:
@@ -335,6 +335,28 @@ class TestDecrypt:
         key = OCT_256_BIT_KEY
         actual = jwe.decrypt(jwe_package, key)
         assert actual == b"Live long and prosper."
+
+    @pytest.mark.parametrize(
+        "enc, key",
+        (
+            (ALGORITHMS.A128CBC_HS256, OCT_256_BIT_KEY),
+            (ALGORITHMS.A192CBC_HS384, OCT_384_BIT_KEY),
+            (ALGORITHMS.A256CBC_HS512, OCT_512_BIT_KEY),
+        ),
+    )
+    def test_tampered_cipher_text_is_auth_tag_error(self, enc, key):
+        encrypted = jwe.encrypt(b"Live long and prosper.", key, enc, ALGORITHMS.DIR)
+        header, encrypted_key, iv, cipher_text, auth_tag = encrypted.split(b".")
+        tampered = bytearray(base64url_decode(cipher_text))
+        # Flip the last byte of the second-to-last block so that only the final
+        # padding byte of the plaintext changes; flipping a byte in the last
+        # block would scramble the whole block and could leave valid padding.
+        tampered[-17] ^= 0x01
+        cipher_text = base64url_encode(bytes(tampered))
+        encrypted = b".".join((header, encrypted_key, iv, cipher_text, auth_tag))
+        with pytest.raises(JWEError) as excinfo:
+            jwe.decrypt(encrypted, key)
+        assert str(excinfo.value) == "Invalid JWE Auth Tag"
 
     def test_invalid_jwe_is_parse_error(self):
         with pytest.raises(JWEParseError):

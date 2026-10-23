@@ -1,4 +1,5 @@
 import binascii
+import hmac
 import json
 import zlib
 from collections.abc import Mapping
@@ -237,17 +238,16 @@ def _decrypt_and_auth(cek_bytes, enc, cipher_text, iv, aad, auth_tag):
     if enc in ALGORITHMS.HMAC_AUTH_TAG:
         encryption_key, mac_key, key_len = _get_encryption_key_mac_key_and_key_length_from_cek(cek_bytes, enc)
         auth_tag_check = _auth_tag(cipher_text, iv, aad, mac_key, key_len)
+        # Validate the tag before decrypting so that a forged ciphertext is
+        # rejected without ever being decrypted or unpadded.
+        if not hmac.compare_digest(auth_tag, auth_tag_check):
+            raise JWEError("Invalid JWE Auth Tag")
     elif enc in ALGORITHMS.GCM:
-        encryption_key = jwk.construct(cek_bytes, enc)
-        auth_tag_check = auth_tag  # GCM check auth on decrypt
+        encryption_key = jwk.construct(cek_bytes, enc)  # GCM check auth on decrypt
     else:
         raise NotImplementedError(f"enc {enc} is not implemented!")
 
-    plaintext = encryption_key.decrypt(cipher_text, iv, aad, auth_tag)
-    if auth_tag != auth_tag_check:
-        raise JWEError("Invalid JWE Auth Tag")
-
-    return plaintext
+    return encryption_key.decrypt(cipher_text, iv, aad, auth_tag)
 
 
 def _get_encryption_key_mac_key_and_key_length_from_cek(cek_bytes, enc):
