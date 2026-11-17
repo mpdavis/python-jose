@@ -95,6 +95,22 @@ def test_key_from_ecdsa():
     assert not ECKey(key, ALGORITHMS.ES256).is_public()
 
 
+@pytest.mark.ecdsa
+@pytest.mark.skipif(None in (ECDSAECKey, ecdsa), reason="python-ecdsa backend not available")
+def test_ecdsa_key_without_pem_armor_rejected():
+    pem = ecdsa.SigningKey.from_pem(private_key).get_verifying_key().to_pem().decode()
+    bare = "".join(line for line in pem.splitlines() if not line.startswith("-----"))
+
+    # Without the armor the key would also pass HMACKey's asymmetric key
+    # check, so the same public key string could verify an HS256 token.
+    with pytest.raises(JWKError):
+        ECDSAECKey(bare, ALGORITHMS.ES256)
+    with pytest.raises(JWKError):
+        ECDSAECKey(pem.replace("PUBLIC KEY", "EC PUBLIC KEY"), ALGORITHMS.ES256)
+
+    assert ECDSAECKey(pem, ALGORITHMS.ES256).is_public()
+
+
 @pytest.mark.cryptography
 @pytest.mark.skipif(CryptographyECKey is None, reason="pyca/cryptography backend not available")
 @pytest.mark.parametrize(

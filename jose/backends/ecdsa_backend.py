@@ -5,7 +5,7 @@ import ecdsa
 from jose.backends.base import Key
 from jose.constants import ALGORITHMS
 from jose.exceptions import JWKError
-from jose.utils import base64_to_long, long_to_base64
+from jose.utils import base64_to_long, is_pem_format, long_to_base64
 
 
 class ECDSAECKey(Key):
@@ -58,6 +58,13 @@ class ECDSAECKey(Key):
             key = key.encode("utf-8")
 
         if isinstance(key, bytes):
+            # python-ecdsa's from_pem() skips the "-----" armor lines and also
+            # decodes bare base64 DER. HMACKey only refuses PEM-armored keys,
+            # so a key accepted here without armor could also be used as an
+            # HMAC secret. Require real PEM, as the cryptography backend does.
+            if not is_pem_format(key):
+                raise JWKError("Unable to parse an ECKey from key: key is not in PEM format")
+
             # Attempt to load key. We don't know if it's
             # a Signing Key or a Verifying Key, so we try
             # the Verifying Key first.
